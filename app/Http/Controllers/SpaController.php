@@ -13,5 +13,4 @@ class SpaController extends Controller
     public function job_request_settings(){
         return view('layouts.job_request_settings');
     }
-    
 }
