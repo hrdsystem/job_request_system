@@ -43,6 +43,6 @@ class JobRequired extends Model
     }
 
     public function sub_docs(){
-        return $this->hasMany('App\JobRequestSubDocument', 'document_id', 'id')->where('active', 1);
+        return $this->hasMany('App\Models\JobRequestSubDocument', 'document_id', 'id')->where('active', 1);
     }
 }
