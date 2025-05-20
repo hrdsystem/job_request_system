@@ -25,6 +25,7 @@ Route::prefix('/jobMaster')->group(function(){
         Route::post('get_job_requireds', 'getJobRequired');
         Route::post('update_job_required', 'jobRequiredUpdate');
         Route::post('insert_job_required', 'jobRequiredInsert');
+        Route::post('delete_job_required', 'jobRequiredDelete');
     });
 });
 

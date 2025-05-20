@@ -18,6 +18,8 @@ import '@mdi/font/css/materialdesignicons.css'
 import JobRequestApp from '../components/templates/JobRequestApp.vue'
 import JobRequestSettingsApp from '../components/templates/JobRequestSettingsApp.vue';
 
+//MOVABLEDIALOG
+import '../js/movableDialog.js'
 
 // PINIA
 import { createPinia } from 'pinia'
