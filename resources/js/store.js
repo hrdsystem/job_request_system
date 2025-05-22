@@ -102,6 +102,18 @@ export const useSampleStore = defineStore('sampleStore', {
 
     actions: {
         // Global Functions
+        executeSearch(obj){
+            const pageActions = {
+                //SECTION - JOB REQUEST MASTER
+                JobRequestRequiredData: this.jobRequiredPage.bind(this)
+            };
+            const pageAction = pageActions[obj.page];
+            if (pageAction){
+                pageAction();
+            } else{
+                console.log(`no page action is found for ${obj.page}`);
+            }
+        },
         toggleViewMode(value){
             this.viewMode = value
         },
