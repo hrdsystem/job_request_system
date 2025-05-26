@@ -4,6 +4,7 @@ use App\Http\Controllers\JobRequestSettingsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
+use App\Models\JobRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,13 @@ use App\Http\Controllers\ProjectController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix('/jobRequest')->group(function(){
+    Route::controller(JobRequest::class)->group(function (){
+        Route::post('get_job_request', 'getJobRequests');
+        Route::post('job_insert', 'jobRequestInsert');
+    });
 });
 
 Route::prefix('/jobMaster')->group(function(){
