@@ -26,6 +26,7 @@ Route::prefix('/jobRequest')->group(function(){
     Route::controller(JobRequestController::class)->group(function (){
         Route::post('get_job_request', 'getJobRequests');
         Route::post('job_insert', 'jobRequestInsert');
+        Route::post('job_update', 'jobRequestUpdate');
     });
 });
 
