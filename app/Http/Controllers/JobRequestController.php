@@ -72,8 +72,8 @@ class JobRequestController extends Controller
             $data->requested_date = $request->get('requested_date');
             $data->job_ecd = now();
             $data->note = $request->get('note');
-            $data->created_by = 211;
-            $data->updated_by = 211;
+            $data->created_by = 271;
+            $data->updated_by = 271;
             $data->save();
 
             $last_id = $data->id;
@@ -97,5 +97,46 @@ class JobRequestController extends Controller
             return $e->getMessage();
         }
         return $data;
+    }
+
+    public function jobRequestUpdate(Request $request){
+        try{
+            DB::beginTransaction();
+            $data = JobRequest::find($request->get('id'));
+            $data->project_name = $request->get('project_name');
+            $data->subject = $request->get('subject');
+            $data->lot_number = $request->get('lot_number');
+            $data->status = $request->get('status');
+            $data->requested_date = $request->get('requested_date');
+            $data->job_ecd = now();
+            $data->note = $request->get('note');
+            $data->created_by = 271;
+            $data->updated_by = 271;
+            $data->updated_at = now();
+            $data->save();
+
+            $addJobRequirement = json_decode($request->get('addJobRequirement'));
+            if(!empty($addJobRequirement)){
+                foreach($addJobRequirement as $id){
+                    $add[] = array(
+                        "job_request_id" => $request->get('id'),
+                        "document_id" => $id,
+                        "updated_at" => now()
+                    );
+                }
+                DB::table('job_request_requirements')->insert($add);
+            }
+            
+            $removeJobRequirement = json_decode($request->get('removeJobRequirement'));
+            if(!empty($removeJobRequirement)){
+                DB::table('job_request_requirements')->where("job_request_id", $request->get('id'))
+                    ->whereIn('document_id', $removeJobRequirement)
+                    ->delete();
+            }
+            DB::commit();
+            return response()->json(['Success' => 'Update Successful']);
+        } catch(\Exception $e){
+            return $e->getMessage();
+        }
     }
 }
