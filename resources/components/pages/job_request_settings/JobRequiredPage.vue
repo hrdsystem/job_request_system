@@ -286,7 +286,25 @@
         </v-dialog>
 
         <v-dialog v-model="deleteDialog" persistent max-width="300">
-
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Delete this data?</span>
+                    <v-icon style="float: right;" color="white" @click="deleteDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                    <v-btn
+                    color="blue-grey darken-3"
+                    text
+                    @click="Delete"
+                    >Agree</v-btn>
+                    <v-btn
+                        color="blue-grey darken-3"
+                        text
+                        @click="deleteDialog = false"
+                    >Disagree</v-btn>
+                </v-card-actions>
+            </v-card>
         </v-dialog>
 
         <v-dialog v-model="deleteConfirmationDialog" persistent max-width="200">
@@ -311,6 +329,8 @@
             </v-card>
         </v-dialog>
 
+        <snack-bar-component :snackbar="snackbar"></snack-bar-component>
+
         <float-button-component
             :floatButtonData="floatButtonData"
             @addButtonClicked="toggleAddDialog($event)"
@@ -322,7 +342,8 @@
 
 <script setup>
 import ToolBarComponent from '@aspect/ToolBarComponent.vue'
-import FloatButtonComponent from '@aspect/FloatButtonComponent.vue';
+import FloatButtonComponent from '@aspect/FloatButtonComponent.vue'
+import SnackBarComponent from '@aspect/SnackBarComponent.vue'
 </script>
 
 <script>
@@ -353,6 +374,12 @@ export default {
                 deleteButton: true
             },
 
+            snackbar: {
+                color: 'blue-grey',
+                text: '',
+                show: false
+            },
+
             insertDialog: false,
             editDialog: false,
             deleteDialog: false,
@@ -375,8 +402,11 @@ export default {
             'viewMode',
             'tableHeight',
             'rules',
+            'overlay',
             'JobRequestRequiredData',
             'JobRequestRequiredRecords',
+            'JobRequestRequiredSearch',
+            'JobRequestRequiredSort',
             'drawerSubData',
             'drawerSubDataActive',
         ]),
@@ -400,7 +430,9 @@ export default {
             'toggleFilterMode',
             'toggleViewMode',
             'setDrawerSubData',
-            'setSelected'
+            'setSelected',
+            'searchColumn',
+            'sortColumn'
         ]),
 
         toggleAddDialog(){
@@ -413,6 +445,25 @@ export default {
 
         toggleDeleteDialog(){
             this.deleteDialog = true
+        },
+
+        searchCol(e, column){
+            this.searchColumn({
+                selector: e,
+                column: column,
+                page: 'JobRequestRequiredData',
+                search: 'JobRequestRequiredSearch'
+            })
+        },
+
+        sortCol(e, column){
+            this.sortColumn({
+                selector: e,
+                column: column,
+                page: 'JobRequestRequiredData',
+                sort: 'JobRequestRequiredSort'
+            })
+            this.jobRequiredPage()
         },
 
         Edit(data){
@@ -451,7 +502,7 @@ export default {
         },
 
         confirmRemoveItem(){
-            const deleteItemId = this.tempSubDocumentItems[this.itemToRemoveIndex]
+            const deleteItemId = this.tempSubDocumentItems[this.itemToRemoveIndex].id;
             this.deletedItemIds.push(deleteItemId)
             this.tempSubDocumentItems.splice(this.itemToRemoveIndex, 1)
             this.deleteConfirmationDialog = false
@@ -481,14 +532,26 @@ export default {
             .then((res) =>{
                 if(res.data == 1){
                     console.log('required name already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Required Name Already Exists'
+                    this.snackbar.color = 'red darken-2'
                 }
                 else if(res.data == 2){
                     console.log('filling mark already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Filling Mark Already Exists'
+                    this.snackbar.color = 'red darken-2'
                 }
                 else if(res.data == 3){
                     console.log('header name already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Header Name Already Exists'
+                    this.snackbar.color = 'red darken-2'
                 } else{
                     this.insertDialog = false
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Insert Successful'
+                    this.snackbar.color = 'blue-grey'
                     this.jobRequiredPage();
                     console.log('insert working ')
                 }
@@ -515,13 +578,25 @@ export default {
             .then((res) => {
                 if(res.data == 1){
                     console.log('required name already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Required Name Already Exists'
+                    this.snackbar.color = 'red darken-2'
                 }
                 else if(res.data == 2){
                     console.log('filling mark already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Filling Mark Already Exists'
+                    this.snackbar.color = 'red darken-2'
                 }
                 else if(res.data == 3){
                     console.log('header name already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Header Name Already Exists'
+                    this.snackbar.color = 'red darken-2'
                 } else{
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Update Successful'
+                    this.snackbar.color = 'blue-grey'
                     this.editDialog = false
                     this.jobRequiredPage();
                     console.log('update working')
@@ -531,6 +606,25 @@ export default {
                 console.log(res);
             })
         },
+
+        Delete(){
+            console.log('delete is working')
+            axios({
+                method: 'post',
+                url: '/api/jobMaster/delete_job_required',
+                data: {
+                    ids: this.selectedRows
+                }
+            })
+            .then((res) =>{
+                this.selectedRows = []
+                this.snackbar.show = true
+                this.snackbar.text = 'Delete Successful'
+                this.snackbar.color = 'blue-grey'
+                this.deleteDialog = false
+                this.jobRequiredPage()
+            })
+        }
     },
 
     mounted(){
@@ -538,7 +632,7 @@ export default {
     },
 
     watch:{
-        insertDialog(val){
+        insertDialog(val){  
             if(!val){
                 this.tempName = ''
                 this.tempFillName = ''
