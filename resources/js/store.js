@@ -114,6 +114,48 @@ export const useSampleStore = defineStore('sampleStore', {
                 console.log(`no page action is found for ${obj.page}`);
             }
         },
+
+        searchColumn(obj){
+            var obj_index = _.findIndex(this[obj.search], function (o) {
+                return o.column == obj.column;
+            });
+
+            if (obj.selector.value.length == 0){
+                this[obj.search].splice(obj.index, 1);
+            } else{
+                if(obj_index > -1){
+                    this[obj.search][obj_index].val = obj.selector.value;
+                } else{
+                    this[obj.search].push({ column: obj.column, val: obj.selector.value });
+                }
+            }
+
+            if (this.searchTimeout){
+                clearTimeout(this.searchTimeout);
+            }
+            this.searchTimeout = setTimeout(() => {
+                this.executeSearch(obj);
+            }, 1000);
+        },
+
+        sortColumn(obj){
+            var asc = _.findIndex(this[obj.sort], { column: obj.column, val: "ASC"}); 
+            var desc = _.findIndex(this[obj.sort], { column: obj.column, val: "DESC"});
+
+            if(asc > - 1){
+                this[obj.sort].splice(asc, 1)
+                this[obj.sort].unshift({ column: obj.column, val: "DESC"})
+                obj.selector.classList.remove("ASC")
+                obj.selector.classList.add("DESC")
+            } else if (desc > -1){
+                this[obj.sort].splice(desc, 1)
+                obj.selector.classList.remove("DESC")
+            } else {
+                obj.selector.classList.add("ASC")
+                this[obj.sort].unshift({ column: obj.column, val: "ASC" })
+            }
+            this[obj.page] = [];
+        },
         toggleViewMode(value){
             this.viewMode = value
         },
