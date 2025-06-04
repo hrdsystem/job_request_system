@@ -77,8 +77,8 @@ class JobRequestSettingsController extends Controller
                 $data->required_name = $request->get('required_name');
                 $data->filling_mark = $request->get('filling_mark');
                 $data->header_name = $request->get('header_name');
-                $data->created_by = 211;
-                $data->updated_by = 211;
+                $data->created_by = 271;
+                $data->updated_by = 271;
                 $data->save();
                 DB::commit();
             } catch(\Exception $e){
@@ -113,8 +113,8 @@ class JobRequestSettingsController extends Controller
                 $data->required_name = $request->get('required_name');
                 $data->filling_mark = $request->get('filling_mark');
                 $data->header_name = $request->get('header_name');
-                $data->created_by = 211;
-                $data->updated_by = 211;
+                $data->created_by = 271;
+                $data->updated_by = 271;
                 $data->save();
 
                 $data_sub = json_decode($request->sub_docs);
@@ -151,11 +151,16 @@ class JobRequestSettingsController extends Controller
 
     public function jobRequiredDelete(Request $request){
         // return $request;
-
-        JobRequired::whereIn('id', $request->input('ids'))->update([
-            'deleted_by' => 211,
-            'deleted_at' => now()
-        ]);
-        JobRequired::Reseq();
+        try{
+            JobRequired::whereIn('id', $request->id)
+            ->update([
+                'deleted_by' => 271,
+                'deleted_at' => now()
+            ]);
+            JobRequired::Reseq();
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return response()->json(['success' => 'Delete Successfully ']);
     }
 }
