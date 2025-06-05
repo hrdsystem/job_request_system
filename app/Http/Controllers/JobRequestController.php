@@ -139,4 +139,35 @@ class JobRequestController extends Controller
             return $e->getMessage();
         }
     }
+
+    public function jobRequestDelete(Request $request){
+        try{
+            JobRequest::whereIn('id', $request->id)
+            ->update([
+                'deleted_by' => 271,
+                'deleted_at' => now()
+            ]);
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return response()->json(['success' => 'Delete Successfully ']);
+    }
+
+    public function jobRequestStatusChange(Request $request){
+        try{
+            DB::beginTransaction();
+            $data = JobRequest::find($request->get('id'));
+            $data->status = $request->get('status');
+            $data->save();
+
+            DB::commit();
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return response()->json(['success' => 'Update Successfully ']);
+    }
+
+    public function getRequiredDocuments(Request $request){
+        
+    }
 }
