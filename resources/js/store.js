@@ -10,6 +10,8 @@ export const useSampleStore = defineStore('sampleStore', {
             filterMode: false,
             editMode: false,
             overlay: false,
+            allSelected: false,
+            searchTimeout: null,
 
             JobRequestData: [],
             JobRequestRecords: 0,
@@ -26,6 +28,9 @@ export const useSampleStore = defineStore('sampleStore', {
             
             masterDrawerProjects: [],
             masterProjectSearch: null,
+
+            drawerSubData: {},
+            drawerSubDataActive: null,
 
             rules: {
                 required: [
@@ -105,7 +110,8 @@ export const useSampleStore = defineStore('sampleStore', {
         executeSearch(obj){
             const pageActions = {
                 //SECTION - JOB REQUEST MASTER
-                JobRequestRequiredData: this.jobRequiredPage.bind(this)
+                JobRequestRequiredData: this.jobRequiredPage.bind(this),
+                JobRequestData: this.jobRequestPage.bind(this)
             };
             const pageAction = pageActions[obj.page];
             if (pageAction){
@@ -156,6 +162,7 @@ export const useSampleStore = defineStore('sampleStore', {
             }
             this[obj.page] = [];
         },
+
         toggleViewMode(value){
             this.viewMode = value
         },
@@ -186,7 +193,7 @@ export const useSampleStore = defineStore('sampleStore', {
 
         jobRequestPage(){
             this.overlay = true
-            axios.post(`/api/job_requests/get_job_requests`,{
+            axios.post(`/api/jobRequest/get_job_request`,{
                 search: this.JobRequestSearch,
                 sort: this.JobRequestSort
             })
@@ -201,7 +208,7 @@ export const useSampleStore = defineStore('sampleStore', {
 
         jobRequiredPage(){
             this.overlay = true
-            axios.post(`/api/job_requests_master/get_job_requireds`,{
+            axios.post(`/api/jobMaster/get_job_requireds`,{
                 search: this.JobRequestRequiredSearch,
                 sort: this.JobRequestRequiredSort
             })
@@ -212,6 +219,39 @@ export const useSampleStore = defineStore('sampleStore', {
             }).catch(error =>{
                 console.log(error)
             })
-        }
+        },
+
+        setDrawerSubData(obj){
+            console.log('obj', obj)
+            this.drawerSubData = obj.data
+            this.drawerSubDataActive = obj.index
+        },
+
+        // setSelected(obj){
+        //     var index = _.indexOf(this.selectedRows, obj.id);
+
+        //     if(obj.val){
+        //         this.selectedRows.push(obj.id)
+        //     }else{
+        //         this.selectedRows.splice(index, 1)
+        //     }
+        // },
+        
+        setSelected(index){
+        const currentIndex = this.selectedRows.indexOf(index);
+            if(currentIndex === -1){
+                this.selectedRows.push(index);
+                console.log(`Added row ${index} to selectedRows:`, this.selectedRows);
+            }else{
+                this.selectedRows.splice(currentIndex, 1);
+                console.log(`Removed row ${index} from selectedRows:`, this.selectedRows);
+            }
+        },
+
+        resetToggleSelectAll(){
+            this.allSelected = false;
+            this.allSelected = [];
+            this.selectedRows = [];
+        },
     },
 })
