@@ -129,6 +129,145 @@
                 </template>
             </tbody>
         </v-table>
+
+        <v-dialog v-model="insertDialog" persistent max-width="600" @keydown.esc="insertDialog = false">
+            <v-form id="Insert" ref="Insert" @submit.prevent="Insert">
+                <v-card>
+                    <v-card-title>
+                        <span class="headline">Add Required Job</span>
+                        <v-icon style="float: right;" color="white" @click="insertDialog = false">mdi-close</v-icon>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="tempName"
+                                    @keyup="tempName = $event.target.value.toUpperCase()"
+                                    label="PROJECT NAME"
+                                    name="project_name"
+                                    :rules="rules.required"
+                                    class="uppercase-value"
+                                    dense
+                                    outlined
+                                    persistent-placeholder
+                                    autocomplete="off"
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>PROJECT NAME</span>
+                                </template>
+                                </v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="tempSubject"
+                                    @keyup="tempSubject = $event.target.value.toUpperCase()"
+                                    label="SUBJECT"
+                                    name="subject"
+                                    class="required uppercase-value"
+                                    :rules="rules.required"
+                                    dense
+                                    outlined
+                                    required
+                                    autocomplete="off"
+                                    persistent-placeholder
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>SUBJECT</span>
+                                </template>
+                                </v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="tempLot"
+                                    @keyup="tempLot = $event.target.value.toUpperCase()"
+                                    label="LOT #"
+                                    name="lot_number"
+                                    class="uppercase-value"
+                                    :rules="rules.required"
+                                    dense
+                                    outlined
+                                    persistent-placeholder
+                                    autocomplete="off"
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>LOT #</span>
+                                </template>
+                                </v-text-field>
+                            </v-col>
+                            <v-col>
+                                <v-menu
+                                    v-model="insertDatepicker"
+                                    :close-on-content-click="false"
+                                    offset-y
+                                    max-width="290px"
+                                    min-width="290px"
+                                >
+                                    <template v-slot:activator="{ props }">
+                                        <v-text-field
+                                            v-model="formattedDate"
+                                            v-bind="props"
+                                            @click:clear="tempAddIssuedDate = null"
+                                            label="REQUESTED DUE DATE" 
+                                            name="requested_date"
+                                            clearable
+                                            dense
+                                            outlined
+                                            readonly
+                                            persistent-placeholder
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="tempAddIssuedDate"
+                                        @update:model-value ="insertDatepicker = false"
+                                    ></v-date-picker>
+                                </v-menu>
+                            </v-col>
+                            <v-col cols="12" sm="12" md="12">
+                                <v-textarea
+                                    v-model="tempNote"
+                                    name="note"
+                                    label="Note"
+                                    class="optional"
+                                    rows="3"
+                                    outlined
+                                    dense
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: green">#</span>Note</span>
+                                </template>
+                                </v-textarea>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-file-input
+                                    label="Attachment/s"
+                                    prepend-icon="mdi-file"
+                                    persistent-placeholder
+                                    variant="outlined"
+                                    multiple
+                                    dense
+                                ></v-file-input>
+                            </v-col>
+                            <v-col cols="12" class="mb-1">
+                                <b class="pl-1 required-label">JOB Requirements</b>
+                            </v-col>
+                            <v-row class="mx-1">
+                                <template v-for="(job_document, index) in JobRequestRequiredData" :key="index">
+                                    <v-col cols="4" sm="4" md="4">
+                                        <v-checkbox multiple v-model="tempAddJobRequirement" :label="job_document.required_name.toUpperCase()" :value="job_document.id" color="indigo"></v-checkbox>
+                                    </v-col>
+                                </template>
+                            </v-row>
+                        </v-row>
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-btn text color="blue-grey darken-3">SEND</v-btn>
+                        <v-btn type="submit" text color="blue-grey darken-3">SUBMIT</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-form>
+        </v-dialog>
+
     </v-container>
 </template>
 
