@@ -550,6 +550,36 @@
             </v-card>
         </v-dialog>
 
+        <v-dialog v-model="statusDialog" persistent max-width="250px" @keydown.esc="statusDialog = false">
+            <v-form id="Status" ref="Status" @submit.prevent="Status">
+                <template v-slot:default="{ props }">
+                    <v-card>
+                        <v-card-title>
+                            <span class="headline">Update Status</span>
+                            <v-icon style="float: right;" color="white" @click="statusDialog = false">mdi-close</v-icon>
+                        </v-card-title>
+                        <v-card-text>
+                            <v-select
+                                v-model="tempStatus"
+                                :items="statusItem"
+                                item-value="value"
+                                item-title="text"
+                                label="Status"
+                                name="status"
+                            >
+                            </v-select>
+                            <input type="hidden" name="id" :value="editData.id">
+                        </v-card-text>
+                        <v-divider></v-divider>
+                        <v-card-actions>
+                            <v-btn @click="statusDialog = false" color="red">Cancel</v-btn>
+                            <v-btn type="submit" text color="success">save</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </template>
+            </v-form>
+        </v-dialog>
+
     </v-container>
 </template>
 
