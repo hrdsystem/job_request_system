@@ -526,6 +526,30 @@
             </v-card>
         </v-dialog>
 
+        <v-dialog v-model="sendDialog" persistent max-width="600" @keydown.esc="sendDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">{{ uploadDialog ? 'Send Uploading Changes' : 'Send Request' }}</span>
+                    <v-icon style="float: right;" color="white" @click="sendDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-text>
+                    <v-row class="mx-2" v-if="!uploadDialog">
+                        <v-col>
+                            <b>Email Subject:</b><br>
+                            <b class="ml-4">working</b>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" sm="6" md="6">
+                            <v-autocomplete
+                            
+                            ></v-autocomplete>
+                        </v-col>
+                    </v-row>
+                </v-card-text -card-text>
+            </v-card>
+        </v-dialog>
+
     </v-container>
 </template>
 
