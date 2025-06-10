@@ -493,6 +493,39 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <v-dialog v-model="cancelDialog" persistent max-width="300" @keydown.esc="cancelDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Cancel Request?</span>
+                    <v-icon style="float: right;" color="white" @click="cancelDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-text>
+                    <v-col cols="12" class="mb-0">
+                        <v-textarea
+                            v-model="cancellingReason"
+                            label="Reason for Cancelling"
+                            name="cancelling_reason"
+                            persistent-placeholder
+                            :rules="rules.required"
+                            rows="3"
+                        ></v-textarea>
+                    </v-col>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                    <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                            <v-btn color="primary" depressed :disabled="cancellingReason == null || cancellingReason == ''" @click="toggleSendDialog()" v-bind="props">
+                                <v-icon>mdi-send</v-icon>Send
+                            </v-btn>
+                        </template>
+                        <span>Send to Email</span>
+                    </v-tooltip>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
     </v-container>
 </template>
 
