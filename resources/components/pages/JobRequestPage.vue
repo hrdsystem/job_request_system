@@ -616,6 +616,10 @@
 
 <script setup>
 import ToolBarComponent from '@aspect/ToolBarComponent.vue'
+import SnackBarComponent from '@aspect/SnackBarComponent.vue'
+import FloatButtonComponent from '@aspect/FloatButtonComponent.vue'
+import {useDisplay} from 'vuetify'
+const { xs } = useDisplay()
 </script>
 
 <script>
