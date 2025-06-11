@@ -580,6 +580,37 @@
             </v-form>
         </v-dialog>
 
+        <v-dialog v-model="deleteDialog" persistent max-width="300" @keydown.esc="deleteDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span>Delete this record?</span>
+                    <v-icon style="float: right;" color="white" @click="deleteDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="blue-grey darken-3"
+                        text
+                        @click="Delete"
+                    >Agree
+                    </v-btn>
+                    <v-btn
+                        color="blue-grey darken-3"
+                        text
+                        @click="deleteDialog = false"
+                    >Disagree</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <snack-bar-component :snackbar="snackbar"></snack-bar-component>
+
+        <float-button-component
+            :floatButtonData="floatButtonData"
+            @addButtonClicked="toggleAddDialog($event)"
+            @editButtonClicked="floatButtonData.editButtonActive = !floatButtonData.editButtonActive"
+            @deleteButtonHandle="toggleDeleteDialog($event)"
+        ></float-button-component>
     </v-container>
 </template>
 
