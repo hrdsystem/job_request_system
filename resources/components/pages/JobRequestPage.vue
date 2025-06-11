@@ -623,7 +623,7 @@ const { xs } = useDisplay()
 </script>
 
 <script>
-import {mapState,mapActions} from 'pinia'
+import {mapState,mapActions, mapWritableState} from 'pinia'
 import {useSampleStore} from '../../js/store'
 export default {
     data(){
@@ -644,6 +644,62 @@ export default {
                 info: false,
                 key: false
             },
+            floatButtonData:{
+                addButton: true,
+                editButton: true,
+                deleteButton: true
+            },
+
+            snackbar: {
+                color: 'blue-grey',
+                text: '',
+                show: false
+            },
+            
+
+            //SECTION - DIALOGS
+            insertDialog: false,
+            editDialog: false,
+            deleteDialog: false,
+            uploadDialog: false,
+            cancelDialog: false,
+            sendDialog:false,
+            statusDialog: false,
+
+            //SECTION - ADD & EDIT DIALOG DATA
+            tempAddIssuedDate: '',
+            tempName: null,
+            tempSubject: null,
+            tempLot: null,
+            tempNote: null,
+            tempAddJobRequirement: [],
+            tempStatus: null,
+            insertDatepicker: false,
+            editECD: false,
+            editData: [],
+            
+            //SECTION - ARRAY DATA FOR UPLOADING
+            uploadTab: 0,
+            ECD: null,
+            currentDocument: {},
+            requestDetails: {},
+            requiredDocuments: [],
+
+            //SECTION - FOR CANCELLING REQUEST / SENDING EMAIL
+            cancellingReason: null,
+            toRecipients: [],
+            ccRecipients: [],
+            projectMembers: [],
+            toSearchStr: [],
+            ccSearchStr: [],
+
+            //SECTION - STATUS ITEM
+            statusItem:[
+                { value: 0, text: 'NEW', color: 'rgba(231, 76, 60, 1)' }, // Red
+                { value: 1, text: 'ONGOING', color: 'rgba(52, 152, 219, 1)' }, // Blue
+                { value: 2, text: 'COMPLETED', color: 'rgba(46, 204, 113, 1)' }, // Green
+                { value: 3, text: 'CANCELLED', color: 'rgba(217, 217, 217, 1)' } // Grey
+            ]
         }
     },
 
