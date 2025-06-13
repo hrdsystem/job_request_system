@@ -782,6 +782,15 @@ export default {
                 search: 'JobRequestSearch'
             })
         },
+
+        sortCol(){
+            this.sortColumn({
+                selector: e,
+                column: column,
+                page: 'JobRequestPage',
+                sort: 'JobRequestSort'
+            })
+        },
     }
 }
 </script>
