@@ -393,7 +393,30 @@
                     <v-divider></v-divider>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn type="submit" color="blue-grey darken-3">SUBMIT</v-btn>
+                        <v-tooltip location="bottom">
+                            <template v-slot:activator="{ props }">
+                                <v-btn style="border: 1px solid grey; background-color: #e74c3c;" color="white" @click="cancelRequestDialog()" v-bind="props">
+                                    <v-icon>mdi-email-remove-outline</v-icon>CANCEL
+                                </v-btn>
+                            </template>
+                            <span>CANCEL REQUEST</span>
+                        </v-tooltip>
+                        <v-tooltip location="bottom">
+                            <template v-slot:activator="{ props }">
+                                <v-btn style="border: 1px solid grey; background-color: #227093;" color="white" v-bind="props">
+                                    <v-icon>mdi-email-edit-outline</v-icon>REVISE
+                                </v-btn>
+                            </template>
+                            <span>REVISE</span>
+                        </v-tooltip>
+                        <v-tooltip location="bottom">
+                            <template v-slot:activator="{ props }">
+                                <v-btn type="submit" style="border: 1px solid grey" color="blue-grey darken-3" v-bind="props">
+                                    <v-icon>mdi-content-save</v-icon>SAVE
+                                </v-btn>
+                            </template>
+                            <span>SAVE</span>
+                        </v-tooltip>
                     </v-card-actions>
                 </v-card>
             </v-form>
