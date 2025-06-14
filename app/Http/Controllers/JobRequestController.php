@@ -13,10 +13,47 @@ use App\Models\JobRequestSubDocument;
 use App\Models\JobRequired;
 use App\Models\JobRequest;
 use App\Models\IconnUser;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Date;
 
 class JobRequestController extends Controller
-{
+{   
+
+    private function base64Decode($file){
+        $data = $file;
+        list($type, $data) = explode(';', $data);
+        list(, $data)      = explode(',', $data);
+        return base64_decode($data);
+    }
+    
+    public function filesystem(){
+        if(App::environment('development') || App::environment('local') || App::environment('production')) {
+            return 'public';
+        }else{
+            return 's3'; 
+        }
+    }
+
+    private function file_details($attachment)
+    {
+        $attachment = (array) json_decode($attachment);
+
+        if (!$attachment) {
+            $file['orig_filename'] = null;
+            $file['file_hash'] = null;
+            $file['file_data'] = null;
+        } else {
+            // $unique_id = Uuid::generate();
+            $unique_id = Str::uuid()->toString();
+            $file = pathinfo($attachment['filename']);
+            $file['orig_filename'] = $attachment['filename'];
+            $file['file_hash'] = $unique_id . '.' . $file['extension'];
+            $file['file_data'] = isset($attachment['data']) ? $attachment['data'] : null;
+        }
+
+        return $file;
+    }
+
     public function getJobRequests(Request $request){
         $cnt = JobRequest::when(request('search'), function ($q) {
             for($i=0;$i<count(request('search'));$i++){
@@ -53,6 +90,7 @@ class JobRequestController extends Controller
             }
             return $q;
         })
+        ->with('attachments')
         ->get();
         
         return [$data, $cnt];
@@ -92,6 +130,27 @@ class JobRequestController extends Controller
                 DB::table('job_request_requirements')->insert($arr);
             }
 
+            if (!empty($request->attachments)) {
+                foreach ($request->attachments as $file) {
+                    $file_details = $this->file_details($file);
+                    $attachments[] = [
+                        'job_request_id' => $last_id,
+                        'orig_filename' => $file_details['orig_filename'],
+                        'file_hash' => $file_details['file_hash'],
+                        'updated_by' => 211,
+                        'updated_at' => new \DateTime
+                    ];
+    
+                    if (!is_null($file_details['file_data'])) {
+                        Storage::disk($this->filesystem())->put("job_request/" . $last_id . "/attachments/" . $file_details['file_hash'], $this->base64Decode($file_details['file_data']));
+                    }
+                }
+
+                if (isset($attachments)) {
+                    DB::table('job_attachments')->insert($attachments);
+                }
+            }
+
             DB::commit();
         } catch(\Exception $e){
             return $e->getMessage();
@@ -106,7 +165,6 @@ class JobRequestController extends Controller
             $data->project_name = $request->get('project_name');
             $data->subject = $request->get('subject');
             $data->lot_number = $request->get('lot_number');
-            $data->status = $request->get('status');
             $data->requested_date = $request->get('requested_date');
             $data->job_ecd = now();
             $data->note = $request->get('note');
