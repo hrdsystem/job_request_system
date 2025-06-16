@@ -915,6 +915,25 @@ export default {
             }
         },
 
+        Delete(){
+            console.log('delete is working')
+            axios({
+                method: 'post',
+                url: '/api/jobRequest/job_delete',
+                data:{
+                    id: this.selectedRows.map(index => this.JobRequestData[index].id)
+                }
+            })
+            .then((res) =>{
+                this.snackbar.show = true
+                this.snackbar.text = 'Delete Successful'
+                this.snackbar.color = 'blue-grey'
+                this.jobRequestPage()
+                this.deleteDialog = false
+                this.resetToggleSelectAll()
+            })
+        },
+
     }
 }
 </script>
