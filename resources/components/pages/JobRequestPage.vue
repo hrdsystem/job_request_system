@@ -887,6 +887,34 @@ export default {
             })
         },
 
+        Update(){
+            if(this.$refs.Update.validate()){
+                var myform = document.getElementById('Update')
+                var formdata = new FormData(myform)
+
+                const addJobRequirement =   _.difference(this.tempAddJobRequirement, this.oldJobRequirement)
+                const removeJobRequirement = _.difference(this.oldJobRequirement, this.tempAddJobRequirement)
+
+                formdata.set("addJobRequirement", JSON.stringify(addJobRequirement));
+                formdata.set("removeJobRequirement", JSON.stringify(removeJobRequirement));
+
+                axios({
+                    method: 'post',
+                    url: '/api/jobRequest/job_update',
+                    data: formdata
+                })
+                .then((res) =>{
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Update Successful'
+                    this.snackbar.color = 'blue-grey'
+                    this.editDialog = false
+                    this.jobRequestPage()
+                }).catch((res) =>{
+                    console.log(res)
+                })
+            }
+        },
+
     }
 }
 </script>
