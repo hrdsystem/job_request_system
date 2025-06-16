@@ -792,6 +792,42 @@ export default {
             })
             this.jobRequestPage()
         },
+
+        statusEditDialog(data){
+            this.editData = data
+            this.tempStatus = data.status
+            this.statusDialog = true
+        },
+
+        toggleUploadDialog(data){
+            this.requestDetails = data
+            this.requiredDocuments = []
+            this.jobRequiredPage(data.id)
+            this.uploadDialog = true
+        },
+
+        cancelRequestDialog(){
+            this.cancellingReason = ''
+            this.cancelDialog = true
+        },
+
+        toggleSendDialog(){
+            this.sendDialog = true
+        },
+
+        toggleAddDialog(){
+            this.insertDialog = true
+            this.tempName = null
+            this.tempLot = null
+            this.tempSubject = null
+            this.tempAddIssuedDate = null
+            this.tempNote = null
+            this.tempAddJobRequirement = []
+        },
+
+        toggleDeleteDialog(){
+            this.deleteDialog = true
+        },
     }
 }
 </script>
