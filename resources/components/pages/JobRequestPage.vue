@@ -860,6 +860,33 @@ export default {
             this.oldJobRequirement = [...data.requirements]
         },
 
+        Insert(){
+            if(this.$refs.Insert.validate()){
+                var myform = document.getElementById('Insert')
+                var formdata = new FormData(myform)
+
+                formdata.set('documents', JSON.stringify(this.tempAddJobRequirement))
+
+                for(var i = 0; i < this.addAttachments.length; i++ ) {
+                    formdata.append("attachments[]",JSON.stringify(this.addAttachments[i]))
+                }
+            }
+            axios({
+                method: 'post',
+                url: '/api/jobRequest/job_insert',
+                data: formdata
+            })
+            .then((res) =>{
+                this.snackbar.show = true
+                this.snackbar.text = 'Insert Successful'
+                this.snackbar.color = 'blue-grey'
+                this.insertDialog = false
+                this.jobRequestPage()
+            }).catch((res) =>{
+                console.log(res)
+            })
+        },
+
     }
 }
 </script>
