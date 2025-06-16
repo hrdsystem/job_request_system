@@ -239,8 +239,13 @@
                                 </template>
                                 </v-textarea>
                             </v-col>
-                            <v-col cols="6" sm="6" md="6">
+                            <v-col cols="6" sm="6" md="6"
+                                @drop.prevent="multiDropFile('tempAddAttachments', 'addAttachments', $event.dataTransfer.files)"
+                                @dragover.prevent
+                                @change="multiChangeFile('tempAddAttachments', 'addAttachments')"
+                            >
                                 <v-file-input
+                                    v-model="tempAddAttachments"
                                     label="Attachment/s"
                                     prepend-icon="mdi-file"
                                     persistent-placeholder
@@ -248,6 +253,25 @@
                                     multiple
                                     dense
                                 ></v-file-input>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="6"></v-col>
+                            <v-col cols="12" class="mb-5" v-if="addAttachments.length > 0">
+                                <v-table>
+                                    <tbody>
+                                        <tr v-for="(file, index) in  addAttachments" :key="'cf' + index">
+                                            <td class="text-center" width="40px">
+                                                <v-icon @click="deleteItemDialog = true; tempRemoveFiles = {model: 'addAttachments', index: index}">mdi-delete</v-icon>
+                                            </td>
+                                            <td class="text-center" width="100px">
+                                                <v-icon size="50px">{{ getIcon(file.filename) }}</v-icon>
+                                            </td>
+                                            <td>
+                                                <span>Original file name:</span>
+                                                <a :href="file.url" target="_blank" :download="file.filename">{{file.filename}}</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </v-table>
                             </v-col>
                             <v-col cols="12" class="mb-1">
                                 <b class="pl-1 required-label">JOB Requirements</b>
