@@ -828,6 +828,22 @@ export default {
         toggleDeleteDialog(){
             this.deleteDialog = true
         },
+
+        toggleSelectAll(){
+            this.allSelected =  !this.allSelected
+            if(this.allSelected){
+                this.selectedRows = this.JobRequestData.map((_, index) => index)
+                console.log('Select All', this.selectedRows)
+            } else{
+                this.selectedRows = []
+                console.log('DESELECT', this.selectedRows)
+            }
+        },
+
+        toggleAttachmentDialog(attachments) {
+            this.attachments = attachments
+            this.attachmentDialog = true
+        },
     }
 }
 </script>
