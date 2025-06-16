@@ -8,12 +8,13 @@
                         <v-checkbox style="display: flex;" color="white" :input-value="allSelected" @change="toggleSelectAll()"></v-checkbox>
                     </th>
                     <th rowspan="2" v-show="floatButtonData.editButtonActive" class="text-left" style="width:20px">Edit</th>
-                    <th rowspan="2">PROJECT NAME</th>
-                    <th rowspan="2">SUBJECT</th>
-                    <th rowspan="2">LOT #</th>
-                    <th rowspan="2">STATUS</th>
-                    <th rowspan="2">REQUESTED <br> BY</th>
-                    <th rowspan="2">REQUESTED DUE <br> DATE</th>
+                    <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.project_name')">PROJECT NAME</th>
+                    <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.subject')">SUBJECT</th>
+                    <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.lot_number')">LOT #</th>
+                    <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.status')">STATUS</th>
+                    <th rowspan="2">Att</th>
+                    <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.created_by')">REQUESTED <br> BY</th>
+                    <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.requested_date')">REQUESTED DUE <br> DATE</th>
                     <th rowspan="2" class="text-center">ECD</th>
                     <th :colspan="JobRequestRequiredData.length" style="border-bottom: 1px solid #d9d9d9 !important;" class="text-center">JOB DOCUMENT</th>
                     <th rowspan="2" class="text-center">Actions</th>
@@ -33,25 +34,26 @@
                     <th v-show="floatButtonData.editButtonActive"></th>
                     <th v-show="floatButtonData.editButtonActive"></th>
                     <th>
-                        <v-text-field variant="solo" placeholder="Search"></v-text-field>
+                        <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'job_requests.project_name')"></v-text-field>
                     </th>
                     <th>
-                        <v-text-field variant="solo" placeholder="Search"></v-text-field>
+                        <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'job_requests.subject')"></v-text-field>
                     </th>
                     <th>
-                        <v-text-field variant="solo" placeholder="Search"></v-text-field>
+                        <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'job_requests.lot_number')"></v-text-field>
+                    </th>
+                    <th>
+                        <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'job_requests.status')"></v-text-field>
                     </th>
                     <th></th>
                     <th>
-                        <v-text-field variant="solo" placeholder="Search"></v-text-field>
+                        <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'users.username')"></v-text-field>
                     </th>
                     <th>
-                        <v-text-field variant="solo" placeholder="Search"></v-text-field>
-                    </th>
-                    <th>
-                        <v-text-field variant="solo" placeholder="Search"></v-text-field>
+                        <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'job_requests.requested_date')"></v-text-field>
                     </th>
                     <th v-for="header in JobRequestRequiredData" :key="'b'+header.id"></th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
