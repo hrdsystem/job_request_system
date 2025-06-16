@@ -778,18 +778,19 @@ export default {
             this.searchColumn({
                 selector: e,
                 column: column,
-                page: 'JobRequestPage',
+                page: 'JobRequestData',
                 search: 'JobRequestSearch'
             })
         },
 
-        sortCol(){
+        sortCol(e, column){
             this.sortColumn({
                 selector: e,
                 column: column,
-                page: 'JobRequestPage',
+                page: 'JobRequestData',
                 sort: 'JobRequestSort'
             })
+            this.jobRequestPage()
         },
     }
 }
