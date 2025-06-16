@@ -844,6 +844,22 @@ export default {
             this.attachments = attachments
             this.attachmentDialog = true
         },
+
+        Edit(data){
+            console.log(data)
+            this.editDialog = true
+            this.editData = data
+            this.tempName = data.project_name
+            this.tempSubject = data.subject
+            this.tempLot = data.lot_number
+            this.tempStatus = data.status
+            this.tempAddIssuedDate = data.requested_date
+            this.tempNote = data.note
+            this.tempAddJobRequirement = data.requirements
+
+            this.oldJobRequirement = [...data.requirements]
+        },
+
     }
 }
 </script>
