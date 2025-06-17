@@ -13,6 +13,7 @@ use App\Models\JobRequestSubDocument;
 use App\Models\JobRequired;
 use App\Models\JobRequest;
 use App\Models\IconnUser;
+use App\Models\JobAttachment;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Date;
 
@@ -29,7 +30,7 @@ class JobRequestController extends Controller
     public function filesystem(){
         if(App::environment('development') || App::environment('local') || App::environment('production')) {
             return 'public';
-        }else{
+        }else{                                
             return 's3'; 
         }
     }
@@ -52,6 +53,27 @@ class JobRequestController extends Controller
         }
 
         return $file;
+    }
+
+    public function openAttachment($attachment_id, $filename){
+
+        $attachment = JobAttachment::findorFail($attachment_id);
+        $viewable = [
+            'pdf',
+            'jpg',
+            'png'
+        ];
+
+        $extension = pathinfo($attachment->orig_filename, PATHINFO_EXTENSION);
+        $inline = in_array(strtolower($extension), $viewable) ? 'inline' : 'attachment';
+        $temp_filepath = tempnam(sys_get_temp_dir(), '');
+        $file_data = Storage::disk($this->filesystem())->get('job_request/' . $attachment->job_request_id . '/attachments/' . $attachment->file_hash);
+        
+        file_put_contents($temp_filepath, $file_data);
+
+        return response()
+            ->download($temp_filepath, $attachment->orig_filename, ['filename' => $attachment->orig_filename], $inline)
+            ->deleteFileAfterSend();
     }
 
     public function getJobRequests(Request $request){
