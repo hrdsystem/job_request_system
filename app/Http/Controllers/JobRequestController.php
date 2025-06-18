@@ -181,6 +181,7 @@ class JobRequestController extends Controller
     }
 
     public function jobRequestUpdate(Request $request){
+        // return $request;
         try{
             DB::beginTransaction();
             $data = JobRequest::find($request->get('id'));
@@ -213,6 +214,43 @@ class JobRequestController extends Controller
                     ->whereIn('document_id', $removeJobRequirement)
                     ->delete();
             }
+
+            
+            $deleted_attachments = $request->input('deleted_attachments');
+            if (!empty($deleted_attachments)) {
+                DB::table('job_attachments')
+                    ->whereIn('id', $deleted_attachments)
+                    ->update([
+                        'deleted_by' => 211,
+                        'deleted_at' => new \DateTime()
+                    ]);
+            }
+
+            if (!empty($request->input('attachments'))) {
+                foreach ($request->input('attachments') as $item) {
+                $file = json_decode($item, true);
+
+                if (isset($file['data'])){
+                    $file_details = $this->file_details($item);
+                    $attachments[] = [
+                        'job_request_id' => $data -> id,
+                        'orig_filename' => $file_details['orig_filename'],
+                        'file_hash' => $file_details['file_hash'],
+                        'updated_by' => 211,
+                        'updated_at' => new \DateTime
+                    ];
+    
+                        if (!is_null($file_details['file_data'])) {
+                            Storage::disk($this->filesystem())->put("job_request/" . $data->id . "/attachments/" . $file_details['file_hash'], $this->base64Decode($file_details['file_data']));
+                        }
+                    }
+                }
+
+                if (isset($attachments)) {
+                    DB::table('job_attachments')->insert($attachments);
+                }
+            }
+
             DB::commit();
             return response()->json(['Success' => 'Update Successful']);
         } catch(\Exception $e){
