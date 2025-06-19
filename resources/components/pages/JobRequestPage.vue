@@ -89,6 +89,17 @@
                                 {{ statusMapping(item.status).label }}
                             </v-chip>
                         </td>
+                        <td>
+                            <v-tooltip v-if="item.attachments.length > 0" location="bottom">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon @click="toggleAttachmentDialog(item.attachments)" size="30px" style="color: goldenrod" flat v-bind="props">mdi-folder
+                                        <p class="white--text">{{item.attachments.length}}</p>
+                                    </v-icon>
+                                </template>
+                                <span>Attachments</span>
+                            </v-tooltip>
+                            <v-icon v-else class="disabled" style="color: gray;" size="30px">mdi-folder</v-icon>
+                        </td>
                         <td>{{ item.username }}</td>
                         <td>{{ item.requested_date }}</td>
                         <td>{{ item.job_ecd }}</td>
