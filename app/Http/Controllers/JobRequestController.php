@@ -14,6 +14,7 @@ use App\Models\JobRequired;
 use App\Models\JobRequest;
 use App\Models\IconnUser;
 use App\Models\JobAttachment;
+use App\Models\JobRequestRequirement;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Date;
 
@@ -147,7 +148,7 @@ class JobRequestController extends Controller
                         'document_id' => $val,
                         'created_at' => new \DateTime,
                         'updated_at' => new \DateTime
-                    );
+                    );  
                 }
                 DB::table('job_request_requirements')->insert($arr);
             }
@@ -285,7 +286,16 @@ class JobRequestController extends Controller
         return response()->json(['success' => 'Update Successfully ']);
     }
 
-    public function getRequiredDocuments(Request $request){
-        
-    }
+    // public function getRequiredDocWithUpload($request_id)
+    // {
+
+    //     $requirements = JobRequestRequirement::select(
+    //         'job_request_requirements.id',
+    //         'job_request_requirements.job_request_id',
+    //         'job_request_requirements.document_id',
+    //         'job_requireds.required_name',
+    //         'job_requireds.filling_mark',
+    //         'job_requireds.header_name',
+    //     )
+    // }
 }
