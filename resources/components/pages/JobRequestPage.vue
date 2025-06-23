@@ -298,8 +298,22 @@
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions>
-                        <v-btn text color="blue-grey darken-3">SEND</v-btn>
-                        <v-btn type="submit" text color="blue-grey darken-3">SUBMIT</v-btn>
+                        <v-tooltip location="bottom">
+                            <template v-slot:activator="{ props }">
+                                <v-btn disabled style="border: 1px solid grey;" color="blue-grey darken-3" @click="toggleSendDialog()" v-bind="props">
+                                    <v-icon>mdi-send</v-icon>Send
+                                </v-btn>
+                            </template>
+                            <span>Send to Email</span>
+                        </v-tooltip>
+                        <v-tooltip location="bottom">
+                            <template v-slot:activator="{ props }">
+                                <v-btn type="submit" style="border: 1px solid grey" color="blue-grey darken-3" v-bind="props">
+                                    <v-icon>mdi-content-save</v-icon>SAVE
+                                </v-btn>
+                            </template>
+                            <span>SAVE</span>
+                        </v-tooltip>
                     </v-card-actions>
                 </v-card>
             </v-form>
