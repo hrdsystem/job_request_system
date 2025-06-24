@@ -286,16 +286,44 @@ class JobRequestController extends Controller
         return response()->json(['success' => 'Update Successfully ']);
     }
 
-    // public function getRequiredDocWithUpload($request_id)
-    // {
+    public function getRequiredDocWithUpload($request_id)
+    {
 
-    //     $requirements = JobRequestRequirement::select(
-    //         'job_request_requirements.id',
-    //         'job_request_requirements.job_request_id',
-    //         'job_request_requirements.document_id',
-    //         'job_requireds.required_name',
-    //         'job_requireds.filling_mark',
-    //         'job_requireds.header_name',
-    //     )
-    // }
+        $requirements = JobRequestRequirement::select(
+            'job_request_requirements.id',
+            'job_request_requirements.job_request_id',
+            'job_request_requirements.document_id',
+            'job_requireds.required_name',
+            'job_requireds.filling_mark',
+            'job_requireds.header_name',
+            'job_request_uploads.id as upload_id',
+            'job_request_uploads.date_viewed',
+            'job_request_uploads.date_uploaded',
+        )
+        ->join('job_requireds', 'job_requireds.id', 'document_id')
+        ->leftJoin('job_request_uploads', function($join) {
+            $join
+                ->on('job_request_uploads.request_id', '=', 'job_request_requirements.job_request_id')
+                ->on('job_request_uploads.document_id', '=', 'job_request_requirements.document_id')
+                ->where('job_request_uploads.latest', true);
+        })
+        ->where('job_request_requirements.job_request_id', $request_id)
+        ->get();
+
+        $upload_ids = $requirements->pluck('upload_id')->toArray();
+        $files = JobRequestUploadedFile::whereIn('upload_id', $upload_ids)->get();
+
+        $data = $requirements->map(function ($obj) use ($files){
+
+            $obj->uploads = $files->filter(function ($item) use ($obj){
+                if ($item->upload_id == $obj->upload_id){
+                    return true;
+                }
+            })->values();
+
+            return $obj;
+        });
+
+        return $data;
+    }
 }
