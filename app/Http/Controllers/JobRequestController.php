@@ -326,4 +326,7 @@ class JobRequestController extends Controller
 
         return $data;
     }
+    public function getRequiredDocuments(Request $request){
+        return $this->getRequiredDocWithUpload($request->input('request_id'));
+    }
 }
