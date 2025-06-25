@@ -25,4 +25,12 @@ class JobRequest extends Model
     public function getRequirementsAttribute(){
         return $this->hasMany('App\Models\JobRequestRequirement', 'job_request_id')->pluck('document_id')->toArray();
     }
+
+    public function attachments(){
+        return $this->hasMany(JobAttachment::class);
+    }
+
+    public function requiredDocument(){
+        return $this->hasMany('App\JobRequestRequirement', 'job_request_id');
+    }
 }
