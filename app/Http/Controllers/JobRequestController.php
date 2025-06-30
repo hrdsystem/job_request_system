@@ -326,7 +326,25 @@ class JobRequestController extends Controller
 
         return $data;
     }
+
     public function getRequiredDocuments(Request $request){
         return $this->getRequiredDocWithUpload($request->input('request_id'));
+    }
+
+    public function masterUsers(){
+        try{
+            $data = IconnUser::select(
+                'users.id',
+                'users.username',
+                'users.photo',
+                'users.email'
+            )
+            ->orderBy('seq', 'desc')
+            ->get();
+            
+            return $data;
+        } catch(\Exeception $e){
+            return $e->getMessage();
+        }
     }
 }
