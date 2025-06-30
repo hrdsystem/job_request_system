@@ -15,6 +15,7 @@ use App\Models\JobRequest;
 use App\Models\IconnUser;
 use App\Models\JobAttachment;
 use App\Models\JobRequestRequirement;
+use App\Models\JobRequestUploadedFile;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Date;
 
