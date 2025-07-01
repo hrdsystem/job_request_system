@@ -32,6 +32,11 @@ export const useSampleStore = defineStore('sampleStore', {
             drawerSubData: {},
             drawerSubDataActive: null,
 
+            masterUsers: [],
+
+            baseDir: `${window.location.protocol}//${window.location.host}/iconnsystem`,
+            // baseDir: 'http://127.0.0.1:8000/iconnsystem',
+
             rules: {
                 required: [
                     v => !!v || 'Field is required'
@@ -145,7 +150,7 @@ export const useSampleStore = defineStore('sampleStore', {
         },
 
         sortColumn(obj){
-            var asc = _.findIndex(this[obj.sort], { column: obj.column, val: "ASC"}); 
+            var asc = _.findIndex(this[obj.sort], { column: obj.column, val: "ASC"});
             var desc = _.findIndex(this[obj.sort], { column: obj.column, val: "DESC"});
 
             if(asc > - 1){
@@ -252,6 +257,15 @@ export const useSampleStore = defineStore('sampleStore', {
             this.allSelected = false;
             this.allSelected = [];
             this.selectedRows = [];
+        },
+
+        getMasterUsers() {
+            axios.post(`/api/jobRequest/master_users`, {
+            }).then(response => {
+                this.masterUsers = response.data
+            }).catch(error => {
+                console.log(error)
+            })
         },
     },
 })

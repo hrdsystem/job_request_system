@@ -8,7 +8,7 @@ const Page404 = () => import('../components/includes/Page404.vue');
 // import Company from '../pages/Company.vue';
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory('/iconnsystem/'),
     routes: [
         {
             path: '/',
