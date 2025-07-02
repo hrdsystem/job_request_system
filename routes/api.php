@@ -27,8 +27,17 @@ Route::prefix('/jobRequest')->group(function(){
         Route::post('get_job_request', 'getJobRequests');
         Route::post('job_insert', 'jobRequestInsert');
         Route::post('job_update', 'jobRequestUpdate');
+        Route::post('job_delete', 'jobRequestDelete');
+        Route::post('job_status_change', 'jobRequestStatusChange');
+        Route::post('get_required_documents', 'getRequiredDocuments');
+        Route::post('master_users' , 'masterUsers');
+        // Route::get('/attachments/{attachment_id}/{file_name}', 'openAttachment');
     });
 });
+
+
+// Route::post('/{attachment_id}/{file_name}', [JobRequestController::class, 'openAttachment']);
+
 
 Route::prefix('/jobMaster')->group(function(){
     Route::controller(JobRequestSettingsController::class)->group(function (){
