@@ -31,6 +31,7 @@ Route::prefix('/jobRequest')->group(function(){
         Route::post('job_status_change', 'jobRequestStatusChange');
         Route::post('get_required_documents', 'getRequiredDocuments');
         Route::post('master_users' , 'masterUsers');
+        Route::post('process_job_updates', 'process_job_updates');
         // Route::get('/attachments/{attachment_id}/{file_name}', 'openAttachment');
     });
 });
