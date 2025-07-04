@@ -332,6 +332,62 @@ class JobRequestController extends Controller
         return $this->getRequiredDocWithUpload($request->input('request_id'));
     }
 
+    public function process_job_updates(Request $request){
+        $request_id = $request->input('id');
+        $updates = $request->input('updates');
+
+        try {
+            DB::beginTransaction();
+            
+            foreach ($updates as $item){
+                if (count($item['newUploads']) > 0){
+                    $data['new_uploads'][] = $item['document_id'];
+                    $upload_data = [
+                        'request_id' => $request_id,
+                        'document_id' => $item['document_id'],
+                        'date_uploaded' => new \DateTime(),
+                        'send_date' => new \DateTime(),
+                        'uploader' => 271,
+                        'latest' => true
+                    ];
+
+                    DB::table('job_request_uploads')
+                        ->where('request_id', $request_id)
+                        ->where('document_id', $item['document_id'])
+                        ->update(['latest' => false]);
+
+                    DB::table('job_request_uploads')->insert($upload_data);
+
+                    $upload_id = DB::getPdo()->lastInsertId();
+
+                    foreach ($item['newUploads'] as $upload){
+                        $file_data = $this->file_details(json_encode($upload));
+
+                        $files[] = [
+                            'upload_id' => $upload_id,
+                            'orig_filename' => $file_data['orig_filename'],
+                            'file_hash' => $file_data['file_hash']
+                        ];
+
+                        if (!is_null($file_data['file_data'])) {
+                            Storage::disk($this->filesystem())->put("job_request/" . $request_id . "/required_docs/" . $file_data['file_hash'], $this->base64Decode($file_data['file_data']));
+                        }
+                    }
+                }
+            }
+
+            if (isset($files) && count($files) > 0){
+                DB::table('job_request_uploaded_files')->insert($files);
+            }
+
+            DB::commit();
+
+            return ['request_id' => $request_id];
+        } catch(\Exception $e){
+            return $e->getMessage();
+        }
+    }
+
     public function masterUsers(){
         try{
             $data = IconnUser::select(
