@@ -68,6 +68,11 @@ const vuetify = createVuetify({
                 // persistentPlaceholder:true,
                 // hideDetails:true
             },
+            VSelect:{
+                style: 'padding: 15px 0 0 0;', //old padding: 15px 15px 0 15px
+                variant:'outlined',
+                density:'compact',
+            }
         }
     }
 })
