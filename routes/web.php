@@ -20,9 +20,9 @@ Route::get('/iconnsystem/job_request', [SpaController::class, 'job_request'])->w
 
 Route::get('/iconnsystem/job_request_settings/{any?}', [SpaController::class, 'job_request_settings'])->where('any', '.*');
 
-Route::prefix('job_requests')->group(function(){
-    Route::get('/attachments/{attachment_id}/{filename}', [JobRequestController::class, 'openAttachment']);
-});
+// Route::prefix('job_request')->group(function(){
+    Route::get('iconnsystem/job_request/attachments/{attachment_id}/{filename}', [JobRequestController::class, 'openAttachment']);
+// });
 
 // Route::get('/job_request/attachments/{id}/{filename}', function ($id, $filename) {
 //     $path = storage_path("app/public/job_request/{$id}/{$filename}"); // Adjust the path as necessary
