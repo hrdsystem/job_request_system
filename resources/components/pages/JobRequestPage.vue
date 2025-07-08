@@ -545,6 +545,185 @@
                                         </v-col>
                                     </v-row>
                                 </v-col>
+                                <v-table fixed-header class="mainTable">
+                                    <thead>
+                                        <tr>
+                                            <th v-show="editECD">Edit</th>
+                                            <th>Type</th>
+                                            <th>Document</th>
+                                            <th>
+                                                <v-tooltip location="bottom">
+                                                    <template v-slot:activator="{ props }">
+                                                        <span v-bind="props">ECD</span>
+                                                    </template>
+                                                    <span>Estimated Completion Date</span>
+                                                </v-tooltip>
+                                            </th>
+                                            <th>Uploader</th>
+                                            <th>Date Uploaded</th>
+                                            <th title="Reason for Updating">Reason</th>
+                                            <th style="width:20px">Upload</th>
+                                            <th v-if="hasNewUploads">New Uploads</th>
+                                            <th>Viewed By</th>
+                                            <th>Date Viewed</th>
+                                            <th style="width:20px">History</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="requiredDocuments.length > 0">
+                                        <tr v-for="(doc, i) in requiredDocuments" :key="'rd' + i">
+                                            <td class="text-center icon-btn" v-show="editECD">
+                                                <div icon="mdi-pencil" @click="updateECD(doc)"></div>
+                                            </td>
+                                            <td>
+                                                <a
+                                                    :href="documentLink(CurrentSubject, doc.filling_mark, doc.job_request_id, doc.document_id)"
+                                                    target="_blank"
+                                                    icon="mdi-file"
+                                                    @click="reloadCadRequests()"
+                                                    v-if="doc.uploads.length === 1">
+                                                    <v-icon size="30px" color="blue">mdi-file</v-icon>
+                                                </a>
+                                                <div
+                                                    
+                                                    v-else-if="doc.uploads.length > 1"
+                                                >
+                                                    <v-icon size="30px" style="color: goldenrod;" @click="toggleJobAttachments(activeRequest, doc.document_id)">
+                                                        mdi-folder
+                                                    </v-icon>
+                                                </div>
+                                                <v-icon v-else color="grey" size="30px">mdi-file</v-icon>
+                                            </td>
+                                            <td>{{ doc.required_name }}</td>
+                                            <td>{{ ECD }}</td> 
+                                            <td>temp uploader</td>
+                                            <td>temp uploaded date</td>
+                                            <td>temp reason</td>
+                                            <td class="text-center icon-btn">
+                                                <v-tooltip location="bottom" >
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-icon color="blue darken-3" size="30" v-bind="props" @click="showUploadTab(doc)">mdi-upload</v-icon>
+                                                    </template>
+                                                    <span>Upload</span>
+                                                </v-tooltip>
+                                                <!-- <v-icon v-else class="disabled" size="30">mdi-upload</v-icon> -->
+                                                <!-- v-if="!disableUpload" -->
+                                            </td>
+                                            <td v-if="hasNewUploads" class="text-center">
+                                                <!-- <v-icon v-if="doc.newUploads.length > 0" size="30px">mdi-file</v-icon> -->
+                                                <v-tooltip v-if="doc.newUploads.length > 0 " color="black" transition="fade-transition" location="bottom">
+                                                    <template v-slot:activator="{ props }">
+                                                        <span v-bind="props" style="position: relative;">
+                                                            <a
+                                                                :href="doc.newUploads[0].url"
+                                                                target="_blank"
+                                                                v-if="doc.newUploads.length === 1"
+                                                            >
+                                                            <v-icon size="30px">mdi-file</v-icon>
+                                                            </a>
+                                                            <div
+                                                                v-else-if="doc.newUploads.length > 1"
+                                                                @click="newUploadedFiles = doc.newUploads; newUploadsDialog = true; dialogTitle = doc.required_name" 
+                                                            >
+                                                                <v-icon size="30px" style="color: goldenrod;">
+                                                                    mdi-folder
+                                                                </v-icon>
+                                                                <v-icon color="red darken-3" size="20" style="position: absolute;">mdi-exclamation-thick</v-icon>
+                                                            </div>
+                                                            <v-icon v-if="doc.newUploads.length === 1" color="red darken-3" size="20" style="position: absolute;">mdi-exclamation-thick</v-icon>
+                                                        </span>
+                                                    </template>
+                                                    <span>Not Yet Saved</span>
+                                                </v-tooltip>
+                                                <v-icon v-else color="grey" size="30px">mdi-folder</v-icon>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </v-table>
+                            </v-window-item>
+                            <v-window-item>
+                                <v-col cols="auto" class="py-0 px-1" v-if="uploadTab == 1">
+                                    <v-row class="mx-0">
+                                        <v-col cols="12" sm="6" md="6">
+                                            <div>
+                                                Required Document:<br>
+                                                <p class="text-right">
+                                                    <span class="font-weight-bold">{{ requiredFileName }}</span>
+                                                </p>
+                                            </div>
+                                        </v-col>
+                                        <v-col cols="12" sm="6" md="6">
+                                            <span max-height="" style="color: red;" v-if="invalidFile.length > 0">Invalid File(s):</span><br>
+                                            <ul class="red--text">
+                                                <li style="color: red" v-for="(invalid, i) in invalidFile" :key="'if' + i">
+                                                    {{ invalid.filename }}
+                                                </li>
+                                            </ul>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mx-0">
+                                        <v-col cols="12" sm="6" md="6"
+                                            @drop.prevent="multiDropFile('tempRequiredFile', 'requiredFile', $event.dataTransfer.files)"
+                                            @dragover.prevent
+                                            @change="multiChangeFile('tempRequiredFile', 'requiredFile')"
+                                        >
+                                            <v-file-input
+                                                v-model="tempRequiredFile"
+                                                label="Document"
+                                                prepend-icon="mdi-file"
+                                                :rules="rules.required"
+                                                persistent-placeholder
+                                                variant="outlined"
+                                                multiple
+                                            ></v-file-input>
+                                        </v-col>
+                                    </v-row>
+                                </v-col>
+                                <v-col cols="12" class="mb-5" v-if="requiredFile.length > 0">
+                                    <v-table>
+                                        <tbody>
+                                            <tr v-for="(file, index) in requiredFile" :key="'rf' + index">
+                                                <td class="text-center" width="40px">
+                                                    <v-icon @click="deleteItemDialog = true; tempRemoveFiles = { model: 'requiredFile', index : index}">mdi-delete</v-icon>
+                                                </td>
+                                                <td class="text-center" width="100px">
+                                                    <v-icon size="60px">mdi-file-pdf-box</v-icon>
+                                                </td>
+                                                <td>
+                                                    <span>Original file name:</span><br>
+                                                    <a :href="file.url" target="_blank">{{file.filename}}</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </v-table>
+                                </v-col>
+                            </v-window-item>
+                        </v-window>
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-btn icon @click="uploadTab = 0" v-show="uploadTab != 0">
+                            <v-icon>mdi-arrow-left</v-icon>
+                        </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn style="border: 1px solid grey;" outlined small v-if="uploadTab == 1" @click="uploadTab = 0">
+                        <v-icon>mdi-close-outline</v-icon>
+                        Cancel
+                    </v-btn>
+                    <v-tooltip location="bottom" v-if="uploadTab == 0">
+                        <template v-slot:activator="{ props }">
+                            <v-btn style="border: 1px solid grey;" color="primary" @click="toggleSendDialog()" v-bind="props">
+                                <v-icon>mdi-send</v-icon>Send
+                            </v-btn>
+                        </template>
+                        <span>Send to Email</span>
+                    </v-tooltip>
+                    <v-btn style="border: 1px solid grey;" type="submit" variant="outlined" small :disabled="requiredFile.length < 1 || disableUploadAndSend || (currentDocument.date_uploaded != null && updatingReason == null)" v-if="uploadTab == 1">
+                        <v-icon color="success">mdi-check-bold</v-icon>
+                        OK
+                    </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-form>
         </v-dialog>
 
         <v-dialog v-model="cancelDialog" persistent max-width="300" @keydown.esc="cancelDialog = false">
