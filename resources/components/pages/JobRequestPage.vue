@@ -497,99 +497,54 @@
             </v-form>
         </v-dialog>
 
-        <v-dialog v-model="uploadDialog" persistent :width="uploadTab == 1 ? 600 : 800 " @keydown.esc="uploadDialog = false">
-            <v-card>
-                <v-card-title>
-                    <span class="headline" v-if="uploadTab == 0" >Job Requirement</span>
-                    <span class="headline" v-else-if="uploadTab == 1" >Upload {{ currentDocument.project_name }}</span>
-                    <span class="headline" v-else>{{ currentDocument.project_name }} Upload History</span>
-                    <v-icon style="float: right;" color="white" @click="uploadDialog = false">mdi-close</v-icon>
-                </v-card-title>
-                <v-card-text class="pa-0">
-                    <v-window v-model="uploadTab" touchless>
-                        <v-window-item>
-                            <v-col cols="auto">
-                                <v-row class="mb-5 mt-0 mx-n2">
-                                    <v-col cols="12" sm="4" md="4">
-                                        <v-text-field
-                                            v-model="ECD"
-                                            @click:clear="ECD = null"
-                                            label="ECD"
-                                            hide-details
-                                            readonly
-                                            persistent-placeholder
-                                        ></v-text-field>
-                                    </v-col>
-                                    <v-col cols="12" sm="5" md=5 class="text-center"> 
-                                        <div class="text-subtitle-2 font-weight-bold" :class="{'mt-3': xs }">
-                                            Subject : {{ requestDetails.subject }}
-                                        </div>
-                                    </v-col>
-                                    <v-col cols="12" sm="3" md="3" class="text-right">
-                                        <v-tooltip location="bottom">
-                                            <template v-slot:activator="{ props }">
-                                                <v-btn
-                                                    color="primary"
-                                                    small
-                                                    deep-purple
-                                                    v-bind="props"
-                                                    @click="editECD = !editECD"                                        
-                                                >
-                                                    <v-icon left>mdi-calendar-edit</v-icon>Edit ECD
-                                                </v-btn>
-                                            </template>
-                                            <span>Edit Estimation Completion Date</span>
-                                        </v-tooltip>
-                                    </v-col>
-                                </v-row>
-                            </v-col>
-                        </v-window-item>
-                    </v-window>
+        <v-dialog v-model="uploadDialog" persistent :width="uploadTab == 1 ? 600 : 800 " @keydown.esc="showConfirmDialog()">
+            <v-form id="uploadForm" ref="uploadForm" @submit.prevent="processUploadForm">
 
-                    <v-table fixed-header class="mainTable">
-                        <thead>
-                            <tr>
-                                <th v-show="editECD">Edit</th>
-                                <th>Type</th>
-                                <th>Document</th>
-                                <th>
-                                    <v-tooltip location="bottom">
-                                        <template v-slot:activator="{ props }">
-                                            <span v-bind="props">ECD</span>
-                                        </template>
-                                        <span>Estimated Completion Date</span>
-                                    </v-tooltip>
-                                </th>
-                                <th>Uploader</th>
-                                <th>Date Uploaded</th>
-                                <th title="Reason for Updating">Reason</th>
-                                <th style="width:20px">Upload</th>
-                                <th v-if="editECD">New Uploads</th>
-                                <th>Viewed By</th>
-                                <th>Date Viewed</th>
-                                <th style="width:20px">History</th>
-                            </tr>
-                        </thead>
-                        <tbody v-if="requiredDocuments.length > 0">
-                            <tr >
-                                
-                            </tr>
-                        </tbody>
-                    </v-table>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-tooltip location="bottom">
-                    <template v-slot:activator="{ props }">
-                        <v-btn color="primary" @click="toggleSendDialog()" v-bind="props">
-                            <v-icon>mdi-send</v-icon>Send
-                        </v-btn>
-                    </template>
-                    <span>Send to Email</span>
-                </v-tooltip>
-                </v-card-actions>
-            </v-card>
+                <v-card>
+                    <v-card-title>
+                        <span class="headline" v-if="uploadTab == 0" >Job Requirement</span>
+                        <span class="headline" v-else-if="uploadTab == 1" >Upload {{ CurrentSubject }}</span>
+                        <span class="headline" v-else>{{ CurrentSubject }} Upload History</span>
+                        <v-icon style="float: right;" color="white" @click="showConfirmDialog()">mdi-close</v-icon>
+                    </v-card-title>
+                    <v-card-text class="pa-0">
+                        <v-window v-model="uploadTab" touchless>
+                            <v-window-item>
+                                <v-col cols="auto">
+                                    <v-row class="mb-5 mt-0 mx-n2">
+                                        <v-col cols="12" sm="4" md="4">
+                                            <v-text-field
+                                                v-model="ECD"
+                                                @click:clear="ECD = null"
+                                                label="ECD"
+                                                hide-details
+                                                readonly
+                                                persistent-placeholder
+                                            ></v-text-field>
+                                        </v-col>
+                                        <v-col cols="12" sm="5" md=5 class="text-center"> 
+                                            <div class="text-subtitle-2 font-weight-bold" :class="{'mt-3': xs }">
+                                                Subject : {{ requestDetails.subject }}
+                                            </div>
+                                        </v-col>
+                                        <v-col cols="12" sm="3" md="3" class="text-right">
+                                            <v-tooltip location="bottom">
+                                                <template v-slot:activator="{ props }">
+                                                    <v-btn
+                                                        color="primary"
+                                                        small
+                                                        deep-purple
+                                                        v-bind="props"
+                                                        @click="editECD = !editECD"                                        
+                                                    >
+                                                        <v-icon left>mdi-calendar-edit</v-icon>Edit ECD
+                                                    </v-btn>
+                                                </template>
+                                                <span>Edit Estimation Completion Date</span>
+                                            </v-tooltip>
+                                        </v-col>
+                                    </v-row>
+                                </v-col>
         </v-dialog>
 
         <v-dialog v-model="cancelDialog" persistent max-width="300" @keydown.esc="cancelDialog = false">
