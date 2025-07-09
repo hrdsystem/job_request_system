@@ -59,7 +59,10 @@ class JobRequestController extends Controller
 
     public function openAttachment($attachment_id, $filename){
 
-        $attachment = JobAttachment::findorFail($attachment_id);
+        // $attachment = JobAttachment::where('id', $attachment_id)->get();
+        $attachment = DB::table('job_attachments')
+        ->where('job_attachments.id', $attachment_id)
+        ->get();
         $viewable = [
             'pdf',
             'jpg',
@@ -76,6 +79,46 @@ class JobRequestController extends Controller
         return response()
             ->download($temp_filepath, $attachment->orig_filename, ['filename' => $attachment->orig_filename], $inline)
             ->deleteFileAfterSend();
+    }
+
+    public function openDocument($reference, $filename){
+        $ids = explode('-', $reference);
+
+        $uploaded_file = JobRequestUpload::select(
+            'job_request_uploads.*',
+            'job_request_uploaded_files.orig_filename',
+            'job_request_uploaded_files.file_hash'
+        )
+        ->join('job_request_uploaded_files', 'job_request_uploaded_files.upload_id', 'job_request_uploads.id')
+        ->when(count($ids) === 2, function ($q) use ($ids){
+            $q
+            ->where('request_id', $ids[0])
+            ->where('document_id', $ids[1])
+            ->where('latest', true);
+        })
+        ->when(count($ids) === 1, function($q) use ($ids){
+            $q
+            ->where('job_request_uploaded_files.id', $ids[0]);
+        })
+        ->get();
+
+        if($uploaded_file){
+            $viewable = [
+                'pdf',
+                'jpg',
+                'png'
+            ];
+            $extension = pathinfo($uploaded_file->orig_filename, PATHINFO_EXTENSION);
+            $inline = in_array(strtolower($extension), $viewable) ? 'inline' : 'attachment';
+            $temp_filepath = tempnam(sys_get_temp_dir(), '');
+            $file_data = Storage::disk($this->filesystem())->get('job_request/' . $uploaded_file->request_id . '/required_docs/' . $uploaded_file->file_hash);
+
+
+            file_put_contents($temp_filepath, $file_data);
+            return response()
+                ->download($temp_filepath, $filename . '-' . date('mdY') . '.' . $extension, ['filename' => $filename . '-' . date('mdY') . '.' . $extension], $inline)
+                ->deleteFileAfterSend();
+        }
     }
 
     public function getJobRequests(Request $request){
