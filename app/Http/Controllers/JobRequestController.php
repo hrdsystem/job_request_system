@@ -371,6 +371,29 @@ class JobRequestController extends Controller
         return $data;
     }
 
+    public function getUploadedDocuments(Request $request){
+        return DB::table('job_request_uploads')
+            ->select(
+                'job_request_uploads.id',
+                'job_request_uploads.document_id',
+                'job_request_uploaded_files.orig_filename',
+                'job_request_uploaded_files.id as file_id',
+            )
+            ->join('job_requests', 'job_requests.id', 'job_request_uploads.request_id')
+            ->join('job_request_uploaded_files', 'job_request_uploaded_files.upload_id', 'job_request_uploads.id')
+            ->when(is_null($request->input('upload_id')), function ($q) use ($request) {
+                $q
+                ->where('job_request_uploads.request_id', $request->input('request_id'))
+                ->where('job_request_uploads.document_id', $request->input('document_id'))
+                ->where('job_request_uploads.latest', true);
+            })
+            ->when(!is_null($request->input('upload_id')), function ($q) use ($request) {
+                $q
+                ->where('job_request_uploads.id', $request->input('upload_id'));
+            })
+            ->get();
+    }
+
     public function getRequiredDocuments(Request $request){
         return $this->getRequiredDocWithUpload($request->input('request_id'));
     }
