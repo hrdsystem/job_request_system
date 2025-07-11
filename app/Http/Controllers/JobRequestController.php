@@ -120,6 +120,27 @@ class JobRequestController extends Controller
                 ->deleteFileAfterSend();
         }
     }
+    public function upload_history(Request $request){
+        $users = IconnUser::select('id', 'username');
+    
+        $history = JobRequestUpload::joinSub($users, 'users', function($join){
+            $join->on('job_request_uploads.uploader', '=', 'users.id');
+        })
+        ->select(
+            'job_request_uploads.*',
+            'job_requireds.required_name',
+            'job_requireds.filling_mark',
+            'users.username as uploaded_by'
+        )
+        ->join('job_requireds', 'job_requireds.id', 'document_id')
+        ->where('request_id', $request->input('request_id'))
+        ->where('document_id', $request->input('document_id'))
+        ->where('latest', 0)
+        ->with('files')
+        ->get();
+
+        return $history;
+    }
 
     public function getJobRequests(Request $request){
         $cnt = JobRequest::when(request('search'), function ($q) {
