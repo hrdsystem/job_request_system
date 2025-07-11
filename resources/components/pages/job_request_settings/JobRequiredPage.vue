@@ -285,7 +285,7 @@
             </v-form>
         </v-dialog>
 
-        <v-dialog v-model="deleteDialog" persistent max-width="300">
+        <v-dialog v-model="deleteDialog" persistent max-width="300" @keydown.esc="deleteDialog = false">
             <v-card>
                 <v-card-title>
                     <span class="headline">Delete this data?</span>
@@ -361,7 +361,7 @@ export default {
                 },
                 back: {
                     show: true,
-                    url: '/job_request'
+                    url: '/iconnsystem/job_request'
                 },
                 view: false,
                 filter: true,
@@ -432,7 +432,8 @@ export default {
             'setDrawerSubData',
             'setSelected',
             'searchColumn',
-            'sortColumn'
+            'sortColumn',
+            'resetToggleSelectAll'
         ]),
 
         toggleAddDialog(){
@@ -613,7 +614,7 @@ export default {
                 method: 'post',
                 url: '/api/jobMaster/delete_job_required',
                 data: {
-                    ids: this.selectedRows
+                    id: this.selectedRows.map(index => this.JobRequestRequiredData[index].id)
                 }
             })
             .then((res) =>{
@@ -623,6 +624,7 @@ export default {
                 this.snackbar.color = 'blue-grey'
                 this.deleteDialog = false
                 this.jobRequiredPage()
+                this.resetToggleSelectAll()
             })
         }
     },
