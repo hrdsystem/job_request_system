@@ -636,6 +636,17 @@
                                                 </v-tooltip>
                                                 <v-icon v-else color="grey" size="30px">mdi-folder</v-icon>
                                             </td>
+                                            <td>temp viewed by</td>
+                                            <td>temp date viewed</td>
+                                            <td class="text-center icon-btn">
+                                                <v-tooltip location="bottom" v-if="doc.updating_reason != null">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-icon size="30px" style="color: goldenrod;" v-bind="props" @click="showHistoryTab(doc)">mdi-history</v-icon>
+                                                    </template>
+                                                    <span>History</span>
+                                                </v-tooltip>
+                                                <v-icon v-else size="30px">mdi-history</v-icon>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </v-table>
@@ -647,12 +658,12 @@
                                             <div>
                                                 Required Document:<br>
                                                 <p class="text-right">
-                                                    <span class="font-weight-bold">{{ requiredFileName }}</span>
+                                                    <span style="padding-right: 30px;" class="font-weight-bold">{{ requiredFileName }}</span>
                                                 </p>
                                             </div>
                                         </v-col>
                                         <v-col cols="12" sm="6" md="6">
-                                            <span max-height="" style="color: red;" v-if="invalidFile.length > 0">Invalid File(s):</span><br>
+                                            <span style="color: red;" v-if="invalidFile.length > 0">Invalid File(s):</span><br>
                                             <ul class="red--text">
                                                 <li style="color: red" v-for="(invalid, i) in invalidFile" :key="'if' + i">
                                                     {{ invalid.filename }}
@@ -692,6 +703,70 @@
                                                     <span>Original file name:</span><br>
                                                     <a :href="file.url" target="_blank">{{file.filename}}</a>
                                                 </td>
+                                            </tr>
+                                        </tbody>
+                                    </v-table>
+                                </v-col>
+                                <v-col cols="12" v-if="currentDocument.date_uploaded != null">
+                                    <v-textarea
+                                        v-model="updatingReason"
+                                        name="updating_reason"
+                                        :rules="rules.required"
+                                        persistent-placeholder
+                                        variant="outlined"
+                                        rows="3"
+                                    >
+                                    <template v-slot:label>
+                                        <span><span style="color: red">*</span>Reason for Updating</span>
+                                    </template>
+                                    </v-textarea>
+                                </v-col>
+                            </v-window-item>
+                            <v-window-item>
+                                <v-col cols="auto">
+                                    <v-row v-if="uploadHistories.length < 1">
+                                        <v-btn @click="console.log('temp for testing')">TEST</v-btn>
+                                    </v-row>
+                                    <v-table fixed-header class="mainTable" v-if="uploadHistories.length > 0">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Document</th>
+                                                <th>Uploader</th>
+                                                <th>Date Uploaded</th>
+                                                <th>Reason</th>
+                                                <th>Viewed by</th>
+                                                <th>Date Viewed</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody v-if="requiredDocuments.length > 0">
+                                            <tr v-for="(history, index) in uploadHistories" :key="'uh' + index">
+                                                <td>
+                                                    <a
+                                                        :href="`/api/job_request/document/${history.files[0].id}/${encodeURIComponent(extractFileName(history.files[0].orig_filename))}`"
+                                                        target="_blank"
+                                                        icon="mdi-file"
+                                                        @click="reloadCadRequests()"
+                                                        v-if="history.files.length === 1">
+                                                        <v-icon size="30px" color="blue">mdi-file</v-icon>
+                                                    </a>
+                                                    <div
+                                                        v-else-if="history.files.length > 1"
+                                                    >
+                                                        <v-icon size="30px" style="color: goldenrod;" @click="toggleJobAttachments(activeRequest, history.document_id, history.id)">
+                                                            mdi-folder
+                                                        </v-icon>
+                                                    </div>
+                                                    <v-icon v-else color="grey" size="30px">mdi-file</v-icon>
+                                                </td>
+                                                <td>{{ history.required_name }}</td>
+                                                <td>{{ history.uploaded_by }}</td>
+                                                <td>{{ dateOnly(history.date_uploaded) }}</td>
+                                                <td>{{ history.updating_reason }}</td>
+                                                <td>
+
+                                                </td>
+                                                <td>{{ dateOnly(history.date_viewed) }}</td>
                                             </tr>
                                         </tbody>
                                     </v-table>
