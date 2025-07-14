@@ -15,6 +15,7 @@ use App\Models\JobRequest;
 use App\Models\IconnUser;
 use App\Models\JobAttachment;
 use App\Models\JobRequestRequirement;
+use App\Models\JobRequestUpload;
 use App\Models\JobRequestUploadedFile;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Date;
@@ -120,6 +121,7 @@ class JobRequestController extends Controller
                 ->deleteFileAfterSend();
         }
     }
+
     public function upload_history(Request $request){
         $users = IconnUser::select('id', 'username');
     
@@ -362,6 +364,7 @@ class JobRequestController extends Controller
             'job_requireds.filling_mark',
             'job_requireds.header_name',
             'job_request_uploads.id as upload_id',
+            'job_request_uploads.updating_reason',
             'job_request_uploads.date_viewed',
             'job_request_uploads.date_uploaded',
         )
@@ -433,6 +436,7 @@ class JobRequestController extends Controller
                         'request_id' => $request_id,
                         'document_id' => $item['document_id'],
                         'date_uploaded' => new \DateTime(),
+                        'updating_reason' => $item['newUploadReasons'],
                         'send_date' => new \DateTime(),
                         'uploader' => 271,
                         'latest' => true
