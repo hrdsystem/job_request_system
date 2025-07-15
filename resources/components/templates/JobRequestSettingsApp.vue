@@ -29,6 +29,11 @@ export default {
                     path: '/job_request_settings/job_required',
                     icon: 'mdi-file-edit-outline'
                 },
+                {
+                    title: 'EMAIL RECIPIENTS',
+                    path: '/job_request_settings/email_recipients',
+                    icon: 'mdi-email-fast'
+                }
             ]
         }
     },
