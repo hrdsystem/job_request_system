@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\App;
 
+use App\Models\EmailRecipient;
 use App\Models\JobRequestSubDocument;
 use App\Models\JobRequired;
 use App\Models\IconnUser;
@@ -162,5 +163,57 @@ class JobRequestSettingsController extends Controller
             return $e->getMessage();
         }
         return response()->json(['success' => 'Delete Successfully ']);
+    }
+
+    public function getEmailRecipient(){
+
+        $users = IconnUser::select('id', 'username');
+
+        $data = EmailRecipient::joinSub($users, 'users', function($join){
+            $join->on('email_recipients.user_id', '=', 'users.id');
+        })
+        ->select(
+            'email_recipients.id',
+            'email_recipients.user_id',
+            'email_recipients.created_by',
+            'email_recipients.created_at',
+            'users.username',
+            DB::raw("DATE_FORMAT(email_recipients.updated_at, '%Y-%m-%d %H:%i:%s') as updatedDate")
+        )
+        ->when(request('search'), function ($q) {
+            for($i=0; $i<count(request('search')); $i++){
+                $q->where(request('search')[$i]['column'], 'like', '%'.request('search')[$i]['val'].'%');
+            }
+            return $q;
+        })
+        ->when(request('sort') , function ($q) {
+            for($i=0;$i<count(request('sort'));$i++){
+                $q->orderBy(request('sort')[$i]['column'],request('sort')[$i]['val']);
+            }
+            return $q;
+        })
+        ->get();
+
+        return $data;
+    }
+
+    public function insertJobRecipients(Request $request){
+        $exist = EmailRecipient::where('user_id', $request->get('user_id'))->exists();
+        if($exist){
+            return 1;
+        }
+        try{
+            DB::beginTransaction();
+            $email_recipients = new EmailRecipient;
+            $email_recipients->user_id = $request->user_id;
+            $email_recipients->created_by = 271;
+            $email_recipients->created_at = now();
+            $email_recipients->updated_at = now();
+            $email_recipients->save();
+            DB::commit();
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return $email_recipients;
     }
 }
