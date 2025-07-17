@@ -48,6 +48,8 @@ Route::prefix('/jobMaster')->group(function(){
         Route::post('update_job_required', 'jobRequiredUpdate');
         Route::post('insert_job_required', 'jobRequiredInsert');
         Route::post('delete_job_required', 'jobRequiredDelete');
+        Route::post('get_email_recipients', 'getEmailRecipient');
+        Route::post('insert_recipients', 'insertJobRecipients');
     });
 });
 
