@@ -6,6 +6,8 @@ export const useSampleStore = defineStore('sampleStore', {
             // Global Variables
 
             tableHeight: window.innerHeight - 160,
+
+            //SECTION - BOOLEAN VARIABLES
             viewMode: false,
             filterMode: false,
             editMode: false,
@@ -13,26 +15,35 @@ export const useSampleStore = defineStore('sampleStore', {
             allSelected: false,
             searchTimeout: null,
 
+            //SECTION - DATA HOLDER FOR JOB REQUEST MAIN PAGE
             JobRequestData: [],
             JobRequestRecords: 0,
             JobRequestSearch: [],
             JobRequestSort: [],
 
+            //SECTION - DATA HOLDERS FOR JOV REQUIRED
             JobRequestRequiredData: [],
             JobRequestRequiredRecords: 0,
             JobRequestRequiredSearch: [],
             JobRequestRequiredSort: [],
 
+            //SECTION - DATA OHLDER FOR CHECKBOX
             selected: [],
             selectedRows: [],
             
+            //SECTION - DATA HOLDER FOR 
             masterDrawerProjects: [],
             masterProjectSearch: null,
 
+            //SECTION - DATA HOLDER FOR DRAWER SUB 
             drawerSubData: {},
             drawerSubDataActive: null,
 
+            //SECTION - DATA HOLDER FOR MASTER USERS
             masterUsers: [],
+
+            //SECTION - DATA HOLDER FOR EMAIL RECIPIENTS
+            EmailRecipientsData: [],
 
             baseDir: `${window.location.protocol}//${window.location.host}/iconnsystem`,
             // baseDir: 'http://127.0.0.1:8000/iconnsystem',
@@ -267,5 +278,14 @@ export const useSampleStore = defineStore('sampleStore', {
                 console.log(error)
             })
         },
+
+        emailRecipientPage(){
+            axios.post('/api/jobMaster/get_email_recipients', {
+            }).then(res =>{
+                this.EmailRecipientsData = res.data
+            }).catch(error =>{
+                console.log(error)
+            })
+        }
     },
 })
