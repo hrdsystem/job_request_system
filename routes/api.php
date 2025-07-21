@@ -50,6 +50,7 @@ Route::prefix('/jobMaster')->group(function(){
         Route::post('delete_job_required', 'jobRequiredDelete');
         Route::post('get_email_recipients', 'getEmailRecipient');
         Route::post('insert_recipients', 'insertJobRecipients');
+        Route::post('delete_recipients', 'deleteJobRecipients');
     });
 });
 
