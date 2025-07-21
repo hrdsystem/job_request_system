@@ -833,27 +833,157 @@
             </v-card>
         </v-dialog>
 
-        <v-dialog v-model="sendDialog" persistent max-width="600" @keydown.esc="sendDialog = false">
+        <v-dialog v-model="sendDialog" persistent width="600" @keydown.esc="sendDialog = false">
             <v-card>
                 <v-card-title>
                     <span class="headline">{{ uploadDialog ? 'Send Uploading Changes' : 'Send Request' }}</span>
                     <v-icon style="float: right;" color="white" @click="sendDialog = false">mdi-close</v-icon>
                 </v-card-title>
-                <v-card-text>
-                    <v-row class="mx-2" v-if="!uploadDialog">
-                        <v-col>
-                            <b>Email Subject:</b><br>
-                            <b class="ml-4">working</b>
-                        </v-col>
-                    </v-row>
-                    <v-row>
+                <v-card-text style="height:auto;">
+                    <v-row class="mx-2">
                         <v-col cols="12" sm="6" md="6">
                             <v-autocomplete
-                            
-                            ></v-autocomplete>
+                                v-model="toRecipients"
+                                :items="toEmails"
+                                item-title="username"
+                                item-value="id"
+                                name="to_recipients"
+                                label="To: "
+                                variant="outlined"
+                                :search-input.sync="toSearchStr"
+                                @change="toSearchStr = ''"
+                                persistent-placeholder
+                                multiple
+                                hide-selected
+                                clear-on-select
+                                autocomplete="off"
+                                chip
+                            >
+                                <template v-slot:selection="data">
+                                    <!-- {{ console.log(data.item ) }} -->
+                                    <v-chip
+                                        v-bind="data.attrs"
+                                        :input-value="data.selected"
+                                        @click="data.select"
+                                        :closable="!defaultRecipient(data.item, 'jobRecipients')"
+                                        @click:close="removeSelection(data.item, 'toRecipients')"
+                                    >
+                                        <v-avatar>
+                                            <v-img
+                                                :src="data.item.avatar ? '/' + data.item.avatar : baseDir+'/img/avatar.png'"
+                                                :lazy-src="baseDir+'/img/avatar.png'"
+                                            ></v-img>
+                                        </v-avatar>
+                                        <span :title="data.item.username">
+                                            {{ data.item.title }}
+                                        </span>
+                                    </v-chip>
+                                </template>
+                                <template v-slot:item="{ props, item }">
+                                    <v-list-item
+                                        v-bind="props"
+                                        :title="item.title"
+                                        :subtitle="item.username"
+                                    >
+                                        <template v-slot:prepend>
+                                        <v-avatar>
+                                            <v-img
+                                            :src="item.avatar ? '/' + item.avatar : baseDir+'/img/avatar.png'"
+                                            :lazy-src="baseDir+'/img/avatar.png'"
+                                            ></v-img>
+                                        </v-avatar>
+                                        </template>
+                                    </v-list-item>
+                                </template>
+                            </v-autocomplete>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="6">
+                            <v-select
+                                v-model="ccRecipients"
+                                :items="ccEmails"
+                                item-title="username"
+                                item-value="id"
+                                name="to_recipients"
+                                label="CC:"
+                                variant="outlined"
+                                :search-input.sync="ccSearchStr"
+                                @change="ccSearchStr = ''"
+                                persistent-placeholder
+                                multiple
+                                hide-selected
+                                clear-on-select
+                                autocomplete="off"
+                            >
+                                <template v-slot:selection="data">
+                                    <!-- {{ console.log(data.item) }} -->
+                                    <v-chip
+                                        v-bind="data.attrs"
+                                        :input-value="data.selected"
+                                        @click="data.select"
+                                        :close="!defaultRecipient(data.item, 'jobRecipients')"
+                                        @click:close="removeSelection(data.item, 'ccRecipients')"
+                                        variant="outlined"
+                                        closable
+                                    >
+                                        <v-avatar>
+                                            <v-img
+                                                :src="data.item.avatar ? '/' + data.item.avatar : baseDir+'/img/avatar.png'"
+                                                :lazy-src="baseDir+'/img/avatar.png'"
+                                            ></v-img>
+                                        </v-avatar>
+                                        <span :title="data.item.username">
+                                            {{ data.item.title }}
+                                        </span>
+                                    </v-chip>
+                                </template>
+                                <template v-slot:data="item">
+                                    <v-avatar>
+                                        <v-img
+                                            :src="item.data.avatar ? '/' + item.data.avatar : baseDir+'/img/avatar.png'"
+                                            :lazy-src="baseDir+'/img/avatar.png'"
+                                        ></v-img>
+                                    </v-avatar>
+                                    <span>{{ item.data.title }}</span>
+                                </template>
+                            </v-select>
                         </v-col>
                     </v-row>
-                </v-card-text -card-text>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                    <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                            <v-btn
+                                depressed
+                                small
+                                @click="processSending()"
+                                v-bind="props"
+                                class="mr-3"
+                                color="white"
+                                style="border: 1px solid green; background-color: #5ab55e;"
+                            >
+                            <v-icon>mdi-check</v-icon>Agree
+                            </v-btn>
+                        </template>
+                        <span>Send</span>
+                    </v-tooltip>
+                    <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                            <v-btn
+                                depressed
+                                small
+                                color="grey darken-3"
+                                outlined
+                                v-bind="props"
+                                @click="sendDialog = false"
+                                style="border: 1px solid grey;"
+                            >
+                            <v-icon left>mdi-close</v-icon>Disagree
+                            </v-btn>
+                        </template>
+                        <span>Cancel</span>
+                    </v-tooltip>
+                </v-card-actions>
             </v-card>
         </v-dialog>
 
