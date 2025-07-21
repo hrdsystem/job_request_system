@@ -1040,6 +1040,151 @@
             </v-card>
         </v-dialog>
 
+        <v-dialog v-model="deleteItemDialog" persistent max-width="300" @keydown.esc="deleteItemDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span>Delete this item?</span>
+                    <v-icon style="float: right;" color="white" @click="deleteDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="blue-grey darken-3"
+                        text
+                        @click="removeItem"
+                    >Agree
+                    </v-btn>
+                    <v-btn
+                        color="blue-grey darken-3"
+                        text
+                        @click="deleteItemDialog = false"
+                    >Disagree</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="confirmDialog" persistent max-width="400" @keydown.esc="confirmDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Please Confirm</span>
+                    <v-icon style="float: right;" color="white" @click="confirmDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-text>
+                    <p class="h4 mb-0 black--text">{{ confirmationText }}</p>
+                </v-card-text>
+                <v-card-actions>
+                    <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                            <v-btn
+                                depressed
+                                small
+                                @click="confirmationFor == 'uploadDialog' ? closeUploadDialog() : send()"
+                                v-bind="props"
+                                class="mr-3"
+                                color="white"
+                                style="border: 1px solid green; background-color: #5ab55e;"
+                            >
+                            <v-icon>mdi-check</v-icon>Agree
+                            </v-btn>
+                        </template>
+                        <span>{{confirmationFor == 'uploadDialog' ? 'Close' : 'Send'}}</span>
+                    </v-tooltip>
+                    <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                            <v-btn
+                                depressed
+                                small
+                                color="grey darken-3"
+                                outlined
+                                v-bind="props"
+                                @click="confirmDialog = false"
+                                style="border: 1px solid grey;"
+                            >
+                            <v-icon left>mdi-close</v-icon>Disagree
+                            </v-btn>
+                        </template>
+                        <span>Cancel</span>
+                    </v-tooltip>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="newUploadsDialog" persistent max-width="400" @keydown.esc="newUploadsDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">{{ dialogTitle }}</span>
+                    <v-icon style="float: right;" color="white" @click="newUploadsDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-text>
+                    <v-col cols="auto">
+                        <v-row v-if="newUploadedFiles.length < 1" class="mb-3">
+                            <v-col class="text-center">
+                                <v-progress-circular
+                                    indeterminate
+                                    color="primary"
+                                ></v-progress-circular>
+                            </v-col>
+                        </v-row>
+                        <v-table v-else fixed-header class="mainTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px">Type</th>
+                                    <th>File Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(file, index) in newUploadedFiles" :key="'att' + index">
+                                    <td class="text-center">
+                                        <a :href="file.url" target="_blank">
+                                            <v-icon color="primary">{{getIcon(file.filename)}}</v-icon>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a :href="file.url" target="_blank">{{ file.filename }}</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </v-col>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="attachmentDialog" persistent max-width="400" @keydown.esc="attachmentDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span>Attachment Dialog</span>
+                    <v-icon style="float: right;" color="white" @click="attachmentDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-text>
+                    <v-col cols="auto">
+                        <v-table fixed-header class="mainTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px">Type</th>
+                                    <th>File Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(attachment, i) in attachments" :key="'att' + i">
+                                    <td class="text-center">
+                                        <a :href="`/job_request/attachments/${attachment.id}/${attachment.orig_filename}`" target="_blank" class="text-decoration-none">
+                                            <v-icon size="25px" color="primary">{{getIcon(attachment.orig_filename)}}</v-icon>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a :href="getAttachmentLink(attachment)" target="_blank" @click="logUrl(attachment)">
+                                            {{attachment.orig_filename}}
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </v-col>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
+
         <snack-bar-component :snackbar="snackbar"></snack-bar-component>
 
         <float-button-component
