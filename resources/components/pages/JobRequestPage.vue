@@ -1366,11 +1366,15 @@ export default {
             'JobRequestData',
             'JobRequestRecords',
             'JobRequestSearch',
-            'JobRequestSort'
+            'JobRequestSort',
+            'baseDir',
+            'selected',
+            'EmailRecipientsData'
         ]),
 
         ...mapWritableState(useSampleStore,[
             'allSelected',
+            'masterUsers',
             'selectedRows'
         ]),
 
@@ -1382,6 +1386,37 @@ export default {
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
         },
+
+        hasNewUploads(){
+            return this.requiredDocuments.some(obj => obj.newUploads.length > 0)
+        },
+        
+        jobRecipients(){
+            return this.EmailRecipientsData.map(email => Number(email.user_id))
+        },
+
+        toEmails() {
+            let items = []
+            let alreadyListed = this.jobRecipients.concat(this.ccRecipients)
+
+            this.masterUsers.forEach(c => {
+                items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
+            })
+            console.log(alreadyListed)
+            return items
+            
+        },
+
+        ccEmails(){
+            let items = []
+            let alreadyListed = this.projectMembers.concat(this.toRecipients)
+
+            this.masterUsers.forEach(c => {
+                items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
+            })
+            console.log(alreadyListed)
+            return items
+        }
     },
     methods:{
         ...mapActions(useSampleStore,[
