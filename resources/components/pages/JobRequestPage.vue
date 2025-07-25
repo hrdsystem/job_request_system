@@ -1184,6 +1184,41 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        
+        <v-dialog v-model="jobUploadDialog" persistent max-width="400" @keydown.esc="jobUploadDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span>Job Attachment Dialog</span>
+                    <v-icon style="float: right;" color="white" @click="jobUploadDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-text>
+                    <v-col cols="auto">
+                        <v-table fixed-header class="mainTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px">Type</th>
+                                    <th>File Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(attachment, i) in jobRequiredAttachments" :key="'att' + i">
+                                    <td class="text-center">
+                                        <a :href="`/job_request/attachments/${attachment.id}/${attachment.orig_filename}`" target="_blank" class="text-decoration-none">
+                                            <v-icon size="25px" color="primary">{{getIcon(attachment.orig_filename)}}</v-icon>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a :href="getAttachmentLink(attachment)" target="_blank" @click="logUrl(attachment)">
+                                            {{attachment.orig_filename}}
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </v-col>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
 
         <snack-bar-component :snackbar="snackbar"></snack-bar-component>
 
@@ -1201,6 +1236,7 @@ import ToolBarComponent from '@aspect/ToolBarComponent.vue'
 import SnackBarComponent from '@aspect/SnackBarComponent.vue'
 import FloatButtonComponent from '@aspect/FloatButtonComponent.vue'
 import {useDisplay} from 'vuetify'
+import {PDFDocument} from 'pdf-lib'
 const { xs } = useDisplay()
 </script>
 
@@ -1215,7 +1251,7 @@ export default {
                 sub_title: "ALL",
                 masters: {
                     show: true,
-                    url: '/job_request_settings/job_required'
+                    url: 'job_request_settings/job_required'
                 },
                 back: {
                     show: false,
@@ -1247,6 +1283,8 @@ export default {
             cancelDialog: false,
             sendDialog:false,
             statusDialog: false,
+            deleteItemDialog: false,
+            attachmentDialog: false,
 
             //SECTION - ADD & EDIT DIALOG DATA
             tempAddIssuedDate: '',
@@ -1257,23 +1295,55 @@ export default {
             tempAddJobRequirement: [],
             tempStatus: null,
             insertDatepicker: false,
-            editECD: false,
             editData: [],
+            attachments: [],
+            addAttachments: [],
+            tempAddAttachments: [],
+            editAttachments: [],
+            tempEditAttachments: [],
+            tempRemoveFiles: {},
+            deletedAttachments: [],
             
             //SECTION - ARRAY DATA FOR UPLOADING
             uploadTab: 0,
             ECD: null,
+            activeRequest: null,
             currentDocument: {},
             requestDetails: {},
+            requiredFileName: [],
             requiredDocuments: [],
+            uploadHistories: [],
+            activeDocument: {},
+            CurrentSubject: null,
+            progress: false,
+            editECD: false,
+            ecdDialog: false,
+            editEcdPicker: false,
+            invalidFile: [],
+            tempRequiredFile: [],
+            requiredFile: [],
+            sendToHrd: false,
+            jobUploadDialog: false,
+            updatingReason: null,
+            jobRequiredAttachments: [],
+
+            //SECTION - New uploadedFiles dialog
+            newUploadedFiles: [],
+            newUploadsDialog: false,
+            dialogTitle: null,
 
             //SECTION - FOR CANCELLING REQUEST / SENDING EMAIL
             cancellingReason: null,
             toRecipients: [],
             ccRecipients: [],
             projectMembers: [],
-            toSearchStr: [],
-            ccSearchStr: [],
+            toSearchStr: '',
+            ccSearchStr: '',
+
+            //SECTION - CONFIRMATION DIALOG
+            confirmDialog: false,
+            confirmationFor: 'attachment',
+            confirmationText: 'Are you sure you want to send this without an attachment?',
 
             //SECTION - STATUS ITEM
             statusItem:[
