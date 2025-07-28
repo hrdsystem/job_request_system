@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 
+use App\Mail\IconnMail;
 use App\Models\JobRequestSubDocument;
 use App\Models\JobRequired;
 use App\Models\JobRequest;
@@ -18,7 +20,6 @@ use App\Models\JobRequestRequirement;
 use App\Models\JobRequestUpload;
 use App\Models\JobRequestUploadedFile;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Date;
 
 class JobRequestController extends Controller
 {   
@@ -426,6 +427,10 @@ class JobRequestController extends Controller
         $request_id = $request->input('id');
         $updates = $request->input('updates');
 
+        // $data['greetings'] = 'Good day!';
+        // $data['header'] = 'New updates for the request' . $request->input('subject') . '.';
+        // $data['project_name'] = $project->project_name;
+
         try {
             DB::beginTransaction();
             
@@ -473,10 +478,61 @@ class JobRequestController extends Controller
 
             DB::commit();
 
+            
+            $to = $this->get_emails($request->input('to_recipients'));
+            $cc = $this->get_emails($request->input('cc_recipients'));
+            dd($request->all(), $request->input('to_recipients'), $request->input('cc_recipients'));
+
+            // $to = $this->get_emails(json_decode($request->input('to_recipients')));
+            // $cc = $this->get_emails(json_decode($request->input('cc_recipients')));
+            Log::info('Processed TO recipients:', $to);
+            Log::info('Processed CC recipients:', $cc);
+            if (empty($to)) {
+                Log::error('Mail Error: "To" recipient list is empty after get_emails.');
+                // It's crucial to return an error or handle this gracefully.
+                // Otherwise, Laravel will throw the "An email must have a "To", "Cc", or "Bcc" header" error.
+                return response()->json(['message' => 'No valid "To" recipients found. Email not sent.'], 400);
+            }
+            $subject = ' [JOB Request - New Job Updates] ' .$request->input('subject');
+            $project = JobRequest::select(
+                'job_requests.project_name'
+            )
+            ->firstOrFail();
+            $data = [
+                'greetings' => 'Good day!',
+                'header' => 'New updates for the request' . $request->input('subject') . '.',
+                'project_name' => $project->project_name,
+                'sender_username' => 'Test User'
+            ];
+
+            $data['documents_uploaded'] = $this->getRequiredDocWithUpload($request_id);
+
+            if (count($cc) > 0){
+                Log::info('Sending email with TO and CC recipients.');
+                Mail::to($to)
+                    ->cc($cc)
+                    ->send(new IconnMail($data, $subject, 'email.job_request_hrd_updates_email'));
+            } else{
+                Log::info('Sending email with only TO recipients (CC list is empty).');
+                Mail::to($to)->send(new IconnMail($data, $subject, 'email.job_request_hrd_updates_email'));
+            }
+
+            Log::info('Email sent successfully for request_id: ' . $request_id);
+
             return ['request_id' => $request_id];
         } catch(\Exception $e){
             return $e->getMessage();
         }
+    }
+
+    private function get_emails($users)
+    {
+        return array_values(array_filter(IconnUser::select('email', 'username as name')
+            ->whereIn('id', $users)
+            ->whereNotNull('email')
+            ->get()
+            ->toArray()
+        ));
     }
 
     public function masterUsers(){
