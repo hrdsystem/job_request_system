@@ -64,6 +64,42 @@
             </v-form>
         </v-dialog>
 
+        <v-dialog v-model="deleteDialog" persistent max-width="300" @keydown.esc="deleteDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Delete this data?</span>
+                    <v-icon style="float: right;" color="white" @click="deleteDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                            <v-btn style="border: 1px solid grey; background-color: #e74c3c;" color="white" @click="Delete" v-bind="props">
+                                <v-icon>mdi-delete-alert</v-icon>Delete
+                            </v-btn>
+                        </template>
+                        <span>Delete</span>
+                    </v-tooltip>
+                    <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                            <v-btn style="border: 1px solid grey; background-color: #227093;" color="white" @click="deleteDialog = false" v-bind="props">
+                                <v-icon>mdi-close-thick</v-icon>Disagree
+                            </v-btn>
+                        </template>
+                        <span>Disagree</span>
+                    </v-tooltip>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <snack-bar-component :snackbar="snackbar"></snack-bar-component>
+
+        <float-button-component
+            :floatButtonData="floatButtonData"
+            @addButtonClicked="toggleAddDialog($event)"
+            @editButtonClicked="floatButtonData.editButtonActive = !floatButtonData.editButtonActive"
+            @deleteButtonHandle="toggleDeleteDialog($event)"
+        ></float-button-component>
     </v-container>
 </template>
 
