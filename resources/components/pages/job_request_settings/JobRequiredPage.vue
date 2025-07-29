@@ -618,13 +618,12 @@ export default {
                 }
             })
             .then((res) =>{
-                this.selectedRows = []
                 this.snackbar.show = true
                 this.snackbar.text = 'Delete Successful'
                 this.snackbar.color = 'blue-grey'
                 this.deleteDialog = false
                 this.jobRequiredPage()
-                this.resetToggleSelectAll()
+                // this.resetToggleSelectAll()
             })
         }
     },
