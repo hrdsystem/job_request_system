@@ -31,6 +31,39 @@
                 </tr>
             </tbody>
         </v-table>
+
+        <v-dialog v-model="insertDialog" persistent width="300" @keydown.esc="insertDialog = false">
+            <v-form id="Insert" ref="Insert" @submit.prevent="Insert">
+                <v-card>
+                    <v-card-title style="background-color: #455A64;" class="d-flex align-center">
+                        <span class="headline" style="color: white;" >Add Email Recipient</span>
+                        <v-spacer></v-spacer>
+                        <v-icon color="white" @click="insertDialog = false">mdi-close</v-icon>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-autocomplete
+                            v-model="tempName"
+                            :items="masterUsers"
+                            item-title="username"
+                            item-value="id"
+                            name="user_id"
+                            variant="outlined"
+                            autocomplete="off"
+                            :rules="rules.required"
+                        >
+                            <template v-slot:label>
+                                <span><span style="color: red">*</span> Recipient</span>
+                            </template>
+                        </v-autocomplete>
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-btn type="submit" style="border: 1px solid grey; background-color: #227093;" color="white">Submit</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-form>
+        </v-dialog>
+
     </v-container>
 </template>
 
