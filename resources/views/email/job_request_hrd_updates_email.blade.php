@@ -11,7 +11,7 @@
         <td><span>{{ date('Y-m-d') }}</span></td>
     </tr>
     <tr>
-        <td>Project Name:</td>
+        <td>Project Name: </td>
         <td><span style="font-family: Arial, Calibri; font-weight: bold;">{{ $project_name }}</span></td>
     </tr>
 </table>
@@ -41,11 +41,11 @@
     <tr>
         @if (isset($new_uploads) && in_array($item->document_id, $new_uploads))
             <td style="color: blue;">
-                {{ $item->$project_name }}
+                {{ $item->required_name }}
             </td>
         @else
             <td>
-                {{ $item->$project_name }}
+                {{ $item->required_name }}
             </td>
         @endif
         <td>
