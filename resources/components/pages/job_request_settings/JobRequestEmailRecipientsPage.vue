@@ -115,14 +115,60 @@ import {useSampleStore} from '../../../js/store'
 export default {
     data(){
         return{
+            toolbarData:{
+                title: "EMAIL RECIPIENTS",
+                sub_title: "ALL",
+                masters: {
+                    show: false,
+                    url: '/job_request_settings/job_required'
+                },
+                back: {
+                    show: true,
+                    url: '/iconnsystem/job_request'
+                },
+                view: false,
+                filter: true,
+                info: false,
+                key: false
+            },
+            floatButtonData:{
+                addButton: true,
+                editButton: true,
+                deleteButton: true
+            },
 
+            snackbar: {
+                color: 'blue-grey',
+                text: '',
+                show: false
+            },
+
+            //SECTION - DIALOGS
+            insertDialog: false,
+            deleteDialog: false,
+
+            //SECTION - Insert data
+            tempName: null,
+
+            //SECTION - CSS data properties
+            fontSizes: '55px'
         }
     },
 
     computed:{
         ...mapState(useSampleStore,[
+            'masterUsers',
+            'tableHeight',
+            'filterMode',
+            'viewMode',
+            'EmailRecipientsData',
+            'rules'
+        ]),
 
-        ])
+        ...mapWritableState(useSampleStore,[
+            'allSelected',
+            'selectedRows'
+        ]),
     },
 
     method:{
