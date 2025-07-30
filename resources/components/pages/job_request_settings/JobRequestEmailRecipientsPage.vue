@@ -200,6 +200,39 @@ export default {
                 console.log('DESELECT', this.selectedRows)
             }
         },
+
+        Insert(){
+            console.log('testing')
+
+            if(this.$refs.Insert.validate()){
+                var myform = document.getElementById('Insert')
+                var formdata = new FormData(myform)
+            }
+
+            formdata.append('user_id', this.tempName)
+
+            axios({
+                method: 'post',
+                url: '/api/jobMaster/insert_recipients',
+                data: formdata
+            })
+            .then((res) =>{
+                if(res.data == 1){
+                    console.log('already existing')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Email Recipient Already Exists'
+                    this.snackbar.color = 'red darken-2'
+                } else{
+                    console.log('insert successful')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Insert Successful'
+                    this.snackbar.color = 'blue-grey'
+                    this.emailRecipientPage()
+                    this.insertDialog = false
+                }
+            })
+        },
+
 }
 </script>
 
