@@ -171,12 +171,35 @@ export default {
         ]),
     },
 
-    method:{
+    methods:{
         ...mapActions(useSampleStore,[
+            'getMasterUsers',
+            'toggleFilterMode',
+            'searchColumn',
+            'sortColumn',
+            'emailRecipientPage',
+            'setSelected',
+            'resetToggleSelectAll'
+        ]),
 
-        ])
-    }
-    
+        toggleAddDialog(){
+            this.insertDialog = true
+        },
+
+        toggleDeleteDialog(){
+            this.deleteDialog = true
+        },
+
+        toggleSelectAll(){
+            this.allSelected =  !this.allSelected
+            if(this.allSelected){
+                this.selectedRows = this.EmailRecipientsData.map((_, index) => index)
+                console.log('Select All', this.selectedRows)
+            } else{
+                this.selectedRows = []
+                console.log('DESELECT', this.selectedRows)
+            }
+        },
 }
 </script>
 
