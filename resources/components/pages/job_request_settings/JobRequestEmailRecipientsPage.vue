@@ -233,6 +233,25 @@ export default {
             })
         },
 
+        Delete(){
+            axios({
+                method: 'post',
+                url: '/api/jobMaster/delete_recipients',
+                data:{
+                    id: this.selectedRows.map(index => this.EmailRecipientsData[index].id)
+                }
+            })
+            .then(res =>{
+                this.snackbar.show = true
+                this.snackbar.text = 'Delete Successful'
+                this.snackbar.color = 'blue-grey'
+                this.deleteDialog = false
+                this.emailRecipientPage()
+                // this.resetToggleSelectAll()
+            })
+        }
+    },
+
 }
 </script>
 
