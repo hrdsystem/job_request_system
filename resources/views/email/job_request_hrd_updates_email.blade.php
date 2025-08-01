@@ -2,7 +2,7 @@
 
 {{ $header }}<br><br>
 
-<a href="{{ URL::to('/') }}/job_requests" target="_blank" style="font-family: Arial, Calibri; font-weight: bold;">JOB Request System</a>
+<a href="{{ URL::to('/iconnsystem') }}/job_request" target="_blank" style="font-family: Arial, Calibri; font-weight: bold;">JOB Request System</a>
 <br><br>
 
 <table>
