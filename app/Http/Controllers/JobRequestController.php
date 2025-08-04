@@ -527,12 +527,44 @@ class JobRequestController extends Controller
 
     private function get_emails($users)
     {
-        return array_values(array_filter(IconnUser::select('email', 'username as name')
-            ->whereIn('id', $users)
-            ->whereNotNull('email')
-            ->get()
-            ->toArray()
-        ));
+        // Log the input to get_emails
+        Log::info('get_emails - Input $users:', ['users_array' => $users]);
+
+        if (!is_array($users) || empty($users)) {
+            Log::warning('get_emails - $users is not a valid array or is empty, returning empty result.');
+            return [];
+        }
+
+        $queryEmail = IconnUser::select('users.email', 'users.username as name')
+            ->whereIn('users.id', $users)
+            ->whereNotNull('users.email')
+            ->get();
+        
+        // Log the raw result from the database before converting to array
+        Log::info('get_emails - Query Result (Collection):', ['result' => $queryEmail->toArray()]);
+
+        $toArrayEmails = $queryEmail->toArray();
+
+        // Log the result after toArray()
+        Log::info('get_emails - After to Array():', ['array_result' => $toArrayEmails]);
+
+        $filteredEmails = array_filter($toArrayEmails);
+
+        // Log the results after array_filter()
+        Log::info('get_emails - After array_filter():', ['filtered_emails' => $filteredEmails]);
+
+        $finalResults = array_values($filteredEmails);
+
+        // Log the final result before returning
+
+        return $finalResults;
+
+        // return array_values(array_filter(IconnUser::select('email', 'username as name')
+        //     ->whereIn('id', $users)
+        //     ->whereNotNull('email')
+        //     ->get()
+        //     ->toArray()
+        // ));
     }
 
     public function masterUsers(){
