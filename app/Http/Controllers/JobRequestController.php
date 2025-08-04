@@ -356,7 +356,6 @@ class JobRequestController extends Controller
 
     public function getRequiredDocWithUpload($request_id)
     {
-
         $requirements = JobRequestRequirement::select(
             'job_request_requirements.id',
             'job_request_requirements.job_request_id',
@@ -477,11 +476,16 @@ class JobRequestController extends Controller
             }
 
             DB::commit();
-
             
-            $to = $this->get_emails($request->input('to_recipients'));
-            $cc = $this->get_emails($request->input('cc_recipients'));
-            dd($request->all(), $request->input('to_recipients'), $request->input('cc_recipients'));
+            $rawToRecipients = $request->input('to_recipients');
+            $rawCcRecipients = $request->input('cc_recipients');
+
+            $to = $this->get_emails($rawToRecipients);
+            $cc = $this->get_emails($rawCcRecipients);
+
+            Log::info('Raw TO recipients from frontend:', ['to' => $rawToRecipients]);
+            Log::info('Raw CC recipients from frontend:', ['cc' => $rawCcRecipients]);
+            // dd($request->all(), $request->input('to_recipients'), $request->input('cc_recipients'));
 
             // $to = $this->get_emails(json_decode($request->input('to_recipients')));
             // $cc = $this->get_emails(json_decode($request->input('cc_recipients')));
@@ -493,18 +497,18 @@ class JobRequestController extends Controller
                 // Otherwise, Laravel will throw the "An email must have a "To", "Cc", or "Bcc" header" error.
                 return response()->json(['message' => 'No valid "To" recipients found. Email not sent.'], 400);
             }
-            $subject = ' [JOB Request - New Job Updates] ' .$request->input('subject');
+            $subject = ' [JOB Request - New Job Updates] ' . $request->input('subject') . '.';
             $project = JobRequest::select(
                 'job_requests.project_name'
             )
             ->firstOrFail();
             $data = [
                 'greetings' => 'Good day!',
-                'header' => 'New updates for the request' . $request->input('subject') . '.',
+                'header' => 'New updates for the request ' . $request->input('subject') . '.',
                 'project_name' => $project->project_name,
                 'sender_username' => 'Test User'
             ];
-
+            
             $data['documents_uploaded'] = $this->getRequiredDocWithUpload($request_id);
 
             if (count($cc) > 0){
