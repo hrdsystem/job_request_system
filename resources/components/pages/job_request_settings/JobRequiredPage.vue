@@ -105,6 +105,7 @@
                                     dense
                                     required
                                     outlined
+                                    hide-details
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>No .</span>
@@ -120,6 +121,7 @@
                                     dense
                                     outlined
                                     autocomplete="off"
+                                    hide-details
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>Required Name</span>
@@ -135,6 +137,7 @@
                                     dense
                                     outlined
                                     autocomplete="off"
+                                    hide-details
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>Filling Mark</span>
@@ -150,6 +153,7 @@
                                     dense
                                     outlined
                                     autocomplete="off"
+                                    
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>Header Name</span>
@@ -184,6 +188,7 @@
                                     label="No ."
                                     name="seq"
                                     persistent-placeholder
+                                    hide-details
                                     dense
                                     required
                                     outlined
@@ -198,6 +203,7 @@
                                     dense
                                     outlined
                                     autocomplete="off"
+                                    hide-details
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
@@ -245,7 +251,7 @@
                         <template v-for="(item, index) in tempSubDocumentItems" :key="index">
                             <v-row class="row-impact">
                                 <v-col cols="1" sm="1" md="1">
-                                    <v-icon color="error" class="mt-3" @click="removeItemAtIndex(index)" >mdi-delete</v-icon>
+                                    <v-icon style="padding-left: 10px;" color="error" class="mt-6" @click="removeItemAtIndex(index)">mdi-delete</v-icon>
                                 </v-col>
                                 <v-col cols="4" sm="4" md="4">
                                     <v-text-field
@@ -721,6 +727,10 @@ color:white !important;
 
 .v-dialog .v-card-title:active {
     cursor: grabbing !important;
+}
+
+.v-dialog > .v-overlay__content > .v-card > .v-card-text, .v-dialog > .v-overlay__content > form > .v-card > .v-card-text {
+    padding: 0px 16px 16px 
 }
 
 .float-right{
