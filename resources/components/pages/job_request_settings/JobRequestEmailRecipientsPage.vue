@@ -27,7 +27,6 @@
                         ></v-checkbox>
                     </td>
                     <td>{{ item.username }}</td>
-                    <td class="text">𝔱𝔢𝔰𝔱𝔦𝔫𝔤 𝔡𝔞𝔱𝔞</td>
                 </tr>
             </tbody>
         </v-table>
@@ -50,6 +49,7 @@
                             variant="outlined"
                             autocomplete="off"
                             :rules="rules.required"
+                            hide-details
                         >
                             <template v-slot:label>
                                 <span><span style="color: red">*</span> Recipient</span>
@@ -349,6 +349,10 @@ color:white !important;
 
 .v-dialog .v-card-title:active {
     cursor: grabbing !important;
+}
+
+.v-dialog > .v-overlay__content > .v-card > .v-card-text, .v-dialog > .v-overlay__content > form > .v-card > .v-card-text {
+    padding: 0px 16px 16px 
 }
 
 .float-right{
