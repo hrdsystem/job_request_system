@@ -1598,6 +1598,107 @@ export default {
             })
         },
 
+        getIcon(filename) {
+            if (filename) {
+                const ext = _.last(_.split(filename.toLowerCase(), '.'))
+                const image = [
+                    'jpg',
+                    'jpeg',
+                    'png'
+                ]
+                // ternary if..else if..
+                return ext === 'pdf' ? 'mdi-file-pdf-box'
+                    : _.includes(image, ext) ? 'mdi-file-image'
+                    : (ext === 'xls' || ext === 'xlsx') ? 'mdi-file-excel'
+                    : (ext === 'dwg' || ext === 'dxf') ? 'mdi-file-cad'
+                    : 'mdi-file'
+            }
+        },
+
+        multiDropFile(temp, model, files) {
+            const self = this
+            _.forEach(files, function(file) {
+                globalThis[temp].push(file)
+            })
+            self.multiChangeFile(temp, model)
+        },
+        
+        multiChangeFile(temp, model) {
+            const self = this
+            if (self[temp].length > 0) {
+                _.forEach(self[temp], function(file) {
+                    self.multiFileChecker(file, model, temp)
+                })
+            } else {
+                self[model] = []
+            }
+            self[temp] = []
+        },
+
+        multiFileChecker(file, model, temp) {
+            const self = this
+            // self.multiFileReader(file, model, file.name, file.type)
+
+            if (model == 'addAttachments'){
+                this.multiFileReader(file, model, file.name, file.type)
+            } else if(model == 'editAttachments'){
+                this.multiFileReader(file, model, file.name, file.type)
+            }else{
+                const requiredFilenameArr = this.requiredFileName.split('-')
+                const filenameArr = file.name.split('.')
+                const filename = filenameArr.shift()
+    
+                const validFileName = filename.includes(this.CurrentSubject) && filename.includes(requiredFilenameArr[requiredFilenameArr.length -1])
+    
+                if (temp == 'tempRequiredFile' && !validFileName) {
+                    this.invalidFile.push({filename: file.name})
+                } else {
+                    this.multiFileReader(file, model, file.name, file.type)
+                }
+            }``
+
+        },
+        
+        async multiFileReader(file, model, filename, filetype) {
+            const self = this
+            const fileUrl = URL.createObjectURL(file)
+
+            if (filetype === 'application/pdf') {
+                let pdfBytes = await fetch(fileUrl).then((res) => res.arrayBuffer());
+                const pdfDoc = await PDFDocument.load(pdfBytes, { 
+                    updateMetadata: true
+                })
+                
+                pdfDoc.setTitle(' ')
+                pdfDoc.setAuthor(' ')
+                pdfDoc.setSubject(' ')
+                pdfDoc.setKeywords([' '])
+                pdfDoc.setCreator(' ')
+                pdfDoc.setProducer(' ')
+
+                pdfBytes = await pdfDoc.saveAsBase64({ dataUri: true })
+                self[model].push({
+                    data: pdfBytes,
+                    url: fileUrl,
+                    filename: self.spaceToUnderscore(filename)
+                });
+            } else {
+                const reader = new FileReader()
+
+                reader.readAsDataURL(file)
+                reader.onloadend = function() {
+                    self[model].push({
+                        data: reader.result,
+                        url: fileUrl,
+                        filename: self.spaceToUnderscore(filename)
+                    });
+                }
+            }
+        },
+
+        spaceToUnderscore(str) {
+            return str.replace(/ /g,'_')
+        },
     }
 }
 </script>
