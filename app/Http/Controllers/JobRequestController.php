@@ -64,7 +64,7 @@ class JobRequestController extends Controller
         // $attachment = JobAttachment::where('id', $attachment_id)->get();
         $attachment = DB::table('job_attachments')
         ->where('job_attachments.id', $attachment_id)
-        ->get();
+        ->first();
         $viewable = [
             'pdf',
             'jpg',
@@ -102,7 +102,7 @@ class JobRequestController extends Controller
             $q
             ->where('job_request_uploaded_files.id', $ids[0]);
         })
-        ->get();
+        ->first();
 
         if($uploaded_file){
             $viewable = [
