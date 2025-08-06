@@ -216,4 +216,16 @@ class JobRequestSettingsController extends Controller
         }
         return $email_recipients;
     }
+
+    public function deleteJobRecipients(Request $request){
+        try{
+            EmailRecipient::whereIn('id', $request->id)
+            ->update([
+                'deleted_by' => 271,
+                'deleted_at' => now()
+            ]);
+        }catch(\Exeception $e){
+            return $e->getMessage();
+        }
+    }
 }
