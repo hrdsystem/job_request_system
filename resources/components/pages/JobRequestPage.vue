@@ -78,7 +78,7 @@
                                 <v-btn icon="mdi-close" flat size="30px" color="red" @click="cancelRequestDialog()"></v-btn>
                             </template>
                             <template v-else>
-                                <v-btn icon="mdi-pencil" flat size="30px" color="success" @click="Edit(item)"></v-btn>
+                                <v-btn icon="mdi-pencil" flat size="30px" style="background-color: #227093; color: white;" @click="Edit(item)"></v-btn>
                             </template>
                         </td>
                         <td>{{ item.project_name }}</td>
@@ -102,7 +102,7 @@
                         </td>
                         <td>{{ item.username }}</td>
                         <td>{{ item.requested_date }}</td>
-                        <td>{{ item.job_ecd }}</td>
+                        <td>{{ item.ECD }}</td>
                         <template v-for="(job_req, index) in JobRequestRequiredData" :key="index">
                             <template v-if="item.requirements.includes(job_req.id)">
                                 <td class="text-center">
@@ -150,7 +150,7 @@
                         <span class="headline">Add Required Job</span>
                         <v-icon style="float: right;" color="white" @click="insertDialog = false">mdi-close</v-icon>
                     </v-card-title>
-                    <v-card-text>
+                    <v-card-text >
                         <v-row>
                             <v-col cols="6" sm="6" md="6">
                                 <v-text-field
@@ -164,6 +164,7 @@
                                     outlined
                                     persistent-placeholder
                                     autocomplete="off"
+                                    hide-details
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>PROJECT NAME</span>
@@ -183,6 +184,7 @@
                                     required
                                     autocomplete="off"
                                     persistent-placeholder
+                                    hide-details
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>SUBJECT</span>
@@ -201,6 +203,7 @@
                                     outlined
                                     persistent-placeholder
                                     autocomplete="off"
+                                    hide-details
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>LOT #</span>
@@ -243,6 +246,7 @@
                                     class="optional"
                                     rows="3"
                                     outlined
+                                    persistent-placeholder
                                     dense
                                 >
                                 <template v-slot:label>
@@ -258,10 +262,11 @@
                                 <v-file-input
                                     v-model="tempAddAttachments"
                                     label="Attachment/s"
+                                    placeholder="testing "
                                     prepend-icon="mdi-file"
-                                    persistent-placeholder
                                     variant="outlined"
                                     multiple
+                                    persistent-placeholder
                                     dense
                                 ></v-file-input>
                             </v-col>
@@ -294,6 +299,7 @@
                                     </v-col>
                                 </template>
                             </v-row>
+                            <input type="hidden" name="send_to_hrd" :value="sendToHrd">
                         </v-row>
                     </v-card-text>
                     <v-divider></v-divider>
@@ -322,7 +328,7 @@
         <v-dialog v-model="editDialog" persistent max-width="600" @keydown.esc="editDialog = false">
             <v-form id="Update" ref="Update" @submit.prevent="Update">
                 <v-card>
-                    <v-card-title>
+                    <v-card-title >
                         <span class="headline">{{ editData.project_name }}</span>
                         <v-icon style="float: right;" color="white" @click="editDialog = false">mdi-close</v-icon>
                     </v-card-title>
@@ -338,6 +344,7 @@
                                     class=" uppercase-value"
                                     dense
                                     outlined
+                                    hide-details
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="6">
@@ -350,6 +357,7 @@
                                     class=" uppercase-value"
                                     dense
                                     outlined
+                                    hide-details
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="6">
@@ -457,7 +465,7 @@
                             <v-row class="mx-1">
                                 <template v-for="(job_document, index) in JobRequestRequiredData" :key="index">
                                     <v-col cols="4" sm="4" md="4">
-                                        <v-checkbox multiple v-model="tempAddJobRequirement" :label="job_document.required_name.toUpperCase()" :value="job_document.id" color="indigo"></v-checkbox>
+                                        <v-checkbox hide-details multiple v-model="tempAddJobRequirement" :label="job_document.required_name.toUpperCase()" :value="job_document.id" color="indigo"></v-checkbox>
                                     </v-col>
                                 </template>
                             </v-row>
@@ -583,10 +591,7 @@
                                                     v-if="doc.uploads.length === 1">
                                                     <v-icon size="30px" color="blue">mdi-file</v-icon>
                                                 </a>
-                                                <div
-                                                    
-                                                    v-else-if="doc.uploads.length > 1"
-                                                >
+                                                <div v-else-if="doc.uploads.length > 1">
                                                     <v-icon size="30px" style="color: goldenrod;" @click="toggleJobAttachments(activeRequest, doc.document_id)">
                                                         mdi-folder
                                                     </v-icon>
@@ -595,9 +600,9 @@
                                             </td>
                                             <td>{{ doc.required_name }}</td>
                                             <td>{{ ECD }}</td> 
-                                            <td>temp uploader</td>
-                                            <td>temp uploaded date</td>
-                                            <td>temp reason</td>
+                                            <td>{{  }}</td>
+                                            <td>{{ doc.date_uploaded }}</td>
+                                            <td>{{ doc.updating_reason }}</td>
                                             <td class="text-center icon-btn">
                                                 <v-tooltip location="bottom" >
                                                     <template v-slot:activator="{ props }">
@@ -715,6 +720,7 @@
                                         persistent-placeholder
                                         variant="outlined"
                                         rows="3"
+                                        hide-details
                                     >
                                     <template v-slot:label>
                                         <span><span style="color: red">*</span>Reason for Updating</span>
@@ -786,7 +792,7 @@
                     </v-btn>
                     <v-tooltip location="bottom" v-if="uploadTab == 0">
                         <template v-slot:activator="{ props }">
-                            <v-btn style="border: 1px solid grey;" color="primary" @click="toggleSendDialog()" v-bind="props">
+                            <v-btn style="border: 1px solid grey;" color="primary" @click="toggleSendDialog()" v-bind="props" :disabled="!newUpdates">
                                 <v-icon>mdi-send</v-icon>Send
                             </v-btn>
                         </template>
@@ -807,7 +813,7 @@
                     <span class="headline">Cancel Request?</span>
                     <v-icon style="float: right;" color="white" @click="cancelDialog = false">mdi-close</v-icon>
                 </v-card-title>
-                <v-card-text>
+                <!-- <v-card-text> -->
                     <v-col cols="12" class="mb-0">
                         <v-textarea
                             v-model="cancellingReason"
@@ -818,12 +824,12 @@
                             rows="3"
                         ></v-textarea>
                     </v-col>
-                </v-card-text>
+                <!-- </v-card-text> -->
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-tooltip location="bottom">
                         <template v-slot:activator="{ props }">
-                            <v-btn color="primary" depressed :disabled="cancellingReason == null || cancellingReason == ''" @click="toggleSendDialog()" v-bind="props">
+                            <v-btn style="border: 1px solid grey" color="primary" depressed :disabled="cancellingReason == null || cancellingReason == ''" @click="toggleSendDialog()" v-bind="props">
                                 <v-icon>mdi-send</v-icon>Send
                             </v-btn>
                         </template>
@@ -839,7 +845,7 @@
                     <span class="headline">{{ uploadDialog ? 'Send Uploading Changes' : 'Send Request' }}</span>
                     <v-icon style="float: right;" color="white" @click="sendDialog = false">mdi-close</v-icon>
                 </v-card-title>
-                <v-card-text style="height:auto;">
+                <!-- <v-card-text style="height:auto;"> -->
                     <v-row class="mx-2">
                         <v-col cols="12" sm="6" md="6">
                             <v-autocomplete
@@ -855,9 +861,7 @@
                                 persistent-placeholder
                                 multiple
                                 hide-selected
-                                clear-on-select
                                 autocomplete="off"
-                                chip
                             >
                                 <template v-slot:selection="data">
                                     <!-- {{ console.log(data.item ) }} -->
@@ -865,8 +869,10 @@
                                         v-bind="data.attrs"
                                         :input-value="data.selected"
                                         @click="data.select"
-                                        :closable="!defaultRecipient(data.item, 'jobRecipients')"
+                                        :close="!defaultRecipient(data.item, 'jobRecipients')"
                                         @click:close="removeSelection(data.item, 'toRecipients')"
+                                        variant="outlined"
+                                        closable
                                     >
                                         <v-avatar>
                                             <v-img
@@ -898,7 +904,7 @@
                             </v-autocomplete>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
-                            <v-select
+                            <v-autocomplete
                                 v-model="ccRecipients"
                                 :items="ccEmails"
                                 item-title="username"
@@ -945,10 +951,10 @@
                                     </v-avatar>
                                     <span>{{ item.data.title }}</span>
                                 </template>
-                            </v-select>
+                            </v-autocomplete>
                         </v-col>
                     </v-row>
-                </v-card-text>
+                <!-- </v-card-text> -->
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-tooltip location="bottom">
@@ -995,7 +1001,7 @@
                             <span class="headline">Update Status</span>
                             <v-icon style="float: right;" color="white" @click="statusDialog = false">mdi-close</v-icon>
                         </v-card-title>
-                        <v-card-text>
+                        <v-card-text style="padding-top: 0px;">
                             <v-select
                                 v-model="tempStatus"
                                 :items="statusItem"
@@ -1003,14 +1009,31 @@
                                 item-title="text"
                                 label="Status"
                                 name="status"
+                                hide-details
                             >
                             </v-select>
                             <input type="hidden" name="id" :value="editData.id">
                         </v-card-text>
                         <v-divider></v-divider>
                         <v-card-actions>
-                            <v-btn @click="statusDialog = false" color="red">Cancel</v-btn>
-                            <v-btn type="submit" text color="success">save</v-btn>
+                            <!-- <v-btn @click="statusDialog = false" color="red">Cancel</v-btn> -->
+                            <v-tooltip location="bottom">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn style="border: 1px solid grey; background-color: #e74c3c;" color="white" v-bind="props" @click="statusDialog = false">
+                                        <v-icon>mdi-email-remove-outline</v-icon>CANCEL
+                                    </v-btn>
+                                </template>
+                                <span>CANCEL</span>
+                            </v-tooltip>
+                            <!-- <v-btn type="submit" text color="success">save</v-btn> -->
+                            <v-tooltip location="bottom">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn type="submit" style="border: 1px solid grey; background-color: #227093;" color="white" v-bind="props">
+                                        <v-icon>mdi-email-edit-outline</v-icon>SAVE
+                                    </v-btn>
+                                </template>
+                                <span>SAVE</span>
+                            </v-tooltip>
                         </v-card-actions>
                     </v-card>
                 </template>
