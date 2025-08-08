@@ -1191,7 +1191,7 @@
                             <tbody>
                                 <tr v-for="(attachment, i) in attachments" :key="'att' + i">
                                     <td class="text-center">
-                                        <a :href="`/job_request/attachments/${attachment.id}/${attachment.orig_filename}`" target="_blank" class="text-decoration-none">
+                                        <a :href="`/job_requests/attachments/${attachment.id}/${attachment.orig_filename}`" target="_blank" class="text-decoration-none">
                                             <v-icon size="25px" color="primary">{{getIcon(attachment.orig_filename)}}</v-icon>
                                         </a>
                                     </td>
@@ -1226,7 +1226,7 @@
                             <tbody>
                                 <tr v-for="(attachment, i) in jobRequiredAttachments" :key="'att' + i">
                                     <td class="text-center">
-                                        <a :href="`/job_request/attachments/${attachment.id}/${attachment.orig_filename}`" target="_blank" class="text-decoration-none">
+                                        <a :href="getAttachmentLink(attachment)" target="_blank" @click="logUrl(attachment)" class="text-decoration-none">
                                             <v-icon size="25px" color="primary">{{getIcon(attachment.orig_filename)}}</v-icon>
                                         </a>
                                     </td>
