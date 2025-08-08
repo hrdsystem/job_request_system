@@ -1439,8 +1439,13 @@ export default {
             })
             console.log(alreadyListed)
             return items
+        },
+
+        newUpdates(){
+            return _.some(this.requiredDocuments) || this.hasNewUploads
         }
     },
+
     methods:{
         ...mapActions(useSampleStore,[
             'jobRequiredPage',
