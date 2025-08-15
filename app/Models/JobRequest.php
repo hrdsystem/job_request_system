@@ -52,4 +52,27 @@ class JobRequest extends Model
     public function uploads(){
         return $this->hasMany(JobRequestUploadedFile::class, 'request_id', 'id');
     }
+
+    public function scopeWithRequirementsData($query, $jobRequestIds){
+        return $query
+        ->select(
+            'job_request_requirements.job_request_id',
+            'job_request_requirements.document_id',
+        )
+        ->leftJoin('job_requests', 'job_requests.id', 'job_request_requirements.id')
+        ->whereIn('id', $jobRequestIds)
+        ->get();
+    }
+
+    public function scopeWithUploadedData($query, $uploadRequestIds){
+        return $query
+        ->select(
+            'job_request_uploads.request_id',
+            'job_request_uploads.document_id'
+        )
+        ->leftJoin('job_request_uploads', 'job_request_uploads.id', 'upload_id')
+        ->leftJoin('job_requests', 'job_requests.id', 'job_request_uploads.request_id')
+        ->whereIn('upload_id', $uploadRequestIds)
+        ->get();
+    }
 }
