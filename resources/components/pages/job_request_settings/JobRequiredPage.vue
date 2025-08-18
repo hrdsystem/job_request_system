@@ -5,7 +5,7 @@
             <thead>
                 <tr>
                     <th v-show="floatButtonData.editButtonActive" class="text-left" style="width:20px">
-                        <v-checkbox style="display: flex;" color="white" :input-value="allSelected" @change="toggleSelectAll()" ></v-checkbox>
+                        <v-checkbox style="display: flex;" color="white" v-model="allSelected"></v-checkbox>
                     </th>
                     <th v-show="floatButtonData.editButtonActive" class="text-left" style="width:20px">Edit</th>
                     <th v-show="floatButtonData.editButtonActive" class="text-left Sortable" style="width:20px">
@@ -43,9 +43,10 @@
                             <v-checkbox 
                                 style="display: flex;" 
                                 color="indigo" 
-                                :model-value="allSelected"
-                                :input-value="allSelected"
-                                @change="setSelected(index)">
+                                
+                                v-model="selectedRows"
+                                :value="index"
+                                >
                             </v-checkbox>
                         </td>
                         <td v-show="floatButtonData.editButtonActive">
@@ -418,7 +419,6 @@ export default {
         ]),
 
         ...mapWritableState(useSampleStore,[
-            'allSelected',
             'selectedRows'
         ]),
 
@@ -428,6 +428,24 @@ export default {
         last_seq(){
             return this.JobRequestRequiredRecords + 1
         },
+
+        allSelected: {
+            get() {
+                // This checks if the length of the selectedRows array
+                // is equal to the total number of items.
+                return this.selectedRows.length === this.JobRequestRequiredData.length;
+            },
+            set(value) {
+                // This is the setter that runs when the select all checkbox is clicked.
+                if (value) {
+                    // Select all rows
+                    this.selectedRows = this.JobRequestRequiredData.map((_, index) => index);
+                } else {
+                    // Deselect all rows
+                    this.selectedRows = [];
+                }
+            }
+        }
     },
 
     methods: {
@@ -629,7 +647,7 @@ export default {
                 this.snackbar.color = 'blue-grey'
                 this.deleteDialog = false
                 this.jobRequiredPage()
-                // this.resetToggleSelectAll()
+                this.resetToggleSelectAll()
             })
         }
     },
