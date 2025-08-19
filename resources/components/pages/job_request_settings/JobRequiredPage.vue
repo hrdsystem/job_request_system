@@ -43,10 +43,8 @@
                             <v-checkbox 
                                 style="display: flex;" 
                                 color="indigo" 
-                                
                                 v-model="selectedRows"
-                                :value="index"
-                                >
+                                :value="index">
                             </v-checkbox>
                         </td>
                         <td v-show="floatButtonData.editButtonActive">
@@ -647,7 +645,7 @@ export default {
                 this.snackbar.color = 'blue-grey'
                 this.deleteDialog = false
                 this.jobRequiredPage()
-                this.resetToggleSelectAll()
+                // this.resetToggleSelectAll()
             })
         }
     },
