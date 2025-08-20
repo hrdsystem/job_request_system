@@ -196,7 +196,7 @@ class JobRequestSettingsController extends Controller
 
         return $data;
     }
-
+    
     public function insertJobRecipients(Request $request){
         $exist = EmailRecipient::where('user_id', $request->get('user_id'))->exists();
         if($exist){
