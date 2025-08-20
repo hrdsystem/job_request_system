@@ -29,6 +29,7 @@ Route::prefix('/jobRequest')->group(function(){
         Route::post('job_update', 'jobRequestUpdate');
         Route::post('job_delete', 'jobRequestDelete');
         Route::post('job_status_change', 'jobRequestStatusChange');
+        Route::post('job_ecd_change', 'jobRequestEcdChange');
         Route::post('get_required_documents', 'getRequiredDocuments');
         Route::post('master_users' , 'masterUsers');
         Route::post('process_job_updates', 'process_job_updates');
