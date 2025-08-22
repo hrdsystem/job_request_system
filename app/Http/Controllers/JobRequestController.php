@@ -354,6 +354,21 @@ class JobRequestController extends Controller
         return response()->json(['success' => 'Update Successfully ']);
     }
 
+    public function jobRequestEcdChange(Request $request){
+        try{
+            DB::beginTransaction();
+            $data = JobRequest::find($request->get('id'));
+            $data->job_ecd = $request->get('ecd_date');
+            $data->save();
+
+            DB::commit();
+        } catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return response()->json(['success' => 'Update Successfully ']);
+
+    }
+
     public function getRequiredDocWithUpload($request_id)
     {
         $requirements = JobRequestRequirement::select(
