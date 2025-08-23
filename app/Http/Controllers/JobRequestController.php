@@ -146,15 +146,16 @@ class JobRequestController extends Controller
     }
 
     public function getJobRequests(Request $request){
-        $cnt = JobRequest::when(request('search'), function ($q) {
-            for($i=0;$i<count(request('search'));$i++){
-                return $q->orWhere(request('search')[$i]['column'],'like','%'.request('search')[$i]['val'].'%');
-            }
-        })->count();
+
+        // $cnt = JobRequest::when(request('search'), function ($q) {
+        //     for($i=0;$i<count(request('search'));$i++){
+        //         return $q->orWhere(request('search')[$i]['column'],'like','%'.request('search')[$i]['val'].'%');
+        //     }
+        // })->count();
 
         $users = IconnUser::select('id', 'username');
     
-        $data = JobRequest::joinSub($users, 'users', function($join){
+        $jobRequestQuery = JobRequest::joinSub($users, 'users', function($join){
             $join->on('job_requests.created_by', '=', 'users.id');
         })
         ->select(
@@ -172,7 +173,10 @@ class JobRequestController extends Controller
         )
         ->when(request('search'), function ($q) {
             for($i=0;$i<count(request('search'));$i++){
-                return $q->orWhere(request('search')[$i]['column'],'like','%'.request('search')[$i]['val'].'%');
+                $searchColumn = request('search')[$i]['column'];
+                $searchValue = request('search')[$i]['val'];
+
+                return $q->orWhere($searchColumn, 'like', '%' . $searchValue . '%');
             }
         })
         ->when(request('sort') , function ($q) {
@@ -181,10 +185,45 @@ class JobRequestController extends Controller
             }
             return $q;
         })
-        ->with('attachments')
+        ->with(['attachments', 'uploaded_file'], 'requiredDocument')
         ->get();
+        $cnt = $jobRequestQuery->count();
+
+
+        // $jobRequestIds = $data->pluck('id');
+
+        // $uploaded = DB::table('job_request_uploaded_files')
+        //     ->select(
+        //         'job_request_uploads.request_id',
+        //         'job_request_uploads.document_id',
+        //     )
+        //     ->leftJoin('job_request_uploads', 'job_request_uploads.id', 'upload_id')
+        //     ->leftJoin('job_requests', 'job_requests.id', 'job_request_uploads.request_id')
+        //     ->when(!request('showLatest'), function($q) use ($jobRequestIds){
+        //         $q->whereIn('job_request_uploads.id', $jobRequestIds);
+        //     })
+        //     ->when(request('showLatest'), function($q) use ($previousRequestIds){
+        //         $q->whereIn('job_request_uploads.request_id', $previousRequestIds);
+        //     })
+        //     ->get();
+
+        // $data->each(function ($jobRequest){
+        //     $uploadRequestIds = $jobRequest->uploaded_file->pluck('request_id')->toArray();
+        //     $jobRequestIds = $jobRequest->requiredDocument->pluck('job_request_id')->toArray();
+
+        //     JobRequest::latest_upload($jobRequest, $jobRequestIds, $uploadRequestIds);
+        // });
+
+        // $filteredJobQuery->each(function ($jobRequest) {
+        //     $requiredDocIds = $jobRequest->requiredDocument->pluck('document_id');
+            
+        //     $latestUploads = collect();
+        //     foreach ($requiredDocIds as $docId){
+        //         $latestUpload = $jobRequest
+        //     }
+        // })
         
-        return [$data, $cnt];
+        return [$jobRequestQuery, $cnt];
     }
 
     public function jobRequestInsert(Request $request){
