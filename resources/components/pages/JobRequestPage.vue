@@ -1207,6 +1207,59 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+
+        <v-dialog v-model="ecdDialog" persistent max-width="320" @keydown.esc="ecdDialog = false">
+            <v-form id="ecdDate" ref="ecdDate" @submit.prevent="ecdForm">
+                <v-card>
+                    <v-card-title>
+                        <span>Estimated Completion Date</span>
+                        <v-icon style="float: right;" color="white" @click="ecdDialog = false">mdi-close</v-icon>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-menu
+                            v-model="insertDatepicker"
+                            :close-on-content-click="false"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                        >
+                            <template v-slot:activator="{ props }">
+                                <v-text-field
+                                    v-model="formatEcdDate"
+                                    v-bind="props"
+                                    @click:clear="tempEcd = null"
+                                    label="ESTIMATED COMPLETION DATE" 
+                                    name="ecd_date"
+                                    clearable
+                                    dense
+                                    outlined
+                                    readonly
+                                    persistent-placeholder
+                                    hide-details
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker
+                                v-model="tempEcd"
+                                @update:model-value ="insertDatepicker = false"
+                            ></v-date-picker>
+                        </v-menu>
+                        <input type="hidden" name="id" :value="editData.id">
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-tooltip location="bottom">
+                            <template v-slot:activator="{ props }">
+                                <v-btn type="submit" style="border: 1px solid grey; background-color: #227093;" color="white" v-bind="props">
+                                    <v-icon>mdi-calendar-cursor-outline</v-icon>SAVE
+                                </v-btn>
+                            </template>
+                            <span>SAVE</span>
+                        </v-tooltip>
+                    </v-card-actions>
+                </v-card>
+            </v-form>
+        </v-dialog>
+
         
         <v-dialog v-model="jobUploadDialog" persistent max-width="400" @keydown.esc="jobUploadDialog = false">
             <v-card>
