@@ -414,6 +414,7 @@ class JobRequestController extends Controller
             'job_request_requirements.id',
             'job_request_requirements.job_request_id',
             'job_request_requirements.document_id',
+            'job_request_requirements.estimated_completion_date',
             'job_requireds.required_name',
             'job_requireds.filling_mark',
             'job_requireds.header_name',
@@ -421,8 +422,10 @@ class JobRequestController extends Controller
             'job_request_uploads.updating_reason',
             'job_request_uploads.date_viewed',
             'job_request_uploads.date_uploaded',
+            'job_requests.job_ecd'
         )
         ->join('job_requireds', 'job_requireds.id', 'document_id')
+        ->join('job_requests', 'job_requests.id', 'job_request_id')
         ->leftJoin('job_request_uploads', function($join) {
             $join
                 ->on('job_request_uploads.request_id', '=', 'job_request_requirements.job_request_id')
