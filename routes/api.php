@@ -35,6 +35,9 @@ Route::prefix('/jobRequest')->group(function(){
         Route::post('process_job_updates', 'process_job_updates');
         Route::post('get_uploaded_requirements', 'getUploadedDocuments');
         Route::post('upload_history', 'upload_history');
+        Route::post('get_projects', 'get_projects');
+        Route::post('get_project_lists', 'get_project_list');
+        // Route::post('get_project_lot', 'get_project_name_data');
         // Route::get('/attachments/{attachment_id}/{file_name}', 'openAttachment');
     });
 });
