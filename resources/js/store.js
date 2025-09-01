@@ -302,14 +302,14 @@ export const useSampleStore = defineStore('sampleStore', {
             })
         },
 
-        getProjectLots() {
-            axios.post(`/api/jobRequest/get_project_lot`, {
-            }).then(response => {
-                this.projectLot = response.data
-            }).catch(error => {
-                console.log(error)
-            })
-        },
+        // getProjectLots() {
+        //     axios.post(`/api/jobRequest/get_project_lot`, {
+        //     }).then(response => {
+        //         this.projectLot = response.data
+        //     }).catch(error => {
+        //         console.log(error)
+        //     })
+        // },
 
         emailRecipientPage(){
             axios.post('/api/jobMaster/get_email_recipients', {
