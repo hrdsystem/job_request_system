@@ -45,6 +45,11 @@ export const useSampleStore = defineStore('sampleStore', {
             //SECTION - DATA HOLDER FOR EMAIL RECIPIENTS
             EmailRecipientsData: [],
 
+            //SECTION - DATA HOLDER FOR PROJECTS AND PROJECT LIST   
+            projects: [],
+            projectLists: [],
+            projectLot: [],
+
             baseDir: `${window.location.protocol}//${window.location.host}/iconnsystem`,
             // baseDir: 'http://127.0.0.1:8000/iconnsystem',
 
@@ -274,6 +279,33 @@ export const useSampleStore = defineStore('sampleStore', {
             axios.post(`/api/jobRequest/master_users`, {
             }).then(response => {
                 this.masterUsers = response.data
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+
+        getProjects() {
+            axios.post(`/api/jobRequest/get_projects`, {
+            }).then(response => {
+                this.projects = response.data
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+
+        getProjectLists() {
+            axios.post(`/api/jobRequest/get_project_lists`, {
+            }).then(response => {
+                this.projectLists = response.data
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+
+        getProjectLots() {
+            axios.post(`/api/jobRequest/get_project_lot`, {
+            }).then(response => {
+                this.projectLot = response.data
             }).catch(error => {
                 console.log(error)
             })
