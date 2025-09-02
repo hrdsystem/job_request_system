@@ -489,8 +489,27 @@ class JobRequestController extends Controller
 
         try {
             DB::beginTransaction();
+
+            JobRequest::where('id', $request_id)
+                ->update([
+                    'job_ecd' => $request->input('latest_ecd'),
+                    'updated_by' => 271,
+                    'updated_at' => new \DateTime()
+                ]);
+
+            $haveNewECD = [];
             
             foreach ($updates as $item){
+                if ($item['changedECD']) {
+                    $haveNewECD[] = $item['document_id'];
+                    
+                    JobRequestRequirement::where('id', $item['id'])
+                    ->update([
+                        'estimated_completion_date' => $item['estimated_completion_date'],
+                        'updated_at' => new \DateTime()
+                    ]);
+                }
+
                 if (count($item['newUploads']) > 0){
                     $data['new_uploads'][] = $item['document_id'];
                     $upload_data = [
@@ -558,6 +577,7 @@ class JobRequestController extends Controller
             $project = JobRequest::select(
                 'job_requests.project_name'
             )
+            ->where('id', $request_id)
             ->firstOrFail();
             $data = [
                 'greetings' => 'Good day!',
