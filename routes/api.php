@@ -37,7 +37,8 @@ Route::prefix('/jobRequest')->group(function(){
         Route::post('upload_history', 'upload_history');
         Route::post('get_projects', 'get_projects');
         Route::post('get_project_lists', 'get_project_list');
-        Route::post('projectFilter', 'filterProjects');
+        Route::post('get_lots_for_project/{project_id}', 'get_lots_for_project');
+        // Route::post('projectFilter', 'filterProjects');
         // Route::post('get_project_lot', 'get_project_name_data');
         // Route::get('/attachments/{attachment_id}/{file_name}', 'openAttachment');
     });
