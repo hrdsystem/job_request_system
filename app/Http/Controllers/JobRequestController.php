@@ -648,6 +648,39 @@ class JobRequestController extends Controller
         // ));
     }
 
+    public function get_projects(){
+        try{
+            $data = jobProjects::select(
+                '*'
+            )
+            ->get();
+
+            return $data;
+        } catch(\Exeception $e){
+            return $e->getMessage();
+        }
+    }
+
+    public function get_project_list(){
+        try{
+            $data = JobProjectList::select(
+                'project_registered.id as project_registered_id',
+                'project_registered.construction_code',
+                'project_registered.lot',
+                'project_registered.project_id',
+                'projects.id as projects_id',
+                'projects.name as project_name'
+            )
+            ->leftJoin('projects', 'projects.id', 'project_registered.project_id')
+            ->get()
+            ->unique('project_name');
+
+            return response()->json($data->values());
+        } catch(\Exeception $e){
+            return $e->getMessage();
+        }
+    }
+
     public function masterUsers(){
         try{
             $data = IconnUser::select(
