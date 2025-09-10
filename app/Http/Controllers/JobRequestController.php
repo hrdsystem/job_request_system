@@ -680,6 +680,25 @@ class JobRequestController extends Controller
             return $e->getMessage();
         }
     }
+    public function get_lots_for_project($project_id){
+        try{
+            $data = JobProjectList::select(
+                'project_registered.id as project_registered_id',
+                'project_registered.lot',
+                'project_registered.construction_code',
+                'projects.name as project_name'
+            )
+            ->leftJoin('projects', 'projects.id', 'project_registered.project_id')
+            ->where('project_registered.project_id', $project_id)
+            ->get()
+            ->unique('lot')
+            ->values();
+
+            return response()->json($data);
+        } catch(\Exception $e){
+            return $e->getMessage();
+        }
+    }
 
     public function masterUsers(){
         try{
