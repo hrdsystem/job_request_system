@@ -1260,6 +1260,53 @@
             </v-form>
         </v-dialog>
 
+        <v-dialog v-model="editEcdDialog" persistent max-width="330" @keydown.esc="editEcdDialog = false">
+            <v-card>
+                <v-card-title>
+                    <span>Edit {{ activeDocument.required_name }} ECD</span>
+                    <v-icon style="float: right;" color="white" @click="editEcdDialog = false">mdi-close</v-icon>
+                </v-card-title>
+                <v-card-text>
+                    <v-menu
+                        v-model="insertDatepicker"
+                        :close-on-content-click="false"
+                        offset-y
+                        max-width="290px"
+                        min-width="290px"
+                    >
+                        <template v-slot:activator="{ props }">
+                            <v-text-field
+                                v-model="formatChangeEcdDate"
+                                v-bind="props"
+                                @click:clear="currentECD = null"
+                                label="ESTIMATED COMPLETION DATE" 
+                                clearable
+                                dense
+                                outlined
+                                readonly
+                                persistent-placeholder
+                                hide-details
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker
+                            v-model="currentECD"
+                            @update:model-value ="insertDatepicker = false"
+                        ></v-date-picker>
+                    </v-menu>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                    <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                            <v-btn @click="saveNewECD()" style="border: 1px solid grey; background-color: #227093;" color="white" v-bind="props">
+                                <v-icon>mdi-calendar-cursor-outline</v-icon>SAVE
+                            </v-btn>
+                        </template>
+                        <span>SAVE</span>
+                    </v-tooltip>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         
         <v-dialog v-model="jobUploadDialog" persistent max-width="400" @keydown.esc="jobUploadDialog = false">
             <v-card>
