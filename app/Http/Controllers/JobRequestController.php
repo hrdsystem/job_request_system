@@ -154,9 +154,22 @@ class JobRequestController extends Controller
         // })->count();
 
         $users = IconnUser::select('id', 'username');
+        $project_registered = JobProjectList::select(
+            'project_registered.id',
+            'project_registered.construction_code',
+            'project_registered.lot',
+            'project_registered.project_id',
+        );
+        $projects = jobProjects::select('id', 'name');
     
         $jobRequestQuery = JobRequest::joinSub($users, 'users', function($join){
             $join->on('job_requests.created_by', '=', 'users.id');
+        })
+        ->joinSub($project_registered, 'project_registered', function($join){
+            $join->on('job_requests.register_id', '=', 'project_registered.id');
+        })
+        ->joinSub($projects, 'projects', function($join){
+            $join->on('projects.id', '=', 'project_registered.project_id');
         })
         ->select(
             'job_requests.id',
@@ -170,6 +183,10 @@ class JobRequestController extends Controller
             'job_requests.created_at',
             'users.username',
             'job_requests.updated_at',
+            'project_registered.project_id',
+            'project_registered.lot',
+            'project_registered.construction_code',
+            'projects.name as projects_name'
         )
         ->when(request('search'), function ($q) {
             for($i=0;$i<count(request('search'));$i++){
