@@ -717,6 +717,36 @@ class JobRequestController extends Controller
         }
     }
 
+    // public function filterProjects(Request $request){
+
+    //     $project = JobProjectList::select(
+    //         'project_registered.id as project_registered_id',
+    //         'project_registered.construction_code',
+    //         'project_registered.lot',
+    //         'project_registered.project_id',
+    //         'projects.id as projects_id',
+    //         'projects.name as project_name'
+    //     )
+    //     ->leftJoin('projects', 'projects.id', 'project_registered.project_id');
+
+    //     if ($request->filled('project_name')) {
+    //         $project->where('project_name', $request->test_pname);
+
+    //         if ($request->filled('lot')) {
+    //             $subjects = $project->where('project_registered.lot', $request->test_lot)
+    //                 ->distinct()
+    //                 ->pluck('construction_code');
+    //             return response()->json($subjects);
+    //         }
+
+    //         $lots = $project->distinct()->pluck('lot');
+    //             return response()->json($lots);
+    //     }
+
+    //     $projects = $project->distinct()->pluck('project_name');
+    //         return response()->json($projects);
+    // }
+
     public function masterUsers(){
         try{
             $data = IconnUser::select(
