@@ -1396,7 +1396,9 @@ export default {
                 text: '',
                 show: false
             },
-            
+
+            //SECTION - FOR SEARCHING
+            searchTerm: '',
 
             //SECTION - DIALOGS
             insertDialog: false,
@@ -1408,6 +1410,9 @@ export default {
             statusDialog: false,
             deleteItemDialog: false,
             attachmentDialog: false,
+            ecdDialog: false,
+            editEcdDialog: false,
+            isEditing: false,
 
             //SECTION - ADD & EDIT DIALOG DATA
             tempAddIssuedDate: '',
@@ -1415,6 +1420,7 @@ export default {
             tempSubject: null,
             tempLot: null,
             tempNote: null,
+            tempEcd: null,
             tempAddJobRequirement: [],
             tempStatus: null,
             insertDatepicker: false,
@@ -1429,7 +1435,6 @@ export default {
             
             //SECTION - ARRAY DATA FOR UPLOADING
             uploadTab: 0,
-            ECD: null,
             activeRequest: null,
             currentDocument: {},
             requestDetails: {},
@@ -1440,7 +1445,6 @@ export default {
             CurrentSubject: null,
             progress: false,
             editECD: false,
-            ecdDialog: false,
             editEcdPicker: false,
             invalidFile: [],
             tempRequiredFile: [],
@@ -1449,9 +1453,12 @@ export default {
             jobUploadDialog: false,
             updatingReason: null,
             jobRequiredAttachments: [],
+            oldUploadData: [],
+            currentECD: moment().format('YYYY-MM-DD') ,
 
             //SECTION - New uploadedFiles dialog
             newUploadedFiles: [],
+            disableUploadAndSend: false,
             newUploadsDialog: false,
             dialogTitle: null,
 
@@ -1468,12 +1475,20 @@ export default {
             confirmationFor: 'attachment',
             confirmationText: 'Are you sure you want to send this without an attachment?',
 
+            //SECTION - TRIAL V-MODEL VARIABLE FOR PROJECT LIST DATA
+            uniqueProjectLists: [],
+            uniqueLots: [],
+            tempProjectName: null,
+            tempLot2: '',
+            uniqueSubject: '',
+            project_registered_id: null,
+
             //SECTION - STATUS ITEM
             statusItem:[
-                { value: 0, text: 'NEW', color: 'rgba(231, 76, 60, 1)' }, // Red
-                { value: 1, text: 'ONGOING', color: 'rgba(52, 152, 219, 1)' }, // Blue
-                { value: 2, text: 'COMPLETED', color: 'rgba(46, 204, 113, 1)' }, // Green
-                { value: 3, text: 'CANCELLED', color: 'rgba(217, 217, 217, 1)' } // Grey
+                { value: 'NEW', text: 'NEW', color: 'rgba(231, 76, 60, 1)' }, // Red
+                { value: 'ONGOING', text: 'ONGOING', color: 'rgba(52, 152, 219, 1)' }, // Blue
+                { value: 'COMPLETED', text: 'COMPLETED', color: 'rgba(46, 204, 113, 1)' }, // Green
+                { value: 'CANCELLED', text: 'CANCELLED', color: 'rgba(217, 217, 217, 1)' } // Grey
             ]
         }
     },
