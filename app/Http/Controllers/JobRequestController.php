@@ -16,10 +16,14 @@ use App\Models\JobRequired;
 use App\Models\JobRequest;
 use App\Models\IconnUser;
 use App\Models\JobAttachment;
+use App\Models\JobProjectList;
+use App\Models\jobProjects;
 use App\Models\JobRequestRequirement;
 use App\Models\JobRequestUpload;
 use App\Models\JobRequestUploadedFile;
 use Illuminate\Support\Str;
+
+use function PHPSTORM_META\map;
 
 class JobRequestController extends Controller
 {   
