@@ -252,14 +252,15 @@ class JobRequestController extends Controller
 
         try{
             DB::beginTransaction();
+
             
             $data = new JobRequest;
+            $data->register_id = $request->get('register_id');
             $data->project_name = $request->get('project_name');
             $data->subject = $request->get('subject');
             $data->lot_number = $request->get('lot_number');
-            $data->status = 0;
+            $data->status = 'NEW';
             $data->requested_date = $request->get('requested_date');
-            $data->job_ecd = now();
             $data->note = $request->get('note');
             $data->created_by = 271;
             $data->updated_by = 271;
@@ -314,11 +315,11 @@ class JobRequestController extends Controller
         try{
             DB::beginTransaction();
             $data = JobRequest::find($request->get('id'));
+            $data->register_id = $request->get('register_id');
             $data->project_name = $request->get('project_name');
             $data->subject = $request->get('subject');
             $data->lot_number = $request->get('lot_number');
             $data->requested_date = $request->get('requested_date');
-            $data->job_ecd = now();
             $data->note = $request->get('note');
             $data->created_by = 271;
             $data->updated_by = 271;
