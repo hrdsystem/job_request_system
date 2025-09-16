@@ -5,14 +5,15 @@
             <thead>
                 <tr>
                     <th rowspan="2" v-show="floatButtonData.editButtonActive" class="text-left" style="width:20px">
-                        <v-checkbox style="display: flex;" color="white" :input-value="allSelected" @change="toggleSelectAll()"></v-checkbox>
+                        <v-checkbox style="display: flex;" color="white" v-model="allSelected"></v-checkbox>
                     </th>
                     <th rowspan="2" v-show="floatButtonData.editButtonActive" class="text-left" style="width:20px">Edit</th>
                     <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.project_name')">PROJECT NAME</th>
                     <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.subject')">SUBJECT</th>
                     <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.lot_number')">LOT #</th>
                     <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.status')">STATUS</th>
-                    <th rowspan="2">Att</th>
+                    <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.note')">NOTE</th>
+                    <th rowspan="2" class="text-center">Att</th>
                     <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.created_by')">REQUESTED <br> BY</th>
                     <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.requested_date')">REQUESTED DUE <br> DATE</th>
                     <th rowspan="2" class="text-center">ECD</th>
@@ -21,7 +22,7 @@
                     <th rowspan="2">Upload</th>
                 </tr>
                 <tr>
-                    <th v-for="header in JobRequestRequiredData" :key="'a'+header.id" class="sub-header">
+                    <th v-for="header in JobRequestRequiredData" :key="'a'+header.id" class="sub-header text-center">
                         <v-tooltip location="bottom">
                             <template v-slot:activator="{ props }">
                                 <span v-bind="props">{{ header.header_name.toUpperCase()}}</span>
@@ -34,7 +35,7 @@
                     <th v-show="floatButtonData.editButtonActive"></th>
                     <th v-show="floatButtonData.editButtonActive"></th>
                     <th>
-                        <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'job_requests.project_name')"></v-text-field>
+                        <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'projects.name')"></v-text-field>
                     </th>
                     <th>
                         <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'job_requests.subject')"></v-text-field>
@@ -65,9 +66,8 @@
                             <v-checkbox 
                                 style="display: flex;" 
                                 color="indigo" 
-                                :model-value="allSelected"
-                                :input-value="allSelected"
-                                @change="setSelected(index)">
+                                v-model="selectedRows"
+                                :value="index">
                             </v-checkbox>
                         </td>
                         <td v-show="floatButtonData.editButtonActive">
@@ -81,15 +81,23 @@
                                 <v-btn icon="mdi-pencil" flat size="30px" style="background-color: #227093; color: white;" @click="Edit(item)"></v-btn>
                             </template>
                         </td>
-                        <td>{{ item.project_name }}</td>
-                        <td>{{ item.subject }}</td>
-                        <td>{{ item.lot_number }}</td>
-                        <td @click="statusEditDialog(item)">
+                        <td class="text-center">{{ item.projects_name }}</td>
+                        <td class="text-center">{{ item.subject }}</td>
+                        <td class="text-center">{{ item.lot_number }}</td>
+                        <td class="text-center" @click="statusEditDialog(item)">
                             <v-chip :color="statusMapping(item.status).color" dark>
                                 {{ statusMapping(item.status).label }}
                             </v-chip>
                         </td>
-                        <td>
+                        <td class="text-ellipsis">
+                            <v-tooltip location="bottom">
+                                <template v-slot:activator="{ props }">
+                                    <span v-bind="props">{{ item.note }}</span>
+                                </template>
+                                <span>{{ item.note }}</span>
+                            </v-tooltip>    
+                        </td>
+                        <td class="text-center">
                             <v-tooltip v-if="item.attachments.length > 0" location="bottom">
                                 <template v-slot:activator="{ props }">
                                     <v-icon @click="toggleAttachmentDialog(item.attachments)" size="30px" style="color: goldenrod" flat v-bind="props">mdi-folder
@@ -100,9 +108,20 @@
                             </v-tooltip>
                             <v-icon v-else class="disabled" style="color: gray;" size="30px">mdi-folder</v-icon>
                         </td>
-                        <td>{{ item.username }}</td>
-                        <td>{{ item.requested_date }}</td>
-                        <td>{{ item.ECD }}</td>
+                        <td class="text-center">
+                            <v-tooltip location="botom">
+                                <template v-slot:activator="{ props }">
+                                    <v-avatar v-bind="props">
+                                        <v-img>
+                                            
+                                        </v-img>
+                                    </v-avatar>
+                                </template>
+                                <span>{{ item.username }}</span>
+                            </v-tooltip>
+                        </td>
+                        <td class="text-center">{{ item.requested_date }}</td>
+                        <td class="text-center" @click="toggleEcdDialog(item)">{{ item.job_ecd }}</td>
                         <template v-for="(job_req, index) in JobRequestRequiredData" :key="index">
                             <template v-if="item.requirements.includes(job_req.id)">
                                 <td class="text-center">
@@ -115,7 +134,7 @@
                                 </td>
                             </template>
                         </template>
-                        <td>
+                        <td class="text-center">
                             <v-tooltip location="bottom">
                                 <template v-slot:activator="{ props }">
                                     <v-icon size="30px" style="color: green" flat v-bind="props">mdi-file-excel</v-icon>
@@ -129,7 +148,7 @@
                                 <span>Download PDF</span>
                             </v-tooltip>
                         </td>
-                        <td>
+                        <td class="text-center">
                             <v-tooltip location="bottom" v-if="item.requirements.length > 0">
                                 <template v-slot:activator="{ props }">
                                     <v-icon size="30px" style="color: blue" flat v-bind="props" @click="toggleUploadDialog(item)" >mdi-file-upload</v-icon>
