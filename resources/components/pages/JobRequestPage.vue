@@ -1656,21 +1656,44 @@ export default {
         },
 
         toggleSendDialog(){
+            this.toRecipients = this.jobRecipients
+            this.ccRecipients = this.projectMembers
             this.sendDialog = true
         },
 
         toggleAddDialog(){
             this.insertDialog = true
+        },
+
+        saveForm(){
             this.tempName = null
+            this.tempProjectName = null
+            this.tempLot2 = null
+            this.uniqueSubject = null
             this.tempLot = null
             this.tempSubject = null
             this.tempAddIssuedDate = null
             this.tempNote = null
             this.tempAddJobRequirement = []
+
+            if(this.$refs.Insert){
+                this.$refs.Insert.resetValidation();
+            }
         },
 
         toggleDeleteDialog(){
             this.deleteDialog = true
+        },
+
+        showConfirmDialog(){
+            this.confirmationText = 'Are you sure you want to close without saving?'
+            this.confirmationFor = 'uploadDialog'
+            this.confirmDialog = true
+        },
+
+        closeUploadDialog() {
+            this.confirmDialog = false
+            this.uploadDialog = false
         },
 
         toggleSelectAll(){
