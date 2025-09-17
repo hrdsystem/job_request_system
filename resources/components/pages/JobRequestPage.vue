@@ -348,12 +348,67 @@
             <v-form id="Update" ref="Update" @submit.prevent="Update">
                 <v-card>
                     <v-card-title >
-                        <span class="headline">{{ editData.project_name }}</span>
+                        <span class="headline">{{ editData.projects_name }}</span>
                         <v-icon style="float: right;" color="white" @click="editDialog = false">mdi-close</v-icon>
                     </v-card-title>
                     <v-card-text>
                         <v-row>
-                            <v-col cols="12" sm="6" md="6">
+                            <v-col cols="6" sm="6" md="6">
+                                <v-autocomplete
+                                    v-model="tempProjectName"
+                                    :items="projectLists"
+                                    item-title="project_name"
+                                    item-value="project_id"
+                                    :rules="rules.required"
+                                    @update:modelValue="getLotProjectList"
+                                    label="PROJECT NAME"
+                                    name="project_name"
+                                    outlined
+                                    autocomplete="off"
+                                    hide-details
+                                    persistent-placeholder
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>PROJECT NAME</span>
+                                </template>
+                                </v-autocomplete>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="uniqueSubject"
+                                    label="SUBJECT"
+                                    name="subject"
+                                    persistent-placeholder
+                                    outlined
+                                    autocomplete="off"
+                                    hide-details
+                                    readonly
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>SUBJECT</span>
+                                </template>
+                                </v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-autocomplete
+                                    v-model="tempLot2"
+                                    :items="uniqueLots"
+                                    item-title="lot"
+                                    item-value="lot"
+                                    label="LOT #"
+                                    name="lot_number"
+                                    persistent-placeholder
+                                    outlined
+                                    autocomplete="off"
+                                    hide-details
+                                    @update:modelValue="updateProjectRegisteredLotId"
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>LOT #</span>
+                                </template>
+                                </v-autocomplete>
+                            </v-col>
+                            <!-- <v-col cols="12" sm="6" md="6">
                                 <v-text-field
                                     v-model="tempName"
                                     @keyup="tempName = $event.target.value.toUpperCase()"
