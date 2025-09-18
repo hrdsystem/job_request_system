@@ -112,8 +112,10 @@
                             <v-tooltip location="botom">
                                 <template v-slot:activator="{ props }">
                                     <v-avatar v-bind="props">
-                                        <v-img>
-                                            
+                                        <v-img
+                                            :src="item.photo"
+                                            :lazy-src="baseDir+'/img/avatar.png'"
+                                        >
                                         </v-img>
                                     </v-avatar>
                                 </template>
@@ -169,41 +171,38 @@
                         <span class="headline">Add Required Job</span>
                         <v-icon style="float: right;" color="white" @click="insertDialog = false">mdi-close</v-icon>
                     </v-card-title>
-                    <v-card-text >
+                    <v-card-text>
                         <v-row>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
-                                    v-model="tempName"
-                                    @keyup="tempName = $event.target.value.toUpperCase()"
+                                <v-autocomplete
+                                    v-model="tempProjectName"
+                                    :items="projectLists"
+                                    item-title="project_name"
+                                    item-value="project_id"
+                                    :rules="rules.required"
+                                    @update:modelValue="getLotProjectList"
                                     label="PROJECT NAME"
                                     name="project_name"
-                                    :rules="rules.required"
-                                    class="uppercase-value"
-                                    dense
                                     outlined
-                                    persistent-placeholder
                                     autocomplete="off"
                                     hide-details
+                                    persistent-placeholder
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>PROJECT NAME</span>
                                 </template>
-                                </v-text-field>
+                                </v-autocomplete>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
                                 <v-text-field
-                                    v-model="tempSubject"
-                                    @keyup="tempSubject = $event.target.value.toUpperCase()"
+                                    v-model="uniqueSubject"
                                     label="SUBJECT"
                                     name="subject"
-                                    class="required uppercase-value"
-                                    :rules="rules.required"
-                                    dense
-                                    outlined
-                                    required
-                                    autocomplete="off"
                                     persistent-placeholder
+                                    outlined
+                                    autocomplete="off"
                                     hide-details
+                                    readonly
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>SUBJECT</span>
@@ -211,23 +210,23 @@
                                 </v-text-field>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
-                                    v-model="tempLot"
-                                    @keyup="tempLot = $event.target.value.toUpperCase()"
+                                <v-autocomplete
+                                    v-model="tempLot2"
+                                    :items="uniqueLots"
+                                    item-title="lot"
+                                    item-value="lot"
                                     label="LOT #"
                                     name="lot_number"
-                                    class="uppercase-value"
-                                    :rules="rules.required"
-                                    dense
-                                    outlined
                                     persistent-placeholder
+                                    outlined
                                     autocomplete="off"
                                     hide-details
+                                    @update:modelValue="updateProjectRegisteredLotId"
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>LOT #</span>
                                 </template>
-                                </v-text-field>
+                                </v-autocomplete>
                             </v-col>
                             <v-col>
                                 <v-menu
@@ -319,6 +318,7 @@
                                 </template>
                             </v-row>
                             <input type="hidden" name="send_to_hrd" :value="sendToHrd">
+                            <input type="hidden" name="register_id" :value="project_registered_id">
                         </v-row>
                     </v-card-text>
                     <v-divider></v-divider>
