@@ -1767,19 +1767,70 @@ export default {
             this.attachmentDialog = true
         },
 
-        Edit(data){
-            console.log(data)
-            this.editDialog = true
+        async Edit(data){
+            console.log('Edit data: ', data)
+            console.log('Existing Lot Number from selected Index: ', data.lot)
+            this.editDialog = false
+
             this.editData = data
-            this.tempName = data.project_name
-            this.tempSubject = data.subject
-            this.tempLot = data.lot_number
+            this.isEditing = true
+            this.isInitializingEdit = true
+
+            this.tempLot2 = data.lot_number
+            this.uniqueSubject = data.subject
             this.tempStatus = data.status
             this.tempAddIssuedDate = data.requested_date
             this.tempNote = data.note
             this.tempAddJobRequirement = data.requirements
+            this.tempProjectName = data.project_name;
 
+            // await this.getLotProjectList(data.project_name);
+
+            if (data.project_name){
+                try{
+                    await this.getLotProjectList(data.project_name)
+                    console.log('UNIQUE LOTS: ', this.uniqueLots)
+                    if (data.lot_number && !this.uniqueLots.find(lot => lot.lot === data.lot_number)){
+                        console.log('Lot not found, using data subject: ')
+                        this.uniqueSubject = data.subject || data.lot_number || '';
+                    }
+                } catch(error){
+                    console.error('failed to fetch lot project_lists', error)
+                    this.uniqueSubject = data.subject || data.lot_number || ''
+                }
+            }
+
+            // if (data.lot_number) {
+            //     console.log('Reassigning tempLot2 with uniqueLots:', this.uniqueLots);
+            //     this.tempLot2 = data.lot_number;
+            //     // Fallback to data.subject if lot not found in uniqueLots
+            //     if (!this.uniqueLots.find(lot => lot.lot === data.lot_number)) {
+            //         console.log('Lot not found in uniqueLots, using data.subject');
+            //         this.uniqueSubject = data.subject || '';
+            //     }
+            // }
+
+            // if (data.lot_number) {
+            //     this.tempLot2 = data.lot_number; // Trigger tempLot2 setter again
+            // }
+            
             this.oldJobRequirement = [...data.requirements]
+            if (data.attachments.length > 0) {
+                _.forEach(data.attachments, (item) => {
+                    this.editAttachments.push({
+                        id: item.id,
+                        filename: item.orig_filename,
+                        url: `${this.baseDir}/job_request/attachment/${item.id}/${encodeURIComponent(item.original_filename)}`
+                    })
+                })
+            } else {
+                this.editAttachments = []
+            }
+
+
+            this.isInitializingEdit = false
+            this.editDialog = true
+        },
         },
 
         Insert(){
