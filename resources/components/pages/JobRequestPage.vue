@@ -1704,12 +1704,12 @@ export default {
 
         statusMapping(status){
             const mapping = {
-                0 : { label: 'NEW', color: 'rgba(231, 76, 60, 1)'},
-                1 : { label: 'ONGOING', color: 'rgba(52, 152, 219, 1)'},
-                2 : { label: 'COMPLETED', color: 'rgba(46, 204, 113, 1)'},
-                3 : { label: 'CANCELLED', color: 'rgba(217, 217, 217, 1)'},
+                'NEW' : { label: 'NEW', color: 'rgba(231, 76, 60, 1)'},
+                'ONGOING' : { label: 'ONGOING', color: 'rgba(52, 152, 219, 1)'},
+                'COMPLETED' : { label: 'COMPLETED', color: 'rgba(46, 204, 113, 1)'},
+                'CANCELLED' : { label: 'CANCELLED', color: 'rgba(217, 217, 217, 1)'},
             }
-            return mapping[status] || {label: 'Unknown', color: grey};
+            return mapping[status] || {label: 'Unknown', color: 'grey'};
         },
 
         searchCol(e, column){
