@@ -1673,8 +1673,34 @@ export default {
             'sortColumn',
             'jobRequestPage',
             'setSelected',
-            'resetToggleSelectAll'
+            'resetToggleSelectAll',
+            'getMasterUsers',
+            'emailRecipientPage',
+            'getProjects',
+            'getProjectLists',
         ]),
+
+        logUrl(attachment) {
+            if(attachment.document_id){
+                console.log(`${this.baseDir}/job_request/document/${attachment.file_id}/${attachment.orig_filename}`)
+            }else{
+                console.log(`${this.baseDir}/job_request/attachments/${attachment.id}/${attachment.orig_filename}`);
+            }
+        },
+
+        dateOnly(dateTime) {
+            return dateTime == null ? '' : dateTime.substring(0, 10)
+        },
+
+        defaultRecipient(item, list){
+            const index = this[list].indexOf(item.id)
+            return (index >= 0)
+        },
+
+        removeSelection(item, list){
+            const index = this[list].indexOf(item.id)
+            if (index >= 0) this[list].splice(index, 1)
+        },
 
         statusMapping(status){
             const mapping = {
