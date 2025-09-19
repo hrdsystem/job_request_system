@@ -1649,7 +1649,20 @@ export default {
         },
 
         newUpdates(){
-            return _.some(this.requiredDocuments) || this.hasNewUploads
+            return _.some(this.requiredDocuments, {changedECD: true}) || this.hasNewUploads
+        },
+
+        allSelected: {
+            get() {
+                return this.selectedRows.length === this.JobRequestData.length;
+            },
+            set(value) {
+                if (value) {
+                    this.selectedRows = this.JobRequestData.map((_, index) => index);
+                } else {
+                    this.selectedRows = [];
+                }
+            }
         }
     },
 
