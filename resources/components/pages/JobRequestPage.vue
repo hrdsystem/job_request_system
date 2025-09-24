@@ -1737,10 +1737,20 @@ export default {
             this.statusDialog = true
         },
 
+        toggleEcdDialog(data){
+            console.log(data)
+            this.editData = data
+            this.tempEcd = data.job_ecd
+            this.ecdDialog = true
+        },
+
         toggleUploadDialog(data){
             this.requestDetails = data
+            this.tempEcd = data.job_ecd
+            this.activeRequest = data.id
+            this.CurrentSubject = data.subject
             this.requiredDocuments = []
-            this.jobRequiredPage(data.id)
+            this.getRequiredDocuments(data.id)
             this.uploadDialog = true
         },
 
