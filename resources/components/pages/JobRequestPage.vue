@@ -113,7 +113,7 @@
                                 <template v-slot:activator="{ props }">
                                     <v-avatar v-bind="props">
                                         <v-img
-                                            :src="item.photo"
+                                            :src="item.photo "
                                             :lazy-src="baseDir+'/img/avatar.png'"
                                         >
                                         </v-img>
@@ -408,44 +408,6 @@
                                 </template>
                                 </v-autocomplete>
                             </v-col>
-                            <!-- <v-col cols="12" sm="6" md="6">
-                                <v-text-field
-                                    v-model="tempName"
-                                    @keyup="tempName = $event.target.value.toUpperCase()"
-                                    autocomplete="off"
-                                    name="project_name"
-                                    label="Project Name"
-                                    class=" uppercase-value"
-                                    dense
-                                    outlined
-                                    hide-details
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="6">
-                                <v-text-field
-                                    v-model="tempSubject"
-                                    @keyup="tempSubject = $event.target.value.toUpperCase()"
-                                    autocomplete="off"
-                                    name="subject"
-                                    label="Subject"
-                                    class=" uppercase-value"
-                                    dense
-                                    outlined
-                                    hide-details
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="6">
-                                <v-text-field
-                                    v-model="tempLot"
-                                    @keyup="tempLot = $event.target.value.toUpperCase()"
-                                    autocomplete="off"
-                                    name="lot_number"
-                                    label="Lot #"
-                                    class="uppercase-value"
-                                    dense
-                                    outlined
-                                ></v-text-field>
-                            </v-col>
                             <v-col>
                                 <v-menu
                                     v-model="insertDatepicker"
@@ -473,17 +435,6 @@
                                     ></v-date-picker>
                                 </v-menu>
                             </v-col>
-                            <!-- <v-col cols="12" sm="6" md="6">
-                                <v-select
-                                    v-model="tempStatus"
-                                    :items="statusItem"
-                                    item-value="value"
-                                    item-title="text"
-                                    label="Status"
-                                    name="status"
-                                >
-                                </v-select>
-                            </v-col> -->
                             <v-col cols="12" sm="12" md="12">
                                 <v-textarea
                                     v-model="tempNote"
@@ -545,12 +496,13 @@
                             </v-row>
                         </v-row>
                         <input type="hidden" name="id" :value="editData.id">
+                        <input type="hidden" name="register_id" :value="project_registered_id">
                         <input type="hidden" name="old_job_req" :value="editData.requirements">
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-tooltip location="bottom">
+                        <!-- <v-tooltip location="bottom">
                             <template v-slot:activator="{ props }">
                                 <v-btn style="border: 1px solid grey; background-color: #e74c3c;" color="white" @click="cancelRequestDialog()" v-bind="props">
                                     <v-icon>mdi-email-remove-outline</v-icon>CANCEL
@@ -565,7 +517,7 @@
                                 </v-btn>
                             </template>
                             <span>REVISE</span>
-                        </v-tooltip>
+                        </v-tooltip> -->
                         <v-tooltip location="bottom">
                             <template v-slot:activator="{ props }">
                                 <v-btn type="submit" style="border: 1px solid grey" color="blue-grey darken-3" v-bind="props">
@@ -596,7 +548,7 @@
                                     <v-row class="mb-5 mt-0 mx-n2">
                                         <v-col cols="12" sm="4" md="4">
                                             <v-text-field
-                                                v-model="ECD"
+                                                v-model="tempEcd"
                                                 @click:clear="ECD = null"
                                                 label="ECD"
                                                 hide-details
@@ -631,9 +583,9 @@
                                     <thead>
                                         <tr>
                                             <th v-show="editECD">Edit</th>
-                                            <th>Type</th>
-                                            <th>Document</th>
-                                            <th>
+                                            <th class="text-center">Type</th>
+                                            <th class="text-center">Document</th>
+                                            <th class="text-center">
                                                 <v-tooltip location="bottom">
                                                     <template v-slot:activator="{ props }">
                                                         <span v-bind="props">ECD</span>
@@ -641,20 +593,20 @@
                                                     <span>Estimated Completion Date</span>
                                                 </v-tooltip>
                                             </th>
-                                            <th>Uploader</th>
-                                            <th>Date Uploaded</th>
+                                            <th class="text-center">Uploader</th>
+                                            <th class="text-center">Date Uploaded</th>
                                             <th title="Reason for Updating">Reason</th>
                                             <th style="width:20px">Upload</th>
                                             <th v-if="hasNewUploads">New Uploads</th>
-                                            <th>Viewed By</th>
-                                            <th>Date Viewed</th>
+                                            <th class="text-center">Viewed By</th>
+                                            <th class="text-center">Date Viewed</th>
                                             <th style="width:20px">History</th>
                                         </tr>
                                     </thead>
                                     <tbody v-if="requiredDocuments.length > 0">
                                         <tr v-for="(doc, i) in requiredDocuments" :key="'rd' + i">
                                             <td class="text-center icon-btn" v-show="editECD">
-                                                <div icon="mdi-pencil" @click="updateECD(doc)"></div>
+                                                <v-btn icon="mdi-pencil" flat size="30px" style="background-color: #227093; color: white;" @click="EditECD(doc)"></v-btn>
                                             </td>
                                             <td>
                                                 <a
@@ -672,11 +624,22 @@
                                                 </div>
                                                 <v-icon v-else color="grey" size="30px">mdi-file</v-icon>
                                             </td>
-                                            <td>{{ doc.required_name }}</td>
-                                            <td>{{ ECD }}</td> 
-                                            <td>{{  }}</td>
-                                            <td>{{ doc.date_uploaded }}</td>
-                                            <td>{{ doc.updating_reason }}</td>
+                                            <td class="text-center">{{ doc.required_name }}</td>
+                                            <td>
+                                                <v-tooltip v-if="doc.estimated_completion_date != null && doc.changedECD" color="black" transition="fade-transition" location="bottom">
+                                                    <template v-slot:activator="{ props }">
+                                                        <span v-bind="props">
+                                                            {{ doc.estimated_completion_date }}
+                                                            <v-icon color="red darken-3" size="20">mdi-exclamation-thick</v-icon>
+                                                        </span>
+                                                    </template>
+                                                    <span>Not Yet Saved</span>
+                                                </v-tooltip>
+                                                <span v-else>{{ doc.estimated_completion_date }}</span> 
+                                            </td> 
+                                            <td class="text-center">{{ doc.job_uploader }}</td>
+                                            <td class="text-center">{{ dateOnly(doc.date_uploaded) }}</td>
+                                            <td class="text-center">{{ doc.updating_reason }}</td>
                                             <td class="text-center icon-btn">
                                                 <v-tooltip location="bottom" >
                                                     <template v-slot:activator="{ props }">
@@ -715,8 +678,8 @@
                                                 </v-tooltip>
                                                 <v-icon v-else color="grey" size="30px">mdi-folder</v-icon>
                                             </td>
-                                            <td>temp viewed by</td>
-                                            <td>temp date viewed</td>
+                                            <td class="text-center">temp viewed by</td>
+                                            <td class="text-center">temp date viewed</td>
                                             <td class="text-center icon-btn">
                                                 <v-tooltip location="bottom" v-if="doc.updating_reason != null">
                                                     <template v-slot:activator="{ props }">
@@ -810,18 +773,18 @@
                                     <v-table fixed-header class="mainTable" v-if="uploadHistories.length > 0">
                                         <thead>
                                             <tr>
-                                                <th>Type</th>
-                                                <th>Document</th>
-                                                <th>Uploader</th>
-                                                <th>Date Uploaded</th>
-                                                <th>Reason</th>
-                                                <th>Viewed by</th>
-                                                <th>Date Viewed</th>
+                                                <th class="text-center">Type</th>
+                                                <th class="text-center">Document</th>
+                                                <th class="text-center">Uploader</th>
+                                                <th class="text-center">Date Uploaded</th>
+                                                <th class="text-center">Reason</th>
+                                                <th class="text-center">Viewed by</th>
+                                                <th class="text-center">Date Viewed</th>
                                         </tr>
                                         </thead>
                                         <tbody v-if="requiredDocuments.length > 0">
                                             <tr v-for="(history, index) in uploadHistories" :key="'uh' + index">
-                                                <td>
+                                                <td class="text-center">
                                                     <a
                                                         :href="`/api/job_request/document/${history.files[0].id}/${encodeURIComponent(extractFileName(history.files[0].orig_filename))}`"
                                                         target="_blank"
@@ -839,13 +802,11 @@
                                                     </div>
                                                     <v-icon v-else color="grey" size="30px">mdi-file</v-icon>
                                                 </td>
-                                                <td>{{ history.required_name }}</td>
-                                                <td>{{ history.uploaded_by }}</td>
-                                                <td>{{ dateOnly(history.date_uploaded) }}</td>
-                                                <td>{{ history.updating_reason }}</td>
-                                                <td>
-
-                                                </td>
+                                                <td class="text-center">{{ history.required_name }}</td>
+                                                <td class="text-center">{{ history.uploaded_by }}</td>
+                                                <td class="text-center">{{ dateOnly(history.date_uploaded) }}</td>
+                                                <td class="text-center">{{ history.updating_reason }}</td>
+                                                <td class="text-center">{{ testing }}</td>
                                                 <td>{{ dateOnly(history.date_viewed) }}</td>
                                             </tr>
                                         </tbody>
