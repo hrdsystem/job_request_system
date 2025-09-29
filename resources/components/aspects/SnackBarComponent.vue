@@ -3,7 +3,7 @@
         <v-snackbar
             v-model="snackbar.show"
             :color="snackbar.color"
-            :timeout="snackbarTimeout"
+            :timeout="snackBarTimeout"
             location="top right"
         >
             {{ snackbar.text }}
@@ -22,7 +22,7 @@ import { useSampleStore } from '../../js/store';
         },
         computed: {
             ...mapState(useSampleStore, [
-                'snackbarTimeout'
+                'snackBarTimeout'
             ])
         },
         methods: {
