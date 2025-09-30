@@ -647,7 +647,17 @@ export default {
                 this.jobRequiredPage()
                 // this.resetToggleSelectAll()
             })
-        }
+        },
+
+        saveForm(){
+            this.tempName = null
+            this.tempFillName = null
+            this.tempHeaderName = null
+
+            if(this.$refs.Insert){
+                this.$refs.Insert.resetValidation();
+            }
+        },
     },
 
     mounted(){
@@ -657,10 +667,14 @@ export default {
     watch:{
         insertDialog(val){  
             if(!val){
-                this.tempName = ''
-                this.tempFillName = ''
-                this.tempHeaderName = ''
-                this.$refs.Insert.resetValidation()
+                this.saveForm()
+            }
+        },
+
+        editDialog(val){
+            if(!val){
+                this.$refs.Update.resetValidation()
+                this.saveForm()
             }
         },
     }
