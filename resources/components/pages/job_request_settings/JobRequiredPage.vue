@@ -116,7 +116,9 @@
                                     v-model="tempName"
                                     label="Required Name"
                                     name="required_name"
-                                    class=" uppercase-value"
+                                    class="required uppercase-value"
+                                    @keyup="tempName = $event.target.value.toUpperCase()"
+                                    :rules="rules.required"
                                     dense
                                     outlined
                                     autocomplete="off"
@@ -132,7 +134,9 @@
                                     v-model="tempFillName"
                                     label="Filling Mark"
                                     name="filling_mark"
-                                    class=" uppercase-value"
+                                    class="required uppercase-value"
+                                    @keyup="tempFillName = $event.target.value.toUpperCase()"
+                                    :rules="rules.required"
                                     dense
                                     outlined
                                     autocomplete="off"
@@ -148,7 +152,9 @@
                                     v-model="tempHeaderName"
                                     label="Header Name"
                                     name="header_name"
-                                    class="uppercase-value"
+                                    class="required uppercase-value"
+                                    @keyup="tempHeaderName = $event.target.value.toUpperCase()"
+                                    :rules="rules.required"
                                     dense
                                     outlined
                                     autocomplete="off"
@@ -198,7 +204,9 @@
                                     v-model="tempName"
                                     label="Required Name"
                                     name="required_name"
-                                    class=" uppercase-value"
+                                    class="required uppercase-value"
+                                    @keyup="tempName = $event.target.value.toUpperCase()"
+                                    :rules="rules.required"
                                     dense
                                     outlined
                                     autocomplete="off"
@@ -210,7 +218,9 @@
                                     v-model="tempFillName"
                                     label="Filling Mark"
                                     name="filling_mark"
-                                    class="uppercase-value"
+                                    class="required uppercase-value"
+                                    @keyup="tempFillName = $event.target.value.toUpperCase()"
+                                    :rules="rules.required"
                                     dense
                                     outlined
                                     autocomplete="off"
@@ -221,7 +231,9 @@
                                     v-model="tempHeaderName"
                                     label="Header Name"
                                     name="header_name"
-                                    class="uppercase-value"
+                                    class="required uppercase-value"
+                                    @keyup="tempHeaderName = $event.target.value.toUpperCase()"
+                                    :rules="rules.required"
                                     dense
                                     outlined
                                     autocomplete="off"
