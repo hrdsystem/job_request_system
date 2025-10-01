@@ -1820,6 +1820,17 @@ export default {
             })
         },
 
+        EditECD(doc){
+            if (doc.estimated_completion_date != null){
+                this.currentECD = doc.estimated_completion_date
+            }
+
+            console.log(doc)
+            this.activeDocument = doc
+            this.editEcdDialog = true
+        },
+
+
         async Edit(data){
             console.log('Edit data: ', data)
             console.log('Existing Lot Number from selected Index: ', data.lot)
