@@ -1777,6 +1777,49 @@ export default {
             this.attachmentDialog = true
         },
 
+        toggleJobAttachments(reqId, docId, uploadId = null){
+            console.log('function is working')
+            axios({
+                method: 'post',
+                url: '/api/jobRequest/get_uploaded_requirements',
+                data:{
+                    request_id: reqId,
+                    document_id: docId,
+                    upload_id: uploadId
+                },
+            }).then((res) =>{
+                this.jobRequiredAttachments = res.data
+            }).catch(error =>{
+                console.log(error)
+            })
+
+            this.jobUploadDialog = true
+        },
+
+        showUploadTab(doc){
+            this.currentDocument = doc
+            this.requiredFileName = `${this.CurrentSubject}-${doc.filling_mark}`
+            this.uploadTab = 1
+        },
+
+        showHistoryTab(doc){
+            console.log('history dialog tab show')
+            this.uploadTab = 2
+
+            axios({
+                method: 'post',
+                url: '/api/jobRequest/upload_history',
+                data:{
+                    request_id: doc.job_request_id,
+                    document_id: doc.document_id
+                }
+            }).then((res) =>{
+                this.uploadHistories = res.data
+            }).catch(error =>{
+                console.log(error)
+            })
+        },
+
         async Edit(data){
             console.log('Edit data: ', data)
             console.log('Existing Lot Number from selected Index: ', data.lot)
