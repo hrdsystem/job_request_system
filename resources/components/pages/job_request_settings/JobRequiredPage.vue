@@ -602,50 +602,55 @@ export default {
             }
         },
 
-        Update(){
-            if(this.$refs.Update.validate()){
-                var myform = document.getElementById('Update');
-                var formdata = new FormData(myform);
-                
-                formdata.append('seq', this.editData.seq)
-                formdata.set('sub_docs', (JSON.stringify(this.tempSubDocumentItems)))
-                formdata.set('deleted_items', (JSON.stringify(this.deletedItemIds)))
+        async Update(){
+            const  validation = await this.$refs.Update.validate()
+
+
+            if(!validation.valid){
+                this.snackbar.show = true
+                this.snackbar.text = 'Please fill all required field'
+                this.snackbar.color = 'red darken 2'
             }
-            axios({
-                method: 'post',
-                url: '/api/jobMaster/update_job_required',
-                data: formdata
-            })
-            .then((res) => {
-                if(res.data == 1){
+            var myform = document.getElementById('Update');
+            var formdata = new FormData(myform);
+            
+            formdata.append('seq', this.editData.seq)
+            formdata.set('sub_docs', (JSON.stringify(this.tempSubDocumentItems)))
+            formdata.set('deleted_items', (JSON.stringify(this.deletedItemIds)))
+            
+            try{
+                const res = await axios({
+                    method: 'post',
+                    url: '/api/jobMaster/update_job_requireds',
+                    data: formdata
+                });
+
+                if(res.data === 1){
                     console.log('required name already exists')
                     this.snackbar.show = true
-                    this.snackbar.text = 'Required Name Already Exists'
-                    this.snackbar.color = 'red darken-2'
-                }
-                else if(res.data == 2){
+                    this.snackbar.text = 'Required name already exists'
+                    this.snackbar.color = 'red darken 2'
+                } else if (res.data === 2){
                     console.log('filling mark already exists')
                     this.snackbar.show = true
-                    this.snackbar.text = 'Filling Mark Already Exists'
-                    this.snackbar.color = 'red darken-2'
-                }
-                else if(res.data == 3){
-                    console.log('header name already exists')
+                    this.snackbar.text = 'Filling mark already exists'
+                    this.snackbar.color = 'red darken 2'
+                } else if (res.data === 3){
+                    console.log('Header name already exists')
                     this.snackbar.show = true
-                    this.snackbar.text = 'Header Name Already Exists'
-                    this.snackbar.color = 'red darken-2'
+                    this.snackbar.text = 'Header name already exists'
+                    this.snackbar.color = 'red darken 2'
                 } else{
                     this.snackbar.show = true
-                    this.snackbar.text = 'Update Successful'
+                    this.snackbar.text = 'Insert Successful'
                     this.snackbar.color = 'blue-grey'
                     this.editDialog = false
-                    this.jobRequiredPage();
-                    console.log('update working')
+                    this.jobRequiredPage()
                 }
-            })
-            .catch((res) =>{
-                console.log(res);
-            })
+            }catch(error){
+                console.log(error)
+
+            }
         },
 
         Delete(){
