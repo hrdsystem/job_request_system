@@ -83,6 +83,14 @@
             </tbody>
         </v-table>
 
+        <v-overlay v-model="overlay" overlay class="overlay-center">
+            <v-progress-circular 
+                indeterminate 
+                :size="64"
+                style="color: white;"
+            ></v-progress-circular>
+        </v-overlay>
+
         <v-dialog v-model="insertDialog" persistent max-width="300" @keydown.esc="insertDialog = false">
             <v-form id="Insert" ref="Insert" @submit.prevent="Insert">
                 <v-card>
