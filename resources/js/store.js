@@ -6,6 +6,7 @@ export const useSampleStore = defineStore('sampleStore', {
             // Global Variables
 
             tableHeight: window.innerHeight - 160,
+            snackBarTimeout: 1500,
 
             //SECTION - BOOLEAN VARIABLES
             viewMode: false,
@@ -27,11 +28,11 @@ export const useSampleStore = defineStore('sampleStore', {
             JobRequestRequiredSearch: [],
             JobRequestRequiredSort: [],
 
-            //SECTION - DATA OHLDER FOR CHECKBOX
+            //SECTION - DATA HOHLDER FOR CHECKBOX
             selected: [],
             selectedRows: [],
             
-            //SECTION - DATA HOLDER FOR 
+            //SECTION - DATA HOLDER FOR PROJECTS
             masterDrawerProjects: [],
             masterProjectSearch: null,
 
@@ -48,7 +49,7 @@ export const useSampleStore = defineStore('sampleStore', {
             //SECTION - DATA HOLDER FOR PROJECTS AND PROJECT LIST   
             projects: [],
             projectLists: [],
-            projectLot: [],
+            // projectLot: [],
 
             baseDir: `${window.location.protocol}//${window.location.host}/iconnsystem`,
             // baseDir: 'http://127.0.0.1:8000/iconnsystem',
