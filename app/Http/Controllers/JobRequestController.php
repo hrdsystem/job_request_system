@@ -445,6 +445,8 @@ class JobRequestController extends Controller
 
     public function getRequiredDocWithUpload($request_id)
     {
+        $users = IconnUser::select('id', 'username', 'photo');
+        
         $requirements = JobRequestRequirement::select(
             'job_request_requirements.id',
             'job_request_requirements.job_request_id',
@@ -454,19 +456,26 @@ class JobRequestController extends Controller
             'job_requireds.filling_mark',
             'job_requireds.header_name',
             'job_request_uploads.id as upload_id',
+            'job_request_uploads.uploader',
             'job_request_uploads.updating_reason',
+            'job_request_uploads.viewed_by',
             'job_request_uploads.date_viewed',
             'job_request_uploads.date_uploaded',
-            'job_requests.job_ecd'
+            'job_requests.job_ecd',
+            'users.username as job_uploader'
         )
         ->join('job_requireds', 'job_requireds.id', 'document_id')
         ->join('job_requests', 'job_requests.id', 'job_request_id')
         ->leftJoin('job_request_uploads', function($join) {
             $join
-                ->on('job_request_uploads.request_id', '=', 'job_request_requirements.job_request_id')
-                ->on('job_request_uploads.document_id', '=', 'job_request_requirements.document_id')
-                ->where('job_request_uploads.latest', true);
+            ->on('job_request_uploads.request_id', '=', 'job_request_requirements.job_request_id')
+            ->on('job_request_uploads.document_id', '=', 'job_request_requirements.document_id')
+            ->where('job_request_uploads.latest', true);
         })
+        ->leftJoinSub($users, 'users', function($join) {
+            $join->on('users.id', '=', 'job_request_uploads.uploader');
+        })
+        ->whereNull('job_request_requirements.deleted_at')
         ->where('job_request_requirements.job_request_id', $request_id)
         ->get();
 
