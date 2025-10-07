@@ -106,7 +106,7 @@ class JobRequestController extends Controller
             $q
             ->where('job_request_uploaded_files.id', $ids[0]);
         })
-        ->first();
+        ->firstOrFail();
 
         if($uploaded_file){
             $viewable = [
@@ -118,7 +118,18 @@ class JobRequestController extends Controller
             $inline = in_array(strtolower($extension), $viewable) ? 'inline' : 'attachment';
             $temp_filepath = tempnam(sys_get_temp_dir(), '');
             $file_data = Storage::disk($this->filesystem())->get('job_request/' . $uploaded_file->request_id . '/required_docs/' . $uploaded_file->file_hash);
+            $requestor = JobRequest::where('id', $uploaded_file->request_id)->value('created_by');
 
+            $testUserID = 277;
+            if ($testUserID === $requestor && is_null($uploaded_file->viewed_by)) {
+                DB::table('job_request_uploads')
+                    ->where('id', $uploaded_file->id)
+                    ->where('latest', true)
+                    ->update([
+                        'viewwed_by' => $testUserID,
+                        'viewed_date' => now()
+                    ]);
+            }
 
             file_put_contents($temp_filepath, $file_data);
             return response()
