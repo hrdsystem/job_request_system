@@ -168,7 +168,7 @@ class JobRequestController extends Controller
         //     }
         // })->count();
 
-        $users = IconnUser::select('id', 'username');
+        $users = IconnUser::select('id', 'username', 'photo');
         $project_registered = JobProjectList::select(
             'project_registered.id',
             'project_registered.construction_code',
@@ -188,6 +188,7 @@ class JobRequestController extends Controller
         })
         ->select(
             'job_requests.id',
+            'job_requests.register_id',
             'job_requests.project_name',
             'job_requests.subject',
             'job_requests.lot_number',
@@ -197,6 +198,7 @@ class JobRequestController extends Controller
             'job_requests.note',
             'job_requests.created_at',
             'users.username',
+            'users.photo',
             'job_requests.updated_at',
             'project_registered.project_id',
             'project_registered.lot',
