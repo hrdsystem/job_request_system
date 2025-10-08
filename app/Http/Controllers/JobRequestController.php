@@ -534,24 +534,34 @@ class JobRequestController extends Controller
         try {
             DB::beginTransaction();
 
-            JobRequest::where('id', $request_id)
-                ->update([
-                    'job_ecd' => $request->input('latest_ecd'),
-                    'updated_by' => 271,
-                    'updated_at' => new \DateTime()
-                ]);
-
             $haveNewECD = [];
+            $maxEcdDate = null;
+            $debug_output = [];
             
             foreach ($updates as $item){
                 if ($item['changedECD']) {
                     $haveNewECD[] = $item['document_id'];
                     
-                    JobRequestRequirement::where('id', $item['id'])
-                    ->update([
-                        'estimated_completion_date' => $item['estimated_completion_date'],
-                        'updated_at' => new \DateTime()
-                    ]);
+                    if ($item['estimated_completion_date'] === null){
+                        Log::info('CONDITION IS ON THE IF STATEMENT');
+                        JobRequestRequirement::where('id', $item['id'])
+                        ->update([
+                            'estimated_completion_date' => now(),
+                            'updated_at' => new \DateTime()
+                        ]);
+                    } else{
+                        Log::info('CONDITION IS ON THE ELSE STATEMENT');
+                        JobRequestRequirement::where('id', $item['id'])
+                        ->update([
+                            'estimated_completion_date' => $item['estimated_completion_date'],
+                            'updated_at' => new \DateTime()
+                        ]);
+                    }
+ 
+                    $currentEcd = new \DateTime($item['estimated_completion_date']);
+                    if ($maxEcdDate === null || $currentEcd > $maxEcdDate){
+                        $maxEcdDate = $currentEcd;
+                    }
                 }
 
                 if (count($item['newUploads']) > 0){
@@ -575,6 +585,22 @@ class JobRequestController extends Controller
 
                     $upload_id = DB::getPdo()->lastInsertId();
 
+                    if ($item['estimated_completion_date'] === null){
+                        Log::info('CONDITION IS ON THE IF STATEMENT');
+                        JobRequestRequirement::where('id', $item['id'])
+                        ->update([
+                            'estimated_completion_date' => $request->input('latest_ecd'),
+                            'updated_at' => new \DateTime()
+                        ]);
+                    } else{
+                        Log::info('CONDITION IS ON THE ELSE STATEMENT');
+                        JobRequestRequirement::where('id', $item['id'])
+                        ->update([
+                            'estimated_completion_date' => $item['estimated_completion_date'],
+                            'updated_at' => new \DateTime()
+                        ]);
+                    }
+
                     foreach ($item['newUploads'] as $upload){
                         $file_data = $this->file_details(json_encode($upload));
 
@@ -589,6 +615,21 @@ class JobRequestController extends Controller
                         }
                     }
                 }
+            }
+
+            $jobRequestId = JobRequest::find($request_id);
+            if (!$jobRequestId) {
+                throw new \Exception("Job request with ID {$request_id} not found.");
+            }
+            $currentJobEcd = $jobRequestId->job_ecd ? new \DateTime($jobRequestId->job_ecd) : null;
+
+            if ($maxEcdDate !== null && ($currentJobEcd === null || $maxEcdDate > $currentJobEcd)) {
+                JobRequest::where('id', $request_id)
+                    ->update([
+                        'job_ecd' => $maxEcdDate->format('Y-m-d'),
+                        'updated_by' => 271,
+                        'updated_at' => new \DateTime()
+                    ]);
             }
 
             if (isset($files) && count($files) > 0){
@@ -644,7 +685,10 @@ class JobRequestController extends Controller
 
             Log::info('Email sent successfully for request_id: ' . $request_id);
 
+            
+
             return ['request_id' => $request_id];
+            return response()->json(['debug', $debug_output]);
         } catch(\Exception $e){
             return $e->getMessage();
         }
@@ -724,6 +768,7 @@ class JobRequestController extends Controller
             return $e->getMessage();
         }
     }
+
     public function get_lots_for_project($project_id){
         try{
             $data = JobProjectList::select(
@@ -744,36 +789,6 @@ class JobRequestController extends Controller
         }
     }
 
-    // public function filterProjects(Request $request){
-
-    //     $project = JobProjectList::select(
-    //         'project_registered.id as project_registered_id',
-    //         'project_registered.construction_code',
-    //         'project_registered.lot',
-    //         'project_registered.project_id',
-    //         'projects.id as projects_id',
-    //         'projects.name as project_name'
-    //     )
-    //     ->leftJoin('projects', 'projects.id', 'project_registered.project_id');
-
-    //     if ($request->filled('project_name')) {
-    //         $project->where('project_name', $request->test_pname);
-
-    //         if ($request->filled('lot')) {
-    //             $subjects = $project->where('project_registered.lot', $request->test_lot)
-    //                 ->distinct()
-    //                 ->pluck('construction_code');
-    //             return response()->json($subjects);
-    //         }
-
-    //         $lots = $project->distinct()->pluck('lot');
-    //             return response()->json($lots);
-    //     }
-
-    //     $projects = $project->distinct()->pluck('project_name');
-    //         return response()->json($projects);
-    // }
-
     public function masterUsers(){
         try{
             $data = IconnUser::select(
@@ -782,6 +797,7 @@ class JobRequestController extends Controller
                 'users.photo',
                 'users.email'
             )
+            ->whereNotNull('users.photo')
             ->orderBy('seq', 'desc')
             ->get();
             
