@@ -152,12 +152,20 @@ class JobRequestSettingsController extends Controller
 
     public function jobRequiredDelete(Request $request){
         // return $request;
+        $ids = $request->id;
+
         try{
-            JobRequired::whereIn('id', $request->id)
+            JobRequired::whereIn('id', $ids)
             ->update([
                 'deleted_by' => 271,
                 'deleted_at' => now()
             ]);
+
+            JobRequestRequirement::whereIn('document_id', $ids)
+            ->update([
+                'deleted_at' => now()
+            ]);
+
             JobRequired::Reseq();
         }catch(\Exception $e){
             return $e->getMessage();
