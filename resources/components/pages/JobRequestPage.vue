@@ -1830,6 +1830,30 @@ export default {
             this.editEcdDialog = true
         },
 
+        saveNewECD(){
+            const index = this.requiredDocuments.findIndex(obj => obj.document_id === this.activeDocument.document_id)
+            this.requiredDocuments[index].estimated_completion_date = this.formatChangeEcdDate
+            // this.currentECD = this.formatChangeEcdDate
+            this.editEcdDialog = false
+        },
+
+        setECD() {
+            this.requiredDocuments
+                .forEach(obj => {
+                    if (obj.estimated_completion_date == null) {
+                        obj.estimated_completion_date = moment().add(obj.estimated_duration, 'days').format('YYYY-MM-DD')
+                    }
+                })
+        },
+
+        processUploadForm(){
+            console.log('working')
+            const docIndex = this.requiredDocuments.findIndex(obj => obj.document_id === this.currentDocument.document_id)
+            this.requiredDocuments[docIndex].newUploads = this.requiredFile
+            this.requiredDocuments[docIndex].newUploadReasons = this.updatingReason
+            this.requiredFile = []
+            this.uploadTab = 0
+        },
 
         async Edit(data){
             console.log('Edit data: ', data)
