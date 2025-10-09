@@ -1855,6 +1855,33 @@ export default {
             this.uploadTab = 0
         },
 
+        processSending(){
+            if(this.addAttachments.length > 0 || this.uploadDialog || this.cancelRequestDialog){
+                this.send()
+            }else{
+                this.confirmationText = 'Are you sure you want to send this without attachment?'
+                this.confirmationFor = 'attachment'
+                this.confirmDialog = true
+            }
+        },
+
+        getAttachmentLink(attachment){
+            if(attachment.document_id){
+                const rawFileName = ``
+                return `/job_requests/document/${attachment.file_id}/${encodeURIComponent(this.extractFileName(attachment.orig_filename))}`
+            }else{
+                return `/job_requests/attachments/${attachment.id}/${encodeURIComponent(this.extractFileName(attachment.orig_filename))}`
+            }
+        },
+
+        documentLink(constructionCode, planNo,fillingMark, requestId, documentId, latestUploadReferences = {}){
+            // const arr = planNo.split('-')
+            // const planNumber = arr.map(this.pad2).join('')
+            let reference = `${requestId}-${documentId}`
+
+            return `/job_requests/document/${reference}/${constructionCode}-${planNo}-${fillingMark}`
+        },
+
         async Edit(data){
             console.log('Edit data: ', data)
             console.log('Existing Lot Number from selected Index: ', data.lot)
