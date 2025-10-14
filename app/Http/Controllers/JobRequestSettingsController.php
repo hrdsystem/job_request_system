@@ -13,6 +13,7 @@ use App\Models\EmailRecipient;
 use App\Models\JobRequestSubDocument;
 use App\Models\JobRequired;
 use App\Models\IconnUser;
+use App\Models\JobRequestRequirement;
 
 class JobRequestSettingsController extends Controller
 {
@@ -175,7 +176,7 @@ class JobRequestSettingsController extends Controller
 
     public function getEmailRecipient(){
 
-        $users = IconnUser::select('id', 'username');
+        $users = IconnUser::select('id', 'username', 'photo');
 
         $data = EmailRecipient::joinSub($users, 'users', function($join){
             $join->on('email_recipients.user_id', '=', 'users.id');
@@ -186,6 +187,7 @@ class JobRequestSettingsController extends Controller
             'email_recipients.created_by',
             'email_recipients.created_at',
             'users.username',
+            'users.photo',
             DB::raw("DATE_FORMAT(email_recipients.updated_at, '%Y-%m-%d %H:%i:%s') as updatedDate")
         )
         ->when(request('search'), function ($q) {
