@@ -112,7 +112,6 @@
                                     dense
                                     required
                                     outlined
-                                    hide-details
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>No .</span>
@@ -248,6 +247,7 @@
                                 ></v-text-field>
                             </v-col>
                         </v-row>
+                        <br></br>
                         <span>Sub Documents</span>
                         <v-btn @click="addNewItem" x-small color="white" class="float-right">Add New Item</v-btn>
                         <v-table class="mainTable">
@@ -618,6 +618,7 @@ export default {
                 this.snackbar.show = true
                 this.snackbar.text = 'Please fill all required field'
                 this.snackbar.color = 'red darken 2'
+                return
             }
             var myform = document.getElementById('Update');
             var formdata = new FormData(myform);
@@ -629,7 +630,7 @@ export default {
             try{
                 const res = await axios({
                     method: 'post',
-                    url: '/api/jobMaster/update_job_requireds',
+                    url: '/api/jobMaster/update_job_required',
                     data: formdata
                 });
 
@@ -657,12 +658,15 @@ export default {
                 }
             }catch(error){
                 console.log(error)
-
+                this.snackbar.show = true
+                this.snackbar.text = 'Error submitting the form please try again'
+                this.snackbar.color = 'red darken 2'
             }
         },
 
         Delete(){
             console.log('delete is working')
+            this.overlay = true
             axios({
                 method: 'post',
                 url: '/api/jobMaster/delete_job_required',
@@ -675,8 +679,9 @@ export default {
                 this.snackbar.text = 'Delete Successful'
                 this.snackbar.color = 'blue-grey'
                 this.deleteDialog = false
+                this.overlay = false
                 this.jobRequiredPage()
-                // this.resetToggleSelectAll()
+                this.resetToggleSelectAll()
             })
         },
 
@@ -709,7 +714,7 @@ export default {
             }
         },
     }
-}
+}  
 </script>
 
 <style scoped>
