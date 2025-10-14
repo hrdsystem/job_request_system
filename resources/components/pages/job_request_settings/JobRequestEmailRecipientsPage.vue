@@ -201,16 +201,20 @@ export default {
             }
         },
 
-        Insert(){
+        async Insert(){
             console.log('testing')
+            const validation = await this.$refs.Insert.validate();
 
-            if(this.$refs.Insert.validate()){
-                var myform = document.getElementById('Insert')
-                var formdata = new FormData(myform)
+            if(!validation.valid){
+                this.snackbar.show = true
+                this.snackbar.text = 'Please fill all required fields!'
+                this.snackbar.color = 'red darken 2'
+                return;
             }
-
+            const myform = document.getElementById('Insert')
+            const formdata = new FormData(myform)
             formdata.append('user_id', this.tempName)
-
+            
             axios({
                 method: 'post',
                 url: '/api/jobMaster/insert_recipients',
