@@ -14,6 +14,14 @@
         <td>Project Name: </td>
         <td><span style="font-family: Arial, Calibri; font-weight: bold;">{{ $project_name }}</span></td>
     </tr>
+    <tr>
+        <td>Subject: </td>
+        <td><span style="font-family: Arial, Calibri; font-weight: bold;"> {{ $subject }} </span></td>
+    </tr>
+    <tr>
+        <td>Lot Number: </td>
+        <td><span style="font-family: Arial, Calibri; font-weight: bold;"> {{ $lot_number }} </span></td>
+    </tr>
 </table>
 <br>
 
@@ -34,7 +42,7 @@
     <tr>
         <td style="font-family: Arial, Calibri; font-weight: bold;">Document</td>
         <td style="font-family: Arial, Calibri; font-weight: bold;">No. of File/s</td>
-        <!-- <td style="font-family: Arial, Calibri; font-weight: bold;">ECD</td> -->
+        <td style="font-family: Arial, Calibri; font-weight: bold;">ECD</td>
         <td style="font-family: Arial, Calibri; font-weight: bold;">Date Uploaded</td>
     </tr>
     @foreach ($documents_uploaded as $item)
@@ -53,6 +61,23 @@
                 {{ $item->uploads->count() }}
             @endif
         </td>
+            @if ( in_array($item->document_id , $haveNewECD) )
+                <td style="color: blue;">
+                    @if ($item->estimated_completion_date !== null)
+                        {{date('Y-m-d', strtotime($item->estimated_completion_date))}}
+                    @else
+                        N/A
+                    @endif
+                </td>
+            @else
+                <td>
+                    @if ($item->estimated_completion_date !== null)
+                        {{date('Y-m-d', strtotime($item->estimated_completion_date))}}
+                    @else
+                        N/A
+                    @endif
+                </td>
+            @endif
             @if (isset($new_uploads) && in_array($item->document_id, $new_uploads))
                 <td style="color: blue;">
                     @if ($item->date_uploaded !== null)
