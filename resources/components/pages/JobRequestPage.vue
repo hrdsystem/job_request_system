@@ -1587,20 +1587,28 @@ export default {
         },
 
         toEmails() {
-            let items = []
-            let alreadyListed = this.jobRecipients.concat(this.ccRecipients)
-
-            this.masterUsers.forEach(c => {
-                items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
-            })
-            console.log(alreadyListed)
-            return items
-            
+            console.log('toRecipients:', this.toRecipients);
+            console.log('ccRecipients:', this.ccRecipients);
+            return this.masterUsers.filter(
+                (user) => !this.ccRecipients.some((cc) => cc && cc.id === user.id)
+            ).map((user) => ({
+                id: user.id,
+                username: user.username,
+                avatar: user.photo,
+            }));
         },
 
-        ccEmails(){
-            let items = []
-            let alreadyListed = this.projectMembers.concat(this.toRecipients)
+        ccEmails() {
+            console.log('toRecipients:', this.toRecipients);
+            console.log('ccRecipients:', this.ccRecipients);
+            return this.masterUsers.filter(
+                (user) => !this.toRecipients.some((to) => to && to.id === user.id)
+            ).map((user) => ({
+                id: user.id,
+                username: user.username,
+                avatar: user.photo,
+            }));
+        },
 
             this.masterUsers.forEach(c => {
                 items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
