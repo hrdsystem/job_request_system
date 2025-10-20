@@ -1610,12 +1610,30 @@ export default {
             }));
         },
 
-            this.masterUsers.forEach(c => {
-                items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
-            })
-            console.log(alreadyListed)
-            return items
-        },
+
+        // toEmails() {
+        //     let items = []
+        //     let alreadyListed = this.jobRecipients.concat(this.ccRecipients).concat(this.toRecipients);
+        //     console.log('toEmails: ',alreadyListed)
+
+        //     this.masterUsers.forEach(c => {
+        //         console.log('c.id: ', c.id, 'included: ', alreadyListed.includes(c.id))
+        //         items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
+        //     })
+        //     return items
+        // },
+
+        // ccEmails(){
+        //     let items = []
+        //     let alreadyListed = this.toRecipients.concat(this.ccRecipients).concat(this.jobRecipients);
+        //     console.log('ccEmails: ',alreadyListed)
+
+        //     this.masterUsers.forEach(c => {
+        //         console.log('c.id: ', c.id, 'included: ', alreadyListed.includes(c.id))
+        //         items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
+        //     })
+        //     return items
+        // },
 
         newUpdates(){
             return _.some(this.requiredDocuments, {changedECD: true}) || this.hasNewUploads
