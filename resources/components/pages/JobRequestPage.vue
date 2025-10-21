@@ -893,48 +893,36 @@
                                 variant="outlined"
                                 :search-input.sync="toSearchStr"
                                 @change="toSearchStr = ''"
+                                @update:search-input="toSearchStr = $event"
+                                @update:model-value="toSearchStr = ''"
                                 persistent-placeholder
                                 multiple
                                 hide-selected
                                 autocomplete="off"
-                            >
-                                <template v-slot:selection="data">
-                                    <!-- {{ console.log(data.item ) }} -->
+                                chips
+                                return-object
+                            >   
+                                <template v-slot:chip="{ props, item }">
                                     <v-chip
-                                        v-bind="data.attrs"
-                                        :input-value="data.selected"
-                                        @click="data.select"
-                                        :close="!defaultRecipient(data.item, 'jobRecipients')"
-                                        @click:close="removeSelection(data.item, 'toRecipients')"
-                                        variant="outlined"
-                                        closable
+                                    v-bind="props"
+                                    closable
                                     >
-                                        <v-avatar>
-                                            <v-img
-                                                :src="data.item.avatar ? '/' + data.item.avatar : baseDir+'/img/avatar.png'"
-                                                :lazy-src="baseDir+'/img/avatar.png'"
-                                            ></v-img>
-                                        </v-avatar>
-                                        <span :title="data.item.username">
-                                            {{ data.item.title }}
-                                        </span>
+                                    <v-avatar left>
+                                        <v-img
+                                            :src="'/img/avatar.png'"
+                                            :lazy-src="'/img/avatar.png'"                                            </v-img>
+                                    </v-avatar>
+                                    {{ item.title }}
                                     </v-chip>
                                 </template>
-                                <template v-slot:item="{ props, item }">
-                                    <v-list-item
-                                        v-bind="props"
-                                        :title="item.title"
-                                        :subtitle="item.username"
-                                    >
-                                        <template v-slot:prepend>
-                                        <v-avatar>
-                                            <v-img
-                                            :src="item.avatar ? '/' + item.avatar : baseDir+'/img/avatar.png'"
-                                            :lazy-src="baseDir+'/img/avatar.png'"
-                                            ></v-img>
-                                        </v-avatar>
-                                        </template>
-                                    </v-list-item>
+                                <template v-slot:data="item">
+                                    <v-avatar>
+                                        <v-img
+                                            :src="item.data.photo ? '/' + item.data.photo : '/img/avatar.png'"
+                                            :lazy-src="'/img/avatar.png'"
+                                        ></v-img>
+                                    </v-avatar>
+                                    <span>{{ item.data.title }}</span>
                                 </template>
                             </v-autocomplete>
                         </v-col>
@@ -949,38 +937,33 @@
                                 variant="outlined"
                                 :search-input.sync="ccSearchStr"
                                 @change="ccSearchStr = ''"
+                                @update:search-input="ccSearchStr = $event"
+                                @update:model-value="ccSearchStr = ''"
                                 persistent-placeholder
                                 multiple
                                 hide-selected
                                 clear-on-select
+                                return-object
                                 autocomplete="off"
                             >
-                                <template v-slot:selection="data">
-                                    <!-- {{ console.log(data.item) }} -->
+                                <template v-slot:chip="{ props, item }">
                                     <v-chip
-                                        v-bind="data.attrs"
-                                        :input-value="data.selected"
-                                        @click="data.select"
-                                        :close="!defaultRecipient(data.item, 'jobRecipients')"
-                                        @click:close="removeSelection(data.item, 'ccRecipients')"
-                                        variant="outlined"
-                                        closable
+                                    v-bind="props"
+                                    closable
                                     >
-                                        <v-avatar>
+                                        <v-avatar left>
                                             <v-img
-                                                :src="data.item.avatar ? '/' + data.item.avatar : baseDir+'/img/avatar.png'"
-                                                :lazy-src="baseDir+'/img/avatar.png'"
-                                            ></v-img>
+                                                :src="item.raw.photo ? `/${item.raw.photo}` : '/img/avatar.png'"
+                                                :lazy-src="'/img/avatar.png'">
+                                            </v-img>
                                         </v-avatar>
-                                        <span :title="data.item.username">
-                                            {{ data.item.title }}
-                                        </span>
+                                    {{ item.title }}
                                     </v-chip>
                                 </template>
                                 <template v-slot:data="item">
                                     <v-avatar>
                                         <v-img
-                                            :src="item.data.avatar ? '/' + item.data.avatar : baseDir+'/img/avatar.png'"
+                                            :src="item.data.avatar ? '/' + item.data.avatar : '/img/avatar.png'"
                                             :lazy-src="baseDir+'/img/avatar.png'"
                                         ></v-img>
                                     </v-avatar>
