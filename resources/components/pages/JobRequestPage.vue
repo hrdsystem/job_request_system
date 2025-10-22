@@ -1891,6 +1891,31 @@ export default {
             return `/job_requests/document/${reference}/${constructionCode}-${planNo}-${fillingMark}`
         },
 
+        extractFileName(origFilename) {
+            let filename = origFilename.split('.')
+
+            if (filename.length > 0) {
+                filename.pop()
+            }
+            return filename.join('')
+        },
+
+        send(){
+            if (!this.uploadDialog){
+                this.cancelRequestDialog ? this.cancelRequest() :  this.Insert()
+                this.sendToHrd = true
+                this.confirmDialog = false
+            } else{
+                this.processJobUpdates()
+                console.log('going to the process job updates function')
+            }
+            this.sendDialog = false
+        },
+
+        cancelRequest(){
+            console.log('test cancel working')
+        },
+
         async Edit(data){
             console.log('Edit data: ', data)
             console.log('Existing Lot Number from selected Index: ', data.lot)
