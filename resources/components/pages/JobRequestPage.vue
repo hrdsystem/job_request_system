@@ -1716,11 +1716,12 @@ export default {
 
         toggleUploadDialog(data){
             this.requestDetails = data
-            this.tempEcd = data.job_ecd
-            this.activeRequest = data.id
-            this.CurrentSubject = data.subject
             this.requiredDocuments = []
             this.getRequiredDocuments(data.id)
+            this.tempEcd = data.job_ecd
+            this.activeRequest = data.id
+            this.CurrentSubject = data.construction_code
+            this.CurrentPlanNumber = data.lot_number
             this.uploadDialog = true
         },
 
@@ -1731,7 +1732,8 @@ export default {
 
         toggleSendDialog(){
             this.toRecipients = this.jobRecipients
-            this.ccRecipients = this.projectMembers
+                .map((id) => this.masterUsers.find((user) => user.id === id))
+                .filter(Boolean)
             this.sendDialog = true
         },
 
