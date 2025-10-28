@@ -1934,6 +1934,7 @@ export default {
             this.tempNote = data.note
             this.tempAddJobRequirement = data.requirements
             this.tempProjectName = data.project_name;
+            this.project_registered_id = data.register_id
 
             // await this.getLotProjectList(data.project_name);
 
@@ -1941,6 +1942,7 @@ export default {
                 try{
                     await this.getLotProjectList(data.project_name)
                     console.log('UNIQUE LOTS: ', this.uniqueLots)
+                    this.updateProjectRegisteredLotId(data.lot_number)
                     if (data.lot_number && !this.uniqueLots.find(lot => lot.lot === data.lot_number)){
                         console.log('Lot not found, using data subject: ')
                         this.uniqueSubject = data.subject || data.lot_number || '';
@@ -1976,18 +1978,53 @@ export default {
                 })
             } else {
                 this.editAttachments = []
+                this.uniqueLots = []
             }
 
 
             this.isInitializingEdit = false
             this.editDialog = true
         },
-        },
+        
+        processJobUpdates(){
+            const updates = this.requiredDocuments
+                .map(({id,document_id,newUploads, newUploadReasons, changedECD, estimated_completion_date}) => 
+                    ({id, document_id, newUploads, newUploadReasons, changedECD, estimated_completion_date}));
 
-        Insert(){
-            if(this.$refs.Insert.validate()){
-                var myform = document.getElementById('Insert')
-                var formdata = new FormData(myform)
+                // --- ADD THESE CONSOLE LOGS ---
+                console.log('Sending requestDetails.id:', this.requestDetails.id);
+                console.log('Sending requestDetails.subject:', this.requestDetails.subject);
+                console.log('Sending to_recipients:', this.toRecipients);
+                console.log('Sending cc_recipients:', this.ccRecipients);
+                console.log('Sending updates:', updates);
+                // --- END CONSOLE LOGS ---
+            axios({
+                method: 'post',
+                url: '/api/jobRequest/process_job_updates',
+                data: {
+                    id: this.requestDetails.id,
+                    register_id: this.requestDetails.register_id,
+                    subject: this.requestDetails.subject,
+                    lot_number: this.requestDetails.lot,
+                    to_recipients: this.toRecipients,
+                    cc_recipients: this.ccRecipients,
+                    updates: updates,
+                    latest_ecd: this.tempEcd
+                }
+            })
+            .then((res) =>{
+                if (res.data.request_id){
+                    this.getRequiredDocuments(res.data.request_id)
+                    this.snackbar.text = 'Send Complete'
+                    this.snackbar.color = 'success'
+                    this.snackbar.show = true
+                    this.jobRequestPage()
+                }
+            })
+            .catch((error) =>{
+                console.log(error)
+            })
+        },
 
                 formdata.set('documents', JSON.stringify(this.tempAddJobRequirement))
 
