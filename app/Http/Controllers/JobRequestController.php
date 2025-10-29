@@ -525,6 +525,8 @@ class JobRequestController extends Controller
 
     public function process_job_updates(Request $request){
         $request_id = $request->input('id');
+        $register_id = $request->input('register_id');
+        $lot_number = $request->input('lot_number');
         $updates = $request->input('updates');
 
         // $data['greetings'] = 'Good day!';
@@ -572,7 +574,7 @@ class JobRequestController extends Controller
                         'date_uploaded' => new \DateTime(),
                         'updating_reason' => $item['newUploadReasons'],
                         'send_date' => new \DateTime(),
-                        'uploader' => 271,
+                        'uploader' => 261,
                         'latest' => true
                     ];
 
@@ -627,7 +629,7 @@ class JobRequestController extends Controller
                 JobRequest::where('id', $request_id)
                     ->update([
                         'job_ecd' => $maxEcdDate->format('Y-m-d'),
-                        'updated_by' => 271,
+                        'updated_by' => 261,
                         'updated_at' => new \DateTime()
                     ]);
             }
@@ -659,18 +661,30 @@ class JobRequestController extends Controller
                 return response()->json(['message' => 'No valid "To" recipients found. Email not sent.'], 400);
             }
             $subject = ' [JOB Request - New Job Updates] ' . $request->input('subject') . '.';
-            $project = JobRequest::select(
-                'job_requests.project_name'
+            // $project = JobRequest::select(
+            //     'job_requests.project_name'
+            // )
+            $projects = Project::select('id', 'name');
+
+            $project = ProjectRegistered::joinSub($projects, 'projects', function($join) {
+                $join->on('project_registered.project_id', '=', 'projects.id');
+            })
+            ->select(
+                'project_registered.construction_code',
+                'projects.name',
             )
-            ->where('id', $request_id)
+            ->where('project_registered.id', $register_id)
             ->firstOrFail();
             $data = [
                 'greetings' => 'Good day!',
                 'header' => 'New updates for the request ' . $request->input('subject') . '.',
-                'project_name' => $project->project_name,
+                'project_name' => $project->name,
+                'subject' => $project->construction_code,
+                'lot_number' => $lot_number,
                 'sender_username' => 'Test User'
             ];
             
+            $data['haveNewECD'] = $haveNewECD;
             $data['documents_uploaded'] = $this->getRequiredDocWithUpload($request_id);
 
             if (count($cc) > 0){
