@@ -713,13 +713,26 @@ class JobRequestController extends Controller
         // Log the input to get_emails
         Log::info('get_emails - Input $users:', ['users_array' => $users]);
 
-        if (!is_array($users) || empty($users)) {
-            Log::warning('get_emails - $users is not a valid array or is empty, returning empty result.');
+        // if (!is_array($users) || empty($users)) {
+        //     Log::warning('get_emails - $users is not a valid array or is empty, returning empty result.');
+        //     return [];
+        // }
+
+        if(is_array($users)) {
+            $flatUsers = is_array(reset($users)) ? array_merge(...$users) : $users;
+        } else {
+            Log::warning('get_emails - $users is not an array, returning empty result.');
             return [];
         }
 
+        if(empty($flatUsers)) {
+            Log::warning('get_emails - $flatUsers is empty, returning empty result.');
+            return [];
+        }
+
+
         $queryEmail = IconnUser::select('users.email', 'users.username as name')
-            ->whereIn('users.id', $users)
+            ->whereIn('users.id', $flatUsers) //chaned from $users to $flatUsers to adapat the nested array inputting
             ->whereNotNull('users.email')
             ->get();
         
@@ -741,13 +754,6 @@ class JobRequestController extends Controller
         // Log the final result before returning
 
         return $finalResults;
-
-        // return array_values(array_filter(IconnUser::select('email', 'username as name')
-        //     ->whereIn('id', $users)
-        //     ->whereNotNull('email')
-        //     ->get()
-        //     ->toArray()
-        // ));
     }
 
     public function get_projects(){
