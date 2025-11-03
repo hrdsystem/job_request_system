@@ -2086,32 +2086,70 @@ export default {
             // })
         },
 
-        Update(){
-            if(this.$refs.Update.validate()){
-                var myform = document.getElementById('Update')
-                var formdata = new FormData(myform)
+        async Update(){
+            const validation = await this.$refs.Update.validate()
 
-                const addJobRequirement =   _.difference(this.tempAddJobRequirement, this.oldJobRequirement)
-                const removeJobRequirement = _.difference(this.oldJobRequirement, this.tempAddJobRequirement)
+            if(!validation.valid){
+                this.snackbar.show = true
+                this.snackbar.text = 'Please fill all required fields!'
+                this.snackbar.color = 'red darken 2'
+                return;
+            }
+            var myform = document.getElementById('Update')
+            var formdata = new FormData(myform)
 
-                formdata.set("addJobRequirement", JSON.stringify(addJobRequirement));
-                formdata.set("removeJobRequirement", JSON.stringify(removeJobRequirement));
+            const addJobRequirement =   _.difference(this.tempAddJobRequirement, this.oldJobRequirement)
+            const removeJobRequirement = _.difference(this.oldJobRequirement, this.tempAddJobRequirement)
 
-                axios({
+            if (this.tempLot2 !== this.editData.lot_number || this.tempProjectName !== this.editData.project_name) {
+                formdata.set('register_id', this.project_registered_id)
+            } else{
+                formdata.set('register_id', this.editData.register_id)
+            }
+            
+            formdata.set('project_name', this.tempProjectName)
+            formdata.set("addJobRequirement", JSON.stringify(addJobRequirement));
+            formdata.set("removeJobRequirement", JSON.stringify(removeJobRequirement));
+
+            for(var i = 0; i < this.editAttachments.length; i++ ) {
+                formdata.append("attachments[]",JSON.stringify(this.editAttachments[i])) 
+            }
+
+            for(var i = 0; i < this.deletedAttachments.length; i++ ) {
+                formdata.append("deleted_attachments[]",JSON.stringify(this.deletedAttachments[i]))
+            }
+            try{
+                const res = await axios({
                     method: 'post',
                     url: '/api/jobRequest/job_update',
                     data: formdata
                 })
-                .then((res) =>{
-                    this.snackbar.show = true
-                    this.snackbar.text = 'Update Successful'
-                    this.snackbar.color = 'blue-grey'
-                    this.editDialog = false
-                    this.jobRequestPage()
-                }).catch((res) =>{
-                    console.log(res)
-                })
+                this.snackbar.show = true
+                this.snackbar.text = 'Update Successful'
+                this.snackbar.color = 'blue-grey'
+                this.editDialog = false
+                this.jobRequestPage()
+            }catch(error){
+                console.log(error)
+                this.snackbar.show = true
+                this.snackbar.text = 'Error submitting the form please try again'
+                this.snackbar.color = 'red darken 2'
             }
+            // axios({
+            //     method: 'post',
+            //     url: '/api/jobRequest/job_update',
+            //     data: formdata
+            // })
+            // .then((res) =>{
+            //     this.snackbar.show = true
+            //     this.snackbar.text = 'Update Successful'
+            //     this.snackbar.color = 'blue-grey'
+            //     this.editDialog = false
+            //     this.jobRequestPage()
+            // }).catch((res) =>{
+            //     console.log(res)
+            // })
+        },
         },
 
         Delete(){
