@@ -2026,26 +2026,64 @@ export default {
             })
         },
 
-                formdata.set('documents', JSON.stringify(this.tempAddJobRequirement))
+        async Insert(){
+            const validation = await this.$refs.Insert.validate();
 
-                for(var i = 0; i < this.addAttachments.length; i++ ) {
-                    formdata.append("attachments[]",JSON.stringify(this.addAttachments[i]))
-                }
-            }
-            axios({
-                method: 'post',
-                url: '/api/jobRequest/job_insert',
-                data: formdata
-            })
-            .then((res) =>{
+            if(!validation.valid){
                 this.snackbar.show = true
+                this.snackbar.text = 'Please fill all required fields!'
+                this.snackbar.color = 'red darken 2'
+                return;
+            }
+            var myform = document.getElementById('Insert')
+            var formdata = new FormData(myform)
+
+            formdata.set('project_name', this.tempProjectName)
+            formdata.set('documents', JSON.stringify(this.tempAddJobRequirement))
+            formdata.set('sent_to_hrd',(this.sendToHrd))
+            formdata.set('register_id', (this.project_registered_id))
+
+            for(var i = 0; i < this.addAttachments.length; i++ ) {
+                formdata.append("attachments[]",JSON.stringify(this.addAttachments[i]))
+            }
+            try{
+                const res = await axios({
+                    method: 'post',
+                    url: '/api/jobRequest/job_insert',
+                    data: formdata
+                });
+
+                console.log(this.addAttachments)
+                this.snackbar.show = true,
                 this.snackbar.text = 'Insert Successful'
                 this.snackbar.color = 'blue-grey'
                 this.insertDialog = false
                 this.jobRequestPage()
-            }).catch((res) =>{
+
+            }catch(error){
                 console.log(res)
-            })
+                this.snackbar.show = true
+                this.snackbar.text = 'Error submitting the form please try again'
+                this.snackbar.color = 'red darken 2'
+            }
+            // axios({
+            //     method: 'post',
+            //     url: '/api/jobRequest/job_insert',
+            //     data: formdata
+            // })
+            // .then((res) =>{
+            //     console.log(this.addAttachments)
+            //     this.snackbar.show = true,
+            //     this.snackbar.text = 'Insert Successful'
+            //     this.snackbar.color = 'blue-grey'
+            //     this.insertDialog = false
+            //     this.jobRequestPage()
+            // }).catch((res) =>{
+            //     console.log(res)
+            //     this.snackbar.show = true
+            //     this.snackbar.text = 'Error submitting the form please try again'
+            //     this.snackbar.color = 'red darken 2'
+            // })
         },
 
         Update(){
