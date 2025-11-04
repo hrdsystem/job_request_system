@@ -21,6 +21,8 @@ use App\Models\jobProjects;
 use App\Models\JobRequestRequirement;
 use App\Models\JobRequestUpload;
 use App\Models\JobRequestUploadedFile;
+use App\Models\Project;
+use App\Models\ProjectRegistered;
 use Illuminate\Support\Str;
 
 use function PHPSTORM_META\map;
@@ -118,16 +120,16 @@ class JobRequestController extends Controller
             $inline = in_array(strtolower($extension), $viewable) ? 'inline' : 'attachment';
             $temp_filepath = tempnam(sys_get_temp_dir(), '');
             $file_data = Storage::disk($this->filesystem())->get('job_request/' . $uploaded_file->request_id . '/required_docs/' . $uploaded_file->file_hash);
+            
             $requestor = JobRequest::where('id', $uploaded_file->request_id)->value('created_by');
-
-            $testUserID = 277;
+            $testUserID = 261;
             if ($testUserID === $requestor && is_null($uploaded_file->viewed_by)) {
                 DB::table('job_request_uploads')
                     ->where('id', $uploaded_file->id)
                     ->where('latest', true)
                     ->update([
-                        'viewwed_by' => $testUserID,
-                        'viewed_date' => now()
+                        'viewed_by' => $testUserID,
+                        'date_viewed' => now()
                     ]);
             }
 
@@ -148,9 +150,13 @@ class JobRequestController extends Controller
             'job_request_uploads.*',
             'job_requireds.required_name',
             'job_requireds.filling_mark',
-            'users.username as uploaded_by'
+            'users.username as uploaded_by',
+            'users2.username as viewed_by_user'
         )
         ->join('job_requireds', 'job_requireds.id', 'document_id')
+        ->leftJoinSub($users, 'users2', function($join) {
+            $join->on('users2.id', '=', 'job_request_uploads.viewed_by');
+        })
         ->where('request_id', $request->input('request_id'))
         ->where('document_id', $request->input('document_id'))
         ->where('latest', 0)
@@ -159,6 +165,21 @@ class JobRequestController extends Controller
 
         return $history;
     }
+
+    // public function getJobRequests(Request $request){
+    //     $jobRequest = JobRequest::with([
+    //         'user: id, username, photo',
+    //         'projectRegistration.project: id, name as projects_name',
+    //         'attachments',
+    //         'uploaaed_file',
+    //         'requiredDocument'
+    //     ])
+    //     ->select('job_requests.*')
+    //     // ->paginate()
+    //     ->get();
+
+    //     return $jobRequest;
+    // }
 
     public function getJobRequests(Request $request){
 
@@ -275,8 +296,8 @@ class JobRequestController extends Controller
             $data->status = 'NEW';
             $data->requested_date = $request->get('requested_date');
             $data->note = $request->get('note');
-            $data->created_by = 271;
-            $data->updated_by = 271;
+            $data->created_by = 261;
+            $data->updated_by = 261;
             $data->save();
 
             $last_id = $data->id;
@@ -334,8 +355,8 @@ class JobRequestController extends Controller
             $data->lot_number = $request->get('lot_number');
             $data->requested_date = $request->get('requested_date');
             $data->note = $request->get('note');
-            $data->created_by = 271;
-            $data->updated_by = 271;
+            $data->created_by = 261;
+            $data->updated_by = 261;
             $data->updated_at = now();
             $data->save();
 
@@ -405,7 +426,7 @@ class JobRequestController extends Controller
         try{
             JobRequest::whereIn('id', $request->id)
             ->update([
-                'deleted_by' => 271,
+                'deleted_by' => 261,
                 'deleted_at' => now()
             ]);
         }catch(\Exception $e){
@@ -462,7 +483,8 @@ class JobRequestController extends Controller
             'job_request_uploads.date_viewed',
             'job_request_uploads.date_uploaded',
             'job_requests.job_ecd',
-            'users.username as job_uploader'
+            'users.username as job_uploader',
+            'users2.username as viewed_by_user'
         )
         ->join('job_requireds', 'job_requireds.id', 'document_id')
         ->join('job_requests', 'job_requests.id', 'job_request_id')
@@ -474,6 +496,9 @@ class JobRequestController extends Controller
         })
         ->leftJoinSub($users, 'users', function($join) {
             $join->on('users.id', '=', 'job_request_uploads.uploader');
+        })
+        ->leftJoinSub($users, 'users2', function($join) {
+            $join->on('users2.id', '=', 'job_request_uploads.viewed_by');
         })
         ->whereNull('job_request_requirements.deleted_at')
         ->where('job_request_requirements.job_request_id', $request_id)
