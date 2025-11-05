@@ -53,56 +53,16 @@ class JobRequest extends Model
         return $this->hasMany(JobRequestUploadedFile::class, 'request_id', 'id');
     }
 
-    // public function scopeWithRequirementsData($query, $jobRequestIds){
-    //     return $query
-    //     ->select(
-    //         'job_request_requirements.job_request_id',
-    //         'job_request_requirements.document_id',
-    //     )
-    //     ->leftJoin('job_requests', 'job_requests.id', 'job_request_requirements.id')
-    //     ->whereIn('id', $jobRequestIds)
-    //     ->get();
-    // }
+    public function user(){
+        return $this->belongsTo(IconnUser::class, 'created_by');
+    }
 
-    // public function scopeWithUploadedData($query, $uploadRequestIds){
-    //     return $query
-    //     ->select(
-    //         'job_request_uploads.request_id',
-    //         'job_request_uploads.document_id'
-    //     )
-    //     ->leftJoin('job_request_uploads', 'job_request_uploads.id', 'upload_id')
-    //     ->leftJoin('job_requests', 'job_requests.id', 'job_request_uploads.request_id')
-    //     ->whereIn('upload_id', $uploadRequestIds)
-    //     ->get();
-    // }
+    public function projectRegistration() {
+        return $this->belongsTo(ProjectRegistered::class, 'register_id');
+    }
+
+    public function project() {
+        return $this->belongsTo(jobProjects::class, 'project_id');
+    }
     
-    // public static function latest_upload($obj, $jobRequestIds, $uploadRequestIds){
-    //     $requirements = self::query()
-    //     ->withRequirementsData($jobRequestIds)
-    //     ->get();
-
-    //     $uploads = self::query()
-    //     ->withUploadedData($uploadRequestIds)
-    //     ->get();
-
-    //     $requirementGroup = $requirements->where('id', $obj->id)->groupBy('document_id');
-    //     $latestRequirements = $requirementGroup->map(function ($item) {
-    //         return $item->max('id');
-    //     });
-    //     $uploadGroup = $uploads->where('id', $obj->id)->groupBy('document_id');
-    //     $latestUploaded = $uploadGroup->map(function ($item) {
-    //         return $item->max('id');
-    //     });
-
-    //     $filteredUploads = $latestUploaded->intersectByKeys($latestRequirements);
-        
-    //     $obj->latest_preferences = $filteredUploads;
-    //     $obj->uploaded = $uploads->filter(function ($item) use ($filteredUploads) {
-    //         $uploadArray = $filteredUploads->toArray();
-    //         return array_key_exists($item->document_id, $uploadArray) && $uploadArray[$item->document_id] == $item->request_id;
-    //     })->pluck('document_id');
-    //     $obj->latests_uploads = $filteredUploads->keys();
-
-    //     return $obj;
-    // }
 }
