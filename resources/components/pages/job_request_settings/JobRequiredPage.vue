@@ -52,7 +52,7 @@
                                 <v-btn icon="mdi-folder"></v-btn>
                             </template>
                             <template v-else>
-                                <v-btn icon="mdi-pencil" flat size="30px" color="success" @click="Edit(item)"></v-btn>
+                                <v-btn icon="mdi-pencil" flat size="30px" color="#227093" @click="Edit(item)"></v-btn>
                             </template>
                         </td>
                         <td v-show="floatButtonData.editButtonActive">{{item.seq}}</td>
@@ -109,9 +109,8 @@
                                     label="No ."
                                     name="seq"
                                     persistent-placeholder
-                                    dense
                                     required
-                                    outlined
+                                    hide-details
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>No .</span>
@@ -126,8 +125,6 @@
                                     class="required uppercase-value"
                                     @keyup="tempName = $event.target.value.toUpperCase()"
                                     :rules="rules.required"
-                                    dense
-                                    outlined
                                     autocomplete="off"
                                     hide-details
                                 >
@@ -144,8 +141,6 @@
                                     class="required uppercase-value"
                                     @keyup="tempFillName = $event.target.value.toUpperCase()"
                                     :rules="rules.required"
-                                    dense
-                                    outlined
                                     autocomplete="off"
                                     hide-details
                                 >
@@ -162,10 +157,7 @@
                                     class="required uppercase-value"
                                     @keyup="tempHeaderName = $event.target.value.toUpperCase()"
                                     :rules="rules.required"
-                                    dense
-                                    outlined
                                     autocomplete="off"
-                                    
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: red">*</span>Header Name</span>
@@ -201,10 +193,12 @@
                                     name="seq"
                                     persistent-placeholder
                                     hide-details
-                                    dense
                                     required
-                                    outlined
-                                ></v-autocomplete>
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>No .</span>
+                                </template>
+                                </v-autocomplete>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
                                 <v-text-field
@@ -214,11 +208,13 @@
                                     class="required uppercase-value"
                                     @keyup="tempName = $event.target.value.toUpperCase()"
                                     :rules="rules.required"
-                                    dense
-                                    outlined
                                     autocomplete="off"
                                     hide-details
-                                ></v-text-field>
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>Require Name</span>
+                                </template>
+                                </v-text-field>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
                                 <v-text-field
@@ -228,10 +224,12 @@
                                     class="required uppercase-value"
                                     @keyup="tempFillName = $event.target.value.toUpperCase()"
                                     :rules="rules.required"
-                                    dense
-                                    outlined
                                     autocomplete="off"
-                                ></v-text-field>
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>Filing Marks</span>
+                                </template>
+                                </v-text-field>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
                                 <v-text-field
@@ -241,24 +239,26 @@
                                     class="required uppercase-value"
                                     @keyup="tempHeaderName = $event.target.value.toUpperCase()"
                                     :rules="rules.required"
-                                    dense
-                                    outlined
                                     autocomplete="off"
-                                ></v-text-field>
+                                >
+                                <template v-slot:label>
+                                    <span><span style="color: red">*</span>Header Name</span>
+                                </template>
+                                </v-text-field>
                             </v-col>
                         </v-row>
                         <br></br>
                         <span>Sub Documents</span>
-                        <v-btn @click="addNewItem" x-small color="white" class="float-right">Add New Item</v-btn>
+                        <v-btn @click="addNewItem" size="default" color="white" class="float-right">Add New Item</v-btn>
                         <v-table class="mainTable">
                             <thead>
                                 <tr>
                                     <th class="text-center"></th>
                                     <th class="text-center">
-                                        <span>Required Name</span>
+                                        <span>Require Name</span>
                                     </th>
                                     <th class="text-center">
-                                        <span>Filling Mark</span>
+                                        <span>Filing Marks</span>
                                     </th>
                                     <th class="text-center">
                                         <span>Header Name</span>
@@ -268,34 +268,37 @@
                             <tbody></tbody>
                         </v-table>
                         <template v-for="(item, index) in tempSubDocumentItems" :key="index">
-                            <v-row class="row-impact">
+                            <v-row class="row-compact">
                                 <v-col cols="1" sm="1" md="1">
                                     <v-icon style="padding-left: 10px;" color="error" class="mt-6" @click="removeItemAtIndex(index)">mdi-delete</v-icon>
                                 </v-col>
-                                <v-col cols="4" sm="4" md="4">
+                                <td style="width: 144px;">
                                     <v-text-field
                                         v-model="item.required_name"
                                         label="Require Name"
                                         persistent-placeholder
+                                        class="text-field-small"
                                         hide-details
                                     ></v-text-field>
-                                </v-col>
-                                <v-col cols="3" sm="3" md="3">
+                                </td>
+                                <td style="width: 133px;">
                                     <v-text-field
                                         v-model="item.filling_mark"
                                         hide-details
-                                        label="Filling Mark"
+                                        label="Filing Marks"
+                                        class="text-field-small"
                                         persistent-placeholder
                                     ></v-text-field>
-                                </v-col>
-                                <v-col cols="4" sm="4" md="4">
+                                </td>
+                                <td style="width: 144px;">
                                     <v-text-field
                                         v-model="item.header_name"
                                         hide-details
                                         label="Header Name"
+                                        class="text-field-small"
                                         persistent-placeholder
                                     ></v-text-field>
-                                </v-col>
+                                </td>
                             </v-row>
                         </template>
                         <input type="hidden" name="id" :value="editData.id">
@@ -319,15 +322,19 @@
                 <v-card-actions>
                 <v-spacer></v-spacer>
                     <v-btn
-                    color="blue-grey darken-3"
-                    text
-                    @click="Delete"
-                    >Agree</v-btn>
+                        color="blue-grey darken-3"
+                        text
+                        @click="Delete"
+                    >
+                        Agree
+                    </v-btn>
                     <v-btn
                         color="blue-grey darken-3"
                         text
                         @click="deleteDialog = false"
-                    >Disagree</v-btn>
+                    >
+                        Disagree
+                    </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
