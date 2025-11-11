@@ -2272,6 +2272,139 @@ export default {
         spaceToUnderscore(str) {
             return str.replace(/ /g,'_')
         },
+
+    },
+
+    watch: {
+        insertDialog(val){  
+            if(!val){
+                this.saveForm()
+            }
+        },
+
+        editDialog(val){
+            if(!val){
+                this.editAttachments = []
+                this.$refs.Update.resetValidation()
+                this.saveForm()
+            }
+        },
+
+        uploadDialog(val){
+            if (!val){
+                this.requestDetails = {}
+                this.requiredFile = []
+                this.requiredDocuments = []
+                this.tempEcd = null
+                // this.editEC
+            }
+
+            setTimeout(() => {
+                this.uploadTab = 0
+            }, 300);
+        },
+
+        uploadTab(val){
+            if (val !== 1){
+                this.requiredFile = []
+                this.updatingReason = null
+                this.invalidFile = []
+            }
+        },
+
+        attachmenDialog(val){
+            if(!val){
+                this.attachments = []
+            }
+        },
+
+        // tempProjectName(newVal){
+        //     if(newVal){
+        //         console.log('PROJECT NAME condition is on if statement')
+        //         const selectedProjectName = this.projectLists.find(project => project.project_name === newVal)
+        //         this.tempLot2 = selectedProjectName ? selectedProjectName.lot : '';
+        //     } else if(!newVal){
+        //         // this.tempLot2 = this.editData.lot_number
+        //         this.tempLot2 = ''
+        //         console.log('PROJECT NAME condition is on else if statement')
+        //     }else{
+        //         console.log('not working')
+        //     }
+        // },
+
+        tempProjectName(newVal){
+            console.log('tempProjectName: ', newVal)
+            if (newVal && !this.isEditing){
+                console.log('tempProject is on the IF STATEMENT')
+                this.tempLot2 = ''
+            } else if(newVal && this.isEditing && !this.isInitializingEdit){
+                console.log('tempProject is on the ELSE IF STATEMENT')
+                this.tempLot2 = ''
+                this.uniqueSubject = ''
+            }
+            
+        },
+
+        tempLot2(newVal){
+            console.log('tempLot2 setter called:', newVal, 'uniqueLots:', this.uniqueLots);
+            if (newVal){
+                console.log('LOTS condition is on if statement')
+                const selectedLot = this.uniqueLots.find(lot => lot.lot === newVal)
+                this.uniqueSubject = selectedLot ? selectedLot.construction_code : '';
+            } else{
+                this.uniqueSubject = '';
+            }
+        },
+
+        // tempLot2: {
+        //     handler(newVal) {
+        //         console.log('tempLot2 setter called:', newVal, 'uniqueLots:', this.uniqueLots);
+        //         if (newVal) {
+        //             const selectedLot = this.uniqueLots.find(lot => lot.lot === newVal);
+        //             console.log('Selected lot found:', selectedLot, 'Setting uniqueSubject to:', this.uniqueSubject);
+        //             this.uniqueSubject = selectedLot ? selectedLot.construction_code : '';
+        //         } else {
+        //             this.uniqueSubject = '';
+        //         }
+        //     },
+        //     immediate: true  // Add this to fire on init
+        // },
+        // // Your tempProjectName watcher can stay as-is, but wrap it similarly if needed
+        // tempProjectName(newVal) {
+        //     if(this.isEditing) return;
+        //     if (newVal) {
+        //         console.log('condition is on if statement');
+        //         const selectedProjectName = this.projectLists.find(project => project.project_name === newVal);
+        //         this.tempLot2 = selectedProjectName ? selectedProjectName.lot : '';
+        //     } else if (!newVal) {
+        //         this.tempLot2 = '';
+        //         console.log('condition is on else if statement');
+        //     } else {
+        //         console.log('not working');
+        //     }
+        // },
+
+        requiredDocuments:{
+            deep: true,
+            handler(current) {
+                if (current) {
+                    this.requiredDocuments.forEach((obj, index) => {
+                        if (obj.estimated_completion_date == this.oldUploadData[index].estimated_completion_date) {
+                            obj.changedECD = false
+                        } else {
+                            obj.changedECD = true
+                        }
+                    })
+
+                    const latestECD = Math.max(...this.requiredDocuments.map(e => new Date(e.estimated_completion_date)))
+
+                    if (latestECD && isFinite(latestECD)) {
+                        this.tempEcd = moment(latestECD).format('YYYY-MM-DD')
+                    }
+                }
+            }
+        }
+    },
     }
 }
 </script>
