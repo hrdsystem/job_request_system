@@ -1608,6 +1608,7 @@ export default {
                 id: user.id,
                 username: user.username,
                 avatar: user.photo,
+                email: user.email
             }));
         },
 
@@ -1620,6 +1621,7 @@ export default {
                 id: user.id,
                 username: user.username,
                 avatar: user.photo,
+                email: user.email
             }));
         },
 
@@ -1704,10 +1706,10 @@ export default {
 
         statusMapping(status){
             const mapping = {
-                'NEW' : { label: 'NEW', color: 'rgba(231, 76, 60, 1)'},
-                'ONGOING' : { label: 'ONGOING', color: 'rgba(52, 152, 219, 1)'},
-                'COMPLETED' : { label: 'COMPLETED', color: 'rgba(46, 204, 113, 1)'},
-                'CANCELLED' : { label: 'CANCELLED', color: 'rgba(217, 217, 217, 1)'},
+                'NEW' : { label: 'NEW', color: 'rgba(231, 76, 60, 1)', textColor: 'white'},
+                'ONGOING' : { label: 'ONGOING', color: 'rgba(52, 152, 219, 1)', textColor: 'white'},
+                'COMPLETED' : { label: 'COMPLETED', color: 'rgba(46, 204, 113, 1)', textColor: 'white'},
+                'CANCELLED' : { label: 'CANCELLED', color: 'rgba(217, 217, 217, 1)', textColor: 'white'},
             }
             return mapping[status] || {label: 'Unknown', color: 'grey'};
         },
@@ -1753,6 +1755,13 @@ export default {
             this.CurrentSubject = data.construction_code
             this.CurrentPlanNumber = data.lot_number
             this.uploadDialog = true
+        },
+
+        reloadJobRequest(){
+            setTimeout(() => {
+                this.updateDispatch = true
+                this.jobRequestPage()
+            }, 300)
         },
 
         cancelRequestDialog(){
