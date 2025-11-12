@@ -1870,6 +1870,25 @@ export default {
             })
         },
 
+        showViewHistory(doc){
+            console.log('history dialog tab 3')
+            this.uploadTab = 3
+
+            axios({
+                method: 'post',
+                url: '/api/jobRequest/get_viewer_history',
+                data:{
+                    upload_id: doc.document_id,
+                    request_id: doc.job_request_id
+
+                }
+            }).then((res) =>{
+                this.viewerHistories = res.data
+            }).catch(error =>{
+                console.log(error)
+            })
+        },
+
         EditECD(doc){
             if (doc.estimated_completion_date != null){
                 this.currentECD = doc.estimated_completion_date
