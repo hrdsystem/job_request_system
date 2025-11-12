@@ -47,6 +47,7 @@
                         <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'job_requests.status')"></v-text-field>
                     </th>
                     <th></th>
+                    <th></th>
                     <th>
                         <v-text-field autocomplete="off" variant="solo" placeholder="Search" @keyup="searchCol($event.target, 'users.username')"></v-text-field>
                     </th>
@@ -61,7 +62,7 @@
             </thead>
             <tbody>
                 <template v-for="(item, index) in JobRequestData" :key="index">
-                    <tr>
+                    <tr :class="(item.status == 'CANCELLED') ? 'inactive' : '' ">
                         <td v-show="floatButtonData.editButtonActive">
                             <v-checkbox 
                                 style="display: flex;" 
@@ -71,7 +72,7 @@
                             </v-checkbox>
                         </td>
                         <td v-show="floatButtonData.editButtonActive">
-                            <template v-if="item.status == '2' || item.status == '3'">
+                            <template v-if="item.status == 'COMPLETED' || item.status == 'CANCELLED'">
                                 <v-btn disabled icon="mdi-pencil" flat size="30px"></v-btn>
                             </template>
                             <template v-else-if="item.status == '1'">
@@ -84,8 +85,9 @@
                         <td class="text-center">{{ item.projects_name }}</td>
                         <td class="text-center">{{ item.subject }}</td>
                         <td class="text-center">{{ item.lot_number }}</td>
-                        <td class="text-center" @click="statusEditDialog(item)">
-                            <v-chip :color="statusMapping(item.status).color" dark>
+                        <td class="text-center" @click="statusEditDialog(item)" >
+                            <v-chip :color="statusMapping(item.status).color" 
+                                    :class="statusMapping(item.status).textColor + '--text'">
                                 {{ statusMapping(item.status).label }}
                             </v-chip>
                         </td>
@@ -113,8 +115,8 @@
                                 <template v-slot:activator="{ props }">
                                     <v-avatar v-bind="props">
                                         <v-img
-                                            :src="item.photo "
-                                            :lazy-src="baseDir+'/img/avatar.png'"
+                                            :src="'/img/avatar.png'"
+                                            :lazy-src="'/img/avatar.png'"
                                         >
                                         </v-img>
                                     </v-avatar>
@@ -123,7 +125,7 @@
                             </v-tooltip>
                         </td>
                         <td class="text-center">{{ item.requested_date }}</td>
-                        <td class="text-center" @click="toggleEcdDialog(item)">{{ item.job_ecd }}</td>
+                        <td class="text-center" @click="item.status !== 'COMPLETED' && item.status !== 'CANCELLED' && toggleEcdDialog(item)">{{ item.job_ecd }}</td>
                         <template v-for="(job_req, index) in JobRequestRequiredData" :key="index">
                             <template v-if="item.requirements.includes(job_req.id)">
                                 <td class="text-center">
@@ -151,22 +153,31 @@
                             </v-tooltip>
                         </td>
                         <td class="text-center">
-                            <v-tooltip location="bottom" v-if="item.requirements.length > 0">
+                            <v-tooltip location="bottom" v-if="item.requirements.length > 0 && (item.status === 'NEW' || item.status === 'ONGOING')">
                                 <template v-slot:activator="{ props }">
-                                    <v-icon size="30px" style="color: blue" flat v-bind="props" @click="toggleUploadDialog(item)" >mdi-file-upload</v-icon>
+                                    <v-icon size="30px" style="color: blue" flat v-bind="props" @click="item.status !== 'COMPLETED' && item.status !== 'CANCELLED' && toggleUploadDialog(item)" >mdi-file-upload</v-icon>
                                 </template>
                                 <span>Upload</span>
                             </v-tooltip>
-                            <v-icon v-else class="disabled" size="30px">mdi-file-upload</v-icon>
+                            <v-icon v-else-if="item.requirements.length > 0 && (item.status === 'COMPLETED' || item.status === 'CANCELLED')" style="color: black" size="30px">mdi-file-upload</v-icon>
+                            <v-icon v-else style="color: black" class="disabled" size="30px">mdi-file-upload</v-icon>
                         </td>
                     </tr>
                 </template>
             </tbody>
         </v-table>
 
+        <v-overlay v-model="overlay" overlay class="overlay-center">
+            <v-progress-circular 
+                indeterminate 
+                :size="64"
+                style="color: white;"
+            ></v-progress-circular>
+        </v-overlay>
+
         <v-dialog v-model="insertDialog" persistent max-width="600" @keydown.esc="insertDialog = false">
             <v-form id="Insert" ref="Insert" @submit.prevent="Insert">
-                <v-card>
+                <v-card class="rounded-lg">
                     <v-card-title>
                         <span class="headline">Add Required Job</span>
                         <v-icon style="float: right;" color="white" @click="insertDialog = false">mdi-close</v-icon>
@@ -182,8 +193,8 @@
                                     :rules="rules.required"
                                     @update:modelValue="getLotProjectList"
                                     label="PROJECT NAME"
+                                    class="required"
                                     name="project_name"
-                                    outlined
                                     autocomplete="off"
                                     hide-details
                                     persistent-placeholder
@@ -198,8 +209,8 @@
                                     v-model="uniqueSubject"
                                     label="SUBJECT"
                                     name="subject"
+                                    :rules="rules.required"
                                     persistent-placeholder
-                                    outlined
                                     autocomplete="off"
                                     hide-details
                                     readonly
@@ -217,8 +228,8 @@
                                     item-value="lot"
                                     label="LOT #"
                                     name="lot_number"
+                                    :rules="rules.required"
                                     persistent-placeholder
-                                    outlined
                                     autocomplete="off"
                                     hide-details
                                     @update:modelValue="updateProjectRegisteredLotId"
@@ -243,9 +254,8 @@
                                             @click:clear="tempAddIssuedDate = null"
                                             label="REQUESTED DUE DATE" 
                                             name="requested_date"
+                                            :rules="rules.required"
                                             clearable
-                                            dense
-                                            outlined
                                             readonly
                                             persistent-placeholder
                                         ></v-text-field>
@@ -253,6 +263,8 @@
                                     <v-date-picker
                                         v-model="tempAddIssuedDate"
                                         @update:model-value ="insertDatepicker = false"
+                                        color="blue-grey darken-3"
+                                        class="rounded-lg"
                                     ></v-date-picker>
                                 </v-menu>
                             </v-col>
@@ -263,9 +275,7 @@
                                     label="Note"
                                     class="optional"
                                     rows="3"
-                                    outlined
-                                    persistent-placeholder
-                                    dense
+                                    persistent-placehold
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: green">#</span>Note</span>
@@ -284,8 +294,7 @@
                                     prepend-icon="mdi-file"
                                     variant="outlined"
                                     multiple
-                                    persistent-placeholder
-                                    dense
+                                    persistent-placehold
                                 ></v-file-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="6"></v-col>
@@ -346,7 +355,7 @@
 
         <v-dialog v-model="editDialog" persistent max-width="600" @keydown.esc="editDialog = false">
             <v-form id="Update" ref="Update" @submit.prevent="Update">
-                <v-card>
+                <v-card class="rounded-lg">
                     <v-card-title >
                         <span class="headline">{{ editData.projects_name }}</span>
                         <v-icon style="float: right;" color="white" @click="editDialog = false">mdi-close</v-icon>
@@ -363,7 +372,6 @@
                                     @update:modelValue="getLotProjectList"
                                     label="PROJECT NAME"
                                     name="project_name"
-                                    outlined
                                     autocomplete="off"
                                     hide-details
                                     persistent-placeholder
@@ -379,7 +387,7 @@
                                     label="SUBJECT"
                                     name="subject"
                                     persistent-placeholder
-                                    outlined
+                                    :rules="rules.required"
                                     autocomplete="off"
                                     hide-details
                                     readonly
@@ -397,8 +405,8 @@
                                     item-value="lot"
                                     label="LOT #"
                                     name="lot_number"
+                                    :rules="rules.required"
                                     persistent-placeholder
-                                    outlined
                                     autocomplete="off"
                                     hide-details
                                     @update:modelValue="updateProjectRegisteredLotId"
@@ -423,15 +431,16 @@
                                             @click:clear="tempAddIssuedDate = null"
                                             label="REQUESTED DUE DATE" 
                                             name="requested_date"
+                                            :rules="rules.required"
                                             clearable
-                                            dense
-                                            outlined
                                             readonly
                                         ></v-text-field>
                                     </template>
                                     <v-date-picker
                                         v-model="tempAddIssuedDate"
                                         @update:model-value ="insertDatepicker = false"
+                                        color="blue-grey darken-3"
+                                        class="rounded-lg"
                                     ></v-date-picker>
                                 </v-menu>
                             </v-col>
@@ -442,8 +451,7 @@
                                     label="Note"
                                     class="optional"
                                     rows="3"
-                                    outlined
-                                    dense
+                                    outlin
                                 >
                                 <template v-slot:label>
                                     <span><span style="color: green">#</span>Note</span>
@@ -461,8 +469,7 @@
                                     prepend-icon="mdi-file"
                                     persistent-placeholder
                                     variant="outlined"
-                                    multiple
-                                    dense
+                                    multip
                                 ></v-file-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="6"></v-col>
@@ -533,19 +540,19 @@
 
         <v-dialog v-model="uploadDialog" persistent :width="uploadTab == 1 ? 600 : 800 " @keydown.esc="showConfirmDialog()">
             <v-form id="uploadForm" ref="uploadForm" @submit.prevent="processUploadForm">
-
-                <v-card>
+                <v-card class="rounded-lg">
                     <v-card-title>
                         <span class="headline" v-if="uploadTab == 0" >Job Requirement</span>
                         <span class="headline" v-else-if="uploadTab == 1" >Upload {{ CurrentSubject }}</span>
-                        <span class="headline" v-else>{{ CurrentSubject }} Upload History</span>
+                        <span class="headline" v-else-if="uploadTab == 2">{{ CurrentSubject }} Upload History</span>
+                        <span class="headline" v-else>{{ CurrentSubject }} Viewed History</span>
                         <v-icon style="float: right;" color="white" @click="showConfirmDialog()">mdi-close</v-icon>
                     </v-card-title>
                     <v-card-text class="pa-0">
                         <v-window v-model="uploadTab" touchless>
                             <v-window-item>
                                 <v-col cols="auto">
-                                    <v-row class="mb-5 mt-0 mx-n2">
+                                    <v-row class="mb-5 mt-0 mx-    n2">
                                         <v-col cols="12" sm="4" md="4">
                                             <v-text-field
                                                 v-model="tempEcd"
@@ -599,6 +606,7 @@
                                             <th style="width:20px">Upload</th>
                                             <th v-if="hasNewUploads">New Uploads</th>
                                             <th class="text-center">Viewed By</th>
+                                            <th class="text-center">Viewed History</th>
                                             <th class="text-center">Date Viewed</th>
                                             <th style="width:20px">History</th>
                                         </tr>
@@ -610,10 +618,10 @@
                                             </td>
                                             <td>
                                                 <a
-                                                    :href="documentLink(CurrentSubject, doc.filling_mark, doc.job_request_id, doc.document_id)"
+                                                    :href="documentLink(CurrentSubject, CurrentPlanNumber,doc.filling_mark, doc.job_request_id, doc.document_id, )"
                                                     target="_blank"
                                                     icon="mdi-file"
-                                                    @click="reloadCadRequests()"
+                                                    @click="jobRequestPage()"
                                                     v-if="doc.uploads.length === 1">
                                                     <v-icon size="30px" color="blue">mdi-file</v-icon>
                                                 </a>
@@ -678,8 +686,17 @@
                                                 </v-tooltip>
                                                 <v-icon v-else color="grey" size="30px">mdi-folder</v-icon>
                                             </td>
-                                            <td class="text-center">temp viewed by</td>
-                                            <td class="text-center">temp date viewed</td>
+                                            <td class="text-center">{{ doc.viewed_by_user }}</td>
+                                            <td class="text-center icon-btn">
+                                                <v-tooltip location="bottom" v-if="doc.viewed_by != null">
+                                                    <template v-slot:activator="{ props }" >
+                                                        <v-icon size="30px" style="color: goldenrod" v-bind="props" @click="showViewHistory(doc)">mdi-clipboard-text-clock-outline</v-icon>
+                                                    </template>
+                                                    <span>Viewed Hstory</span>
+                                                </v-tooltip>
+                                                <v-icon v-else size="30px">mdi-clipboard-text-clock-outline</v-icon>
+                                            </td>
+                                            <td class="text-center">{{ dateOnly(doc.date_viewed) }}</td>
                                             <td class="text-center icon-btn">
                                                 <v-tooltip location="bottom" v-if="doc.updating_reason != null">
                                                     <template v-slot:activator="{ props }">
@@ -732,7 +749,7 @@
                                     </v-row>
                                 </v-col>
                                 <v-col cols="12" class="mb-5" v-if="requiredFile.length > 0">
-                                    <v-table>
+                                    <v-table> 
                                         <tbody>
                                             <tr v-for="(file, index) in requiredFile" :key="'rf' + index">
                                                 <td class="text-center" width="40px">
@@ -755,7 +772,6 @@
                                         name="updating_reason"
                                         :rules="rules.required"
                                         persistent-placeholder
-                                        variant="outlined"
                                         rows="3"
                                         hide-details
                                     >
@@ -767,10 +783,10 @@
                             </v-window-item>
                             <v-window-item>
                                 <v-col cols="auto">
-                                    <v-row v-if="uploadHistories.length < 1">
+                                    <!-- <v-row v-ploadHistories.length < 1">
                                         <v-btn @click="console.log('temp for testing')">TEST</v-btn>
-                                    </v-row>
-                                    <v-table fixed-header class="mainTable" v-if="uploadHistories.length > 0">
+                                    </v-row>if="u -->
+                                    <v-table fixed-header class="mainTable rounded-lg" v-if="uploadHistories.length > 0">
                                         <thead>
                                             <tr>
                                                 <th class="text-center">Type</th>
@@ -786,10 +802,10 @@
                                             <tr v-for="(history, index) in uploadHistories" :key="'uh' + index">
                                                 <td class="text-center">
                                                     <a
-                                                        :href="`/api/job_request/document/${history.files[0].id}/${encodeURIComponent(extractFileName(history.files[0].orig_filename))}`"
+                                                        :href="`/job_requests/document/${history.files[0].id}/${encodeURIComponent(extractFileName(history.files[0].orig_filename))}`"
                                                         target="_blank"
                                                         icon="mdi-file"
-                                                        @click="reloadCadRequests()"
+                                                        @click="reloadJobRequest()"
                                                         v-if="history.files.length === 1">
                                                         <v-icon size="30px" color="blue">mdi-file</v-icon>
                                                     </a>
@@ -806,8 +822,26 @@
                                                 <td class="text-center">{{ history.uploaded_by }}</td>
                                                 <td class="text-center">{{ dateOnly(history.date_uploaded) }}</td>
                                                 <td class="text-center">{{ history.updating_reason }}</td>
-                                                <td class="text-center">{{ testing }}</td>
+                                                <td class="text-center">{{ history.viewed_by_user }}</td>
                                                 <td>{{ dateOnly(history.date_viewed) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </v-table>
+                                </v-col>
+                            </v-window-item>
+                            <v-window-item>
+                                <v-col cols="auto">
+                                    <v-table fixed_header class="mainTable rounded-lg">
+                                        <thead>
+                                            <tr>
+                                                <th>Viewed By</th>
+                                                <th>Viewed Date </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(viewHistory, index) in viewerHistories" :key="'huh' + index">
+                                                <td>{{viewHistory.viewed_user}}</td>
+                                                <td>{{viewHistory.viewed_at}}</td>
                                             </tr>
                                         </tbody>
                                     </v-table>
@@ -821,7 +855,7 @@
                             <v-icon>mdi-arrow-left</v-icon>
                         </v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn style="border: 1px solid grey;" outlined small v-if="uploadTab == 1" @click="uploadTab = 0">
+                    <v-btn style="border: 1px solid grey;" v-if="uploadTab == 1" @click="uploadTab = 0">
                         <v-icon>mdi-close-outline</v-icon>
                         Cancel
                     </v-btn>
@@ -833,7 +867,7 @@
                         </template>
                         <span>Send to Email</span>
                     </v-tooltip>
-                    <v-btn style="border: 1px solid grey;" type="submit" variant="outlined" small :disabled="requiredFile.length < 1 || disableUploadAndSend || (currentDocument.date_uploaded != null && updatingReason == null)" v-if="uploadTab == 1">
+                    <v-btn style="border: 1px solid grey;" type="submit" :disabled="requiredFile.length < 1 || disableUploadAndSend || (currentDocument.date_uploaded != null && updatingReason == null)" v-if="uploadTab == 1">
                         <v-icon color="success">mdi-check-bold</v-icon>
                         OK
                     </v-btn>
@@ -890,7 +924,6 @@
                                 item-value="id"
                                 name="to_recipients"
                                 label="To: "
-                                variant="outlined"
                                 :search-input.sync="toSearchStr"
                                 @change="toSearchStr = ''"
                                 @update:search-input="toSearchStr = $event"
@@ -901,6 +934,7 @@
                                 autocomplete="off"
                                 chips
                                 return-object
+                                clear-on-select
                             >   
                                 <template v-slot:chip="{ props, item }">
                                     <v-chip
@@ -932,9 +966,8 @@
                                 :items="ccEmails"
                                 item-title="username"
                                 item-value="id"
-                                name="to_recipients"
+                                name="cc_recipients"
                                 label="CC:"
-                                variant="outlined"
                                 :search-input.sync="ccSearchStr"
                                 @change="ccSearchStr = ''"
                                 @update:search-input="ccSearchStr = $event"
@@ -997,7 +1030,6 @@
                                 depressed
                                 small
                                 color="grey darken-3"
-                                outlined
                                 v-bind="props"
                                 @click="sendDialog = false"
                                 style="border: 1px solid grey;"
@@ -1014,7 +1046,7 @@
         <v-dialog v-model="statusDialog" persistent max-width="250px" @keydown.esc="statusDialog = false">
             <v-form id="Status" ref="Status" @submit.prevent="Status">
                 <template v-slot:default="{ props }">
-                    <v-card>
+                    <v-card class="rounded-lg">
                         <v-card-title>
                             <span class="headline">Update Status</span>
                             <v-icon style="float: right;" color="white" @click="statusDialog = false">mdi-close</v-icon>
@@ -1136,7 +1168,6 @@
                                 depressed
                                 small
                                 color="grey darken-3"
-                                outlined
                                 v-bind="props"
                                 @click="confirmDialog = false"
                                 style="border: 1px solid grey;"
@@ -1228,7 +1259,7 @@
 
         <v-dialog v-model="ecdDialog" persistent max-width="320" @keydown.esc="ecdDialog = false">
             <v-form id="ecdDate" ref="ecdDate" @submit.prevent="ecdForm">
-                <v-card>
+                <v-card class="rounded-lg">
                     <v-card-title>
                         <span>Estimated Completion Date</span>
                         <v-icon style="float: right;" color="white" @click="ecdDialog = false">mdi-close</v-icon>
@@ -1249,8 +1280,6 @@
                                     label="ESTIMATED COMPLETION DATE" 
                                     name="ecd_date"
                                     clearable
-                                    dense
-                                    outlined
                                     readonly
                                     persistent-placeholder
                                     hide-details
@@ -1279,9 +1308,9 @@
         </v-dialog>
 
         <v-dialog v-model="editEcdDialog" persistent max-width="330" @keydown.esc="editEcdDialog = false">
-            <v-card>
+            <v-card class="rounded-lg">
                 <v-card-title>
-                    <span>Edit {{ activeDocument.required_name }} ECD</span>
+                    <span class="headline">EDIT {{ activeDocument.required_name }} ECD</span>
                     <v-icon style="float: right;" color="white" @click="editEcdDialog = false">mdi-close</v-icon>
                 </v-card-title>
                 <v-card-text>
@@ -1294,13 +1323,11 @@
                     >
                         <template v-slot:activator="{ props }">
                             <v-text-field
-                                v-model="formatChangeEcdDate"
+                                v-model="currentECD"
                                 v-bind="props"
                                 @click:clear="currentECD = null"
                                 label="ESTIMATED COMPLETION DATE" 
                                 clearable
-                                dense
-                                outlined
                                 readonly
                                 persistent-placeholder
                                 hide-details
@@ -1369,6 +1396,7 @@
             @editButtonClicked="floatButtonData.editButtonActive = !floatButtonData.editButtonActive"
             @deleteButtonHandle="toggleDeleteDialog($event)"
         ></float-button-component>
+        <footer-app :currentData="JobRequestData.length" :currentRecords="JobRequestRecords"></footer-app>
     </v-container>
 </template>
 
@@ -1376,8 +1404,10 @@
 import ToolBarComponent from '@aspect/ToolBarComponent.vue'
 import SnackBarComponent from '@aspect/SnackBarComponent.vue'
 import FloatButtonComponent from '@aspect/FloatButtonComponent.vue'
+import FooterApp from '@aspect/FooterApp.vue'
 import {useDisplay} from 'vuetify'
-import {PDFDocument} from 'pdf-lib'
+import {PDFDocument} from 'pdf-lib' 
+import moment from 'moment'
 const { xs } = useDisplay()
 </script>
 
