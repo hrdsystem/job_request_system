@@ -12,4 +12,14 @@ class viewDocumentHistory extends Model
     
     protected $connection = 'mysql';
     protected $table = 'document_view_history';
+
+    public function viewer(){
+        return $this->belongsTo(IconnUser::class, 'user_id');
+    }
+
+    public function scopeForDocument($query, $uploadId, $requestId){
+        return $query->where('upload_id', $uploadId)
+                    ->where('request_id', $requestId);
+    }
+
 }
