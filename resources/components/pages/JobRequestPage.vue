@@ -2200,20 +2200,20 @@ export default {
                 this.snackbar.color = 'red darken 2'
             }
         },
-            //     method: 'post',
-            //     url: '/api/jobRequest/job_update',
-            //     data: formdata
-            // })
-            // .then((res) =>{
-            //     this.snackbar.show = true
-            //     this.snackbar.text = 'Update Successful'
-            //     this.snackbar.color = 'blue-grey'
-            //     this.editDialog = false
-            //     this.jobRequestPage()
-            // }).catch((res) =>{
-            //     console.log(res)
-            // })
-        },
+
+        getRequiredDocuments(requestId){
+            axios({
+                method: 'post',
+                url: '/api/jobRequest/get_required_documents',
+                data: {
+                    request_id: requestId
+                },
+            }).then(res => {
+                this.oldUploadData = res.data
+                this.requiredDocuments = res.data.map(obj => ({...obj, changedECD: false ,newUploadReasons: null, newUploads: []}))
+            }).catch(error =>{
+                console.log(error)
+            })
         },
 
         Delete(){
