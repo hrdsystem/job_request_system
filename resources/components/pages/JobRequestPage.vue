@@ -2174,19 +2174,32 @@ export default {
                     method: 'post',
                     url: '/api/jobRequest/job_update',
                     data: formdata
-                })
-                this.snackbar.show = true
-                this.snackbar.text = 'Update Successful'
-                this.snackbar.color = 'blue-grey'
-                this.editDialog = false
-                this.jobRequestPage()
+                });
+                
+                if (res.data === 1){
+                    console.log(':ot number & Subject already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'lot number already exists'
+                    this.snackbar.color = 'red darken 2'
+                } else if (res.data === 2){
+                    console.log('subject already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'subject already exists'
+                    this.snackbar.color = 'red darken 2'
+                } else{
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Update Successful'
+                    this.snackbar.color = 'blue-grey'
+                    this.editDialog = false
+                    this.jobRequestPage()
+                }
             }catch(error){
                 console.log(error)
                 this.snackbar.show = true
                 this.snackbar.text = 'Error submitting the form please try again'
                 this.snackbar.color = 'red darken 2'
             }
-            // axios({
+        },
             //     method: 'post',
             //     url: '/api/jobRequest/job_update',
             //     data: formdata
