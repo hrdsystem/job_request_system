@@ -2111,37 +2111,30 @@ export default {
                     data: formdata
                 });
 
-                console.log(this.addAttachments)
-                this.snackbar.show = true,
-                this.snackbar.text = 'Insert Successful'
-                this.snackbar.color = 'blue-grey'
-                this.insertDialog = false
-                this.jobRequestPage()
-
-            }catch(error){
+                if (res.data === 1){
+                    console.log('lot number already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Lot number & Subject already exists'
+                    this.snackbar.color = 'red darken 2'
+                } else if (res.data === 2){
+                    console.log('subject already exists')
+                    this.snackbar.show = true
+                    this.snackbar.text = 'subject already exists'
+                    this.snackbar.color = 'red darken 2'
+                } else {
+                    console.log(this.addAttachments)
+                    this.snackbar.show = true,
+                    this.snackbar.text = 'Insert Successful'
+                    this.snackbar.color = 'blue-grey'
+                    this.insertDialog = false
+                    this.jobRequestPage()
+                }
+            } catch(error){
                 console.log(res)
                 this.snackbar.show = true
                 this.snackbar.text = 'Error submitting the form please try again'
                 this.snackbar.color = 'red darken 2'
             }
-            // axios({
-            //     method: 'post',
-            //     url: '/api/jobRequest/job_insert',
-            //     data: formdata
-            // })
-            // .then((res) =>{
-            //     console.log(this.addAttachments)
-            //     this.snackbar.show = true,
-            //     this.snackbar.text = 'Insert Successful'
-            //     this.snackbar.color = 'blue-grey'
-            //     this.insertDialog = false
-            //     this.jobRequestPage()
-            // }).catch((res) =>{
-            //     console.log(res)
-            //     this.snackbar.show = true
-            //     this.snackbar.text = 'Error submitting the form please try again'
-            //     this.snackbar.color = 'red darken 2'
-            // })
         },
 
         async Update(){
