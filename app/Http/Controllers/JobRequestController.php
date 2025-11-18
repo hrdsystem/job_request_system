@@ -346,79 +346,92 @@ class JobRequestController extends Controller
 
     public function jobRequestUpdate(Request $request){
         // return $request;
-        try{
-            DB::beginTransaction();
-            $data = JobRequest::find($request->get('id'));
-            $data->register_id = $request->get('register_id');
-            $data->project_name = $request->get('project_name');
-            $data->subject = $request->get('subject');
-            $data->lot_number = $request->get('lot_number');
-            $data->requested_date = $request->get('requested_date');
-            $data->note = $request->get('note');
-            $data->created_by = 261;
-            $data->updated_by = 261;
-            $data->updated_at = now();
-            $data->save();
 
-            $addJobRequirement = json_decode($request->get('addJobRequirement'));
-            if(!empty($addJobRequirement)){
-                foreach($addJobRequirement as $id){
-                    $add[] = array(
-                        "job_request_id" => $request->get('id'),
-                        "document_id" => $id,
-                        "updated_at" => now()
-                    );
-                }
-                DB::table('job_request_requirements')->insert($add);
-            }
-            
-            $removeJobRequirement = json_decode($request->get('removeJobRequirement'));
-            if(!empty($removeJobRequirement)){
-                DB::table('job_request_requirements')->where("job_request_id", $request->get('id'))
-                    ->whereIn('document_id', $removeJobRequirement)
-                    ->delete();
-            }
-
-            
-            $deleted_attachments = $request->input('deleted_attachments');
-            if (!empty($deleted_attachments)) {
-                DB::table('job_attachments')
-                    ->whereIn('id', $deleted_attachments)
-                    ->update([
-                        'deleted_by' => 211,
-                        'deleted_at' => new \DateTime()
-                    ]);
-            }
-
-            if (!empty($request->input('attachments'))) {
-                foreach ($request->input('attachments') as $item) {
-                $file = json_decode($item, true);
-
-                if (isset($file['data'])){
-                    $file_details = $this->file_details($item);
-                    $attachments[] = [
-                        'job_request_id' => $data -> id,
-                        'orig_filename' => $file_details['orig_filename'],
-                        'file_hash' => $file_details['file_hash'],
-                        'updated_by' => 211,
-                        'updated_at' => new \DateTime
-                    ];
+        $lot_number_exists = JobRequest::whereNotIn('id', [$request->get('id')])
+            ->where('lot_number', $request->get('lot_number'))
+            ->exists();
+        $subject_exists = JobRequest::whereNotIn('id', [$request->get('id')])
+            ->where('subject', $request->get('subject'))
+            ->exists();
+        if($lot_number_exists) {
+            return 1;
+        } else if ($subject_exists){
+            return 2;
+        } else{
+            try{
+                DB::beginTransaction();
+                $data = JobRequest::find($request->get('id'));
+                $data->register_id = $request->get('register_id');
+                $data->project_name = $request->get('project_name');
+                $data->subject = $request->get('subject');
+                $data->lot_number = $request->get('lot_number');
+                $data->requested_date = $request->get('requested_date');
+                $data->note = $request->get('note');
+                $data->created_by = 261;
+                $data->updated_by = 261;
+                $data->updated_at = now();
+                $data->save();
     
-                        if (!is_null($file_details['file_data'])) {
-                            Storage::disk($this->filesystem())->put("job_request/" . $data->id . "/attachments/" . $file_details['file_hash'], $this->base64Decode($file_details['file_data']));
+                $addJobRequirement = json_decode($request->get('addJobRequirement'));
+                if(!empty($addJobRequirement)){
+                    foreach($addJobRequirement as $id){
+                        $add[] = array(
+                            "job_request_id" => $request->get('id'),
+                            "document_id" => $id,
+                            "updated_at" => now()
+                        );
+                    }
+                    DB::table('job_request_requirements')->insert($add);
+                }
+                
+                $removeJobRequirement = json_decode($request->get('removeJobRequirement'));
+                if(!empty($removeJobRequirement)){
+                    DB::table('job_request_requirements')->where("job_request_id", $request->get('id'))
+                        ->whereIn('document_id', $removeJobRequirement)
+                        ->delete();
+                }
+    
+                
+                $deleted_attachments = $request->input('deleted_attachments');
+                if (!empty($deleted_attachments)) {
+                    DB::table('job_attachments')
+                        ->whereIn('id', $deleted_attachments)
+                        ->update([
+                            'deleted_by' => 211,
+                            'deleted_at' => new \DateTime()
+                        ]);
+                }
+    
+                if (!empty($request->input('attachments'))) {
+                    foreach ($request->input('attachments') as $item) {
+                    $file = json_decode($item, true);
+    
+                    if (isset($file['data'])){
+                        $file_details = $this->file_details($item);
+                        $attachments[] = [
+                            'job_request_id' => $data -> id,
+                            'orig_filename' => $file_details['orig_filename'],
+                            'file_hash' => $file_details['file_hash'],
+                            'updated_by' => 211,
+                            'updated_at' => new \DateTime
+                        ];
+        
+                            if (!is_null($file_details['file_data'])) {
+                                Storage::disk($this->filesystem())->put("job_request/" . $data->id . "/attachments/" . $file_details['file_hash'], $this->base64Decode($file_details['file_data']));
+                            }
                         }
                     }
+    
+                    if (isset($attachments)) {
+                        DB::table('job_attachments')->insert($attachments);
+                    }
                 }
-
-                if (isset($attachments)) {
-                    DB::table('job_attachments')->insert($attachments);
-                }
+    
+                DB::commit();
+                return response()->json(['Success' => 'Update Successful']);
+            } catch(\Exception $e){
+                return $e->getMessage();
             }
-
-            DB::commit();
-            return response()->json(['Success' => 'Update Successful']);
-        } catch(\Exception $e){
-            return $e->getMessage();
         }
     }
 
