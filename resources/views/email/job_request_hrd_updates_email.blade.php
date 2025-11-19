@@ -59,6 +59,8 @@
         <td>
             @if ($item->date_uploaded !== null)
                 {{ $item->uploads->count() }}
+            @else
+                -
             @endif
         </td>
             @if ( in_array($item->document_id , $haveNewECD) )
@@ -66,7 +68,7 @@
                     @if ($item->estimated_completion_date !== null)
                         {{date('Y-m-d', strtotime($item->estimated_completion_date))}}
                     @else
-                        N/A
+                        -
                     @endif
                 </td>
             @else
@@ -74,7 +76,7 @@
                     @if ($item->estimated_completion_date !== null)
                         {{date('Y-m-d', strtotime($item->estimated_completion_date))}}
                     @else
-                        N/A
+                        -
                     @endif
                 </td>
             @endif
@@ -83,7 +85,7 @@
                     @if ($item->date_uploaded !== null)
                         {{date('Y-m-d', strtotime($item->date_uploaded))}}
                     @else
-                        N/A
+                        -
                     @endif
                 </td>
             @else
@@ -91,7 +93,7 @@
                     @if ($item->date_uploaded !== null)
                         {{date('Y-m-d', strtotime($item->date_uploaded))}}
                     @else
-                        N/A
+                        -
                     @endif
                 </td>
             @endif
