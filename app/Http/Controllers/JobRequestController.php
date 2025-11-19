@@ -799,6 +799,32 @@ class JobRequestController extends Controller
             }
         }
 
+        return [
+            'haveNewECD' => $haveNewECD,
+            'maxEcdDate' => $maxEcdDate,
+            'files' => $files
+        ];
+    }
+
+    private function updateJobMasterEcd($request_id, $maxEcdDate) {
+
+        $jobRequest = JobRequest::find($request_id);
+
+        if (!$jobRequest){
+            throw new \Exception("Job request with ID {$request_id} not found.");
+        }
+
+        $currentJobEcd = $jobRequest->job_ecd ? new \DateTime($jobRequest->job_ecd) : null;
+        
+        if ($maxEcdDate !== null && ($currentJobEcd === null || $maxEcdDate > $currentJobEcd)) {
+            JobRequest::where('id', $request_id)
+                ->update([
+                    'job_ecd' => $maxEcdDate->format('Y-m-d'),
+                    'updated_by' => 261,
+                    'updated_at' => now()
+                ]);
+        }
+    }
     public function get_projects(){
         try{
             $data = jobProjects::select(
