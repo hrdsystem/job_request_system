@@ -728,53 +728,76 @@ class JobRequestController extends Controller
         }
     }
 
-    private function get_emails($users)
-    {
-        // Log the input to get_emails
-        Log::info('get_emails - Input $users:', ['users_array' => $users]);
+    private function processRequirementsAndUploads($request_id, array $updates, $latest_ecd){
+        $haveNewECD = [];
+        $maxEcdDate = null;
+        $files = [];
+        $updates = (array) $updates;
 
-        // if (!is_array($users) || empty($users)) {
-        //     Log::warning('get_emails - $users is not a valid array or is empty, returning empty result.');
-        //     return [];
-        // }
+        foreach ($updates as $item){
+            $itemId = $item['id'];
+            $docId = $item['document_id'];
 
-        if(is_array($users)) {
-            $flatUsers = is_array(reset($users)) ? array_merge(...$users) : $users;
-        } else {
-            Log::warning('get_emails - $users is not an array, returning empty result.');
-            return [];
+            if ($item['changedECD']) {
+                $ecdToUse = $item['estimated_completion_date'] ?? now();
+
+                JobRequestRequirement::where('id', $itemId)->update([
+                    'estimated_completion_date' => $ecdToUse,   
+                    'updated_at' => now(),
+                ]);
+
+                $haveNewECD[] = $docId;
+
+                $currentEcd = new \DateTime((string)$ecdToUse);
+                if ($maxEcdDate === null || $currentEcd > $maxEcdDate) {
+                    $maxEcdDate = $currentEcd;
+                }
+            }
+
+            $newUploads = (array) ($item['newUploads'] ?? []);
+
+            if (count($newUploads) > 0) {
+                $ecdToUseUpload = $item['estimated_completion_date'] ?? $latest_ecd;
+
+                JobRequestRequirement::where('id', $itemId)->update([
+                    'estimated_completion_date' => $ecdToUseUpload,
+                    'updated_at' => now()
+                ]);
+
+                DB::table('job_request_uploads')
+                    ->where('request_id', $request_id)
+                    ->where('document_id', $docId)
+                    ->update(['latest' => false]);
+    
+                DB::table('job_request_uploads')->Insert([
+                    'request_id' => $request_id,
+                    'document_id' => $docId,
+                    'date_uploaded' => now(),
+                    'updating_reason' => $item['newUploadReasons'],
+                    'send_date' => now(),
+                    'uploader' => 261,
+                    'latest' => true,
+                ]);
+                $upload_id = DB::getPdo()->lastInsertId(); 
+    
+                foreach ($newUploads as $upload) {
+                    $file_data = $this->file_details(json_encode($upload));
+    
+                    $files[] = [
+                        'upload_id' => $upload_id,
+                        'orig_filename' => $file_data['orig_filename'],
+                        'file_hash' => $file_data['file_hash']
+                    ];
+    
+                    if (!is_null($file_data['file_data'])) {
+                        Storage::disk($this->filesystem())->put(
+                            "job_request/{$request_id}/required_docs/{$file_data['file_hash']}", 
+                            $this->base64Decode($file_data['file_data'])
+                        );
+                    }
+                }
+            }
         }
-
-        if(empty($flatUsers)) {
-            Log::warning('get_emails - $flatUsers is empty, returning empty result.');
-            return [];
-        }
-
-
-        $queryEmail = IconnUser::select('users.email', 'users.username as name')
-            ->whereIn('users.id', $flatUsers) //chaned from $users to $flatUsers to adapat the nested array inputting
-            ->whereNotNull('users.email')
-            ->get();
-        
-        // Log the raw result from the database before converting to array
-        Log::info('get_emails - Query Result (Collection):', ['result' => $queryEmail->toArray()]);
-
-        $toArrayEmails = $queryEmail->toArray();
-
-        // Log the result after toArray()
-        Log::info('get_emails - After to Array():', ['array_result' => $toArrayEmails]);
-
-        $filteredEmails = array_filter($toArrayEmails);
-
-        // Log the results after array_filter()
-        Log::info('get_emails - After array_filter():', ['filtered_emails' => $filteredEmails]);
-
-        $finalResults = array_values($filteredEmails);
-
-        // Log the final result before returning
-
-        return $finalResults;
-    }
 
     public function get_projects(){
         try{
