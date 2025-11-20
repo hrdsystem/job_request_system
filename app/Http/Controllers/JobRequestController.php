@@ -834,6 +834,54 @@ class JobRequestController extends Controller
                 ]);
         }
     }
+
+    private function sendUpdateNotification(Request $request, $register_id, $lot_number, $request_id,array $haveNewECD)
+    {
+        $projects = Project::select('id', 'name');
+        $project = JobProjectList::joinSub($projects, 'projects', function($join) {
+            $join->on('project_registered.project_id', '=', 'projects.id');
+        })
+        ->select('project_registered.construction_code', 'projects.name')
+        ->where('project_registered.id', $register_id)
+        ->firstOrFail();
+
+        $toIds = Arr::flatten($request->input('toRecipients'));
+        $ccIds = Arr::flatten($request->input('ccRecipients'));
+
+        $to = $this->get_email_details($toIds);
+        $cc = $this->get_email_details($ccIds);
+
+        if (empty($to)) {
+            Log::warning('Email skip: No valid "To" recipients found.');
+            return; 
+        }
+
+        $subject = ' [Job Request - New Job Updates] ' . $request->input('subject');
+
+        $data = [
+            'greetings' => 'Good Day!',
+            'header' => 'New Updates for the request '. $request->input('subject'),
+            'project_name' => $project->name,
+            'subject' => $project->construction_code,
+            'lot_number' => $lot_number,
+            'sender_username' => 'Test Usser',
+            'haveNewEcd' => $haveNewECD,
+            'document_uploaded' => $this->getRequiredDocWithUpload($request_id)
+        ];
+
+        $mailable = new IconnMail($data, $subject, 'email.job_request_hrd_updates_email');
+        $mailer = Mail::to($to);
+
+        if (count($cc) > 0) {
+            $mailer->cc($cc);
+            Log::info('Sending email with TO and CC recipients.');
+        } else{
+            Log::info('Sending email with only TO recipients (CC list is empty).');
+        }
+
+        $mailer->send($mailable);
+    }
+
     public function get_projects(){
         try{
             $data = jobProjects::select(
