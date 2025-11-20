@@ -952,4 +952,11 @@ class JobRequestController extends Controller
             return $e->getMessage();
         }
     }
+
+    public function get_email_details($ids){
+        return IconnUser::select('users.email', 'users.username as name')
+            ->whereIn('users.id', $ids)
+            ->whereNotNull('users.email')
+            ->get()->toArray();
+    }
 }
