@@ -728,11 +728,20 @@ class JobRequestController extends Controller
         }
     }
 
-    private function processRequirementsAndUploads($request_id, array $updates, $latest_ecd){
+    private function processRequirementsAndUploads($request_id, array $updates, $latest_ecd): array{
+        if(empty($updates)){
+            return [
+                'haveNewECD' => [],
+                'maxEcdDate => null',
+                'files' => []
+            ];
+        }
+        
         $haveNewECD = [];
         $maxEcdDate = null;
         $files = [];
         $updates = (array) $updates;
+
 
         foreach ($updates as $item){
             $itemId = $item['id'];
