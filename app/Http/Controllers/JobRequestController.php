@@ -882,6 +882,24 @@ class JobRequestController extends Controller
         $mailer->send($mailable);
     }
 
+    // private function get_emails($users)
+    // {
+    //     if (is_array($users)) {
+    //         $flatUsers = Arr::flatten($users); // Requires Illuminate\Support\Arr; or Laravel helper
+    //     } else {
+    //         //placeholder for future error trappings
+    //     }
+
+    //     $queryEmail = IconnUser::select('users.email', 'users.username as name')
+    //         ->whereIn('users.id', $flatUsers) // Correctly using $flatUsers
+    //         ->whereNotNull('users.email')
+    //         ->get();
+
+    //     $toArrayEmails = $queryEmail->toArray();
+
+    //     return $toArrayEmails; 
+    // }
+
     public function get_projects(){
         try{
             $data = jobProjects::select(
