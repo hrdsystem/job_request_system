@@ -728,6 +728,53 @@ class JobRequestController extends Controller
         }
     }
 
+    public function process_job_updates2(Request $request){
+        $request_id = $request->input('id');
+        $register_id = $request->input('register_id');
+        $lot_number = $request->input('lot_number');
+        $updates = (array) $request->input('updates', []);
+
+        $files = [];
+        $haveNewECD = [];
+        $maxEcdDate = null;
+
+        try {
+            DB::beginTransaction();
+
+            $results = $this->processRequirementsAndUploads(
+                $request_id,
+                $updates,
+                $request->input('latest_ecd')
+            );
+
+            $haveNewECD = $results['haveNewECD'];
+            $maxEcdDate = $results['maxEcdDate'];
+            $files = $results['files'];
+            
+            $this->updateJobMasterEcd($request_id, $maxEcdDate);
+
+            if (!empty($files)) {
+                DB::table('job_request_uploaded_files')->insert($files);
+            }
+
+            DB::commit();
+
+            $this->sendUpdateNotification(
+                $request,
+                $register_id,
+                $lot_number,
+                $request_id,
+                $haveNewECD
+            );
+
+            Log::info('Job update and email sent successfully for request_id: ' . $request_id);
+
+            return response()->json(['request_id' => $request_id], 200);
+        } catch(Exception $e){
+
+        }
+    }
+    
     private function processRequirementsAndUploads($request_id, array $updates, $latest_ecd): array{
         if(empty($updates)){
             return [
