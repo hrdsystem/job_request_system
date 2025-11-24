@@ -139,22 +139,43 @@ class JobRequestController extends Controller
                 'jpg',
                 'png'
             ];
+            
+
             $extension = pathinfo($uploaded_file->orig_filename, PATHINFO_EXTENSION);
             $inline = in_array(strtolower($extension), $viewable) ? 'inline' : 'attachment';
             $temp_filepath = tempnam(sys_get_temp_dir(), '');
             $file_data = Storage::disk($this->filesystem())->get('job_request/' . $uploaded_file->request_id . '/required_docs/' . $uploaded_file->file_hash);
             
-            $requestor = JobRequest::where('id', $uploaded_file->request_id)->value('created_by');
-            $testUserID = 261;
-            if ($testUserID === $requestor && is_null($uploaded_file->viewed_by)) {
-                DB::table('job_request_uploads')
-                    ->where('id', $uploaded_file->id)
-                    ->where('latest', true)
-                    ->update([
-                        'viewed_by' => $testUserID,
-                        'date_viewed' => now()
-                    ]);
+            $tempo_id = 261;
+
+            if ($tempo_id !== null){
+                $this->recordViewDocument($uploaded_file, $tempo_id);
             }
+            
+            // $currentUserID = Auth::id();
+            
+            $requestor = JobRequest::where('id', $uploaded_file->request_id)->value('created_by');
+            $temp_id = 261;
+            if ($temp_id !== null && is_null($uploaded_file->viewed_by)) {
+                DB::table('job_request_uploads')
+                ->where('id', $uploaded_file->id)
+                ->where('latest', true)
+                ->update([
+                    'viewed_by' => $temp_id,
+                    'date_viewed' => now()
+                ]);
+            }
+            
+            // FUTURE AUTH ID MODIFICATION 
+            // if ($currentUserID !== null && is_null($uploaded_file->viewed_by)) {
+            //     DB::table('job_request_uploads')
+            //         ->where('id', $uploaded_file->id)
+            //        ` ->where('latest', true)
+            //         ->update([
+            //             'viewed_by' => $currentUserID,
+            //             'date_viewed' => now()
+            //         ]);
+            // }
 
             file_put_contents($temp_filepath, $file_data);
             return response()
