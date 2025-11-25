@@ -12,6 +12,19 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+
+    server: {
+        host: '0.0.0.0',
+        cors : {
+            origin: 'http://10.169.141.202:8000',
+            credentials: true
+        },
+        hmr: {
+            host: '10.169.141.202',
+            clientPort: 5173
+        }
+    },
+
     resolve: {
         alias: {
             "@aspect": `./resources/components/aspects`,
