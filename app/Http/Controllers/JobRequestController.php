@@ -96,8 +96,9 @@ class JobRequestController extends Controller
             'request_id'  => $uploaded_file->request_id,
             'upload_id'   => $uploaded_file->document_id,
             'user_id'     => $userId,
+            // 'user_id'     => Auth::id(),
             'viewed_at'   => $currentTime,
-            'created_at'  => $currentTime,
+            'created_at'  => $currentTime, 
             'updated_at'  => $currentTime,
         ]);
 
@@ -166,22 +167,56 @@ class JobRequestController extends Controller
                 ]);
             }
             
-            // FUTURE AUTH ID MODIFICATION 
-            // if ($currentUserID !== null && is_null($uploaded_file->viewed_by)) {
-            //     DB::table('job_request_uploads')
-            //         ->where('id', $uploaded_file->id)
-            //        ` ->where('latest', true)
-            //         ->update([
-            //             'viewed_by' => $currentUserID,
-            //             'date_viewed' => now()
-            //         ]);
-            // }
-
             file_put_contents($temp_filepath, $file_data);
             return response()
                 ->download($temp_filepath, $filename . '-' . date('mdY') . '.' . $extension, ['filename' => $filename . '-' . date('mdY') . '.' . $extension], $inline)
                 ->deleteFileAfterSend();
         }
+    }
+
+    public function getDocumentViewHistory(Request $request){
+        // $users = IconnUser::select('id', 'username');
+
+        // $history = viewDocumentHistory::joinSub($users, 'users', function($join){
+        //     $join->on('document_view_history.user_id', '=', 'users.id');
+        // })
+        // ->select(
+        //     'document_view_history.viewed_at',
+        //     'users.username as viewer_name',
+        //     'document_view_history.user_id'
+        // )
+        // ->where('upload_id', $request->input('upload_id'))
+        // ->where('request_id', $request->input('request_id'))
+        // ->get();
+
+        $validated = $request->validate([
+            'upload_id' => 'required|integer',
+            'request_id' => 'required|integer',
+        ]);
+        
+        $uploadId = $validated['upload_id'];
+        $requestId = $validated['request_id'];
+
+        $history = viewDocumentHistory::with(['viewer:id,username'])
+            ->forDocument($uploadId, $requestId)
+            ->get([
+                'viewed_at',
+                'user_id',
+            ]);
+
+        if ($history->isEmpty()) {
+            return response()->json(['message' => 'No view history found.'], 404);
+        }
+
+        $transformedHistory = $history->map(function ($item) {
+            return [
+                'viewed_at' => $item->viewed_at,
+                'viewed_user' => $item->viewer->username ?? null,
+                'user_id' => $item->user_id,
+            ];
+        });
+    
+        return response()->json($transformedHistory);
     }
 
     public function upload_history(Request $request){
