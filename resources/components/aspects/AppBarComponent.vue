@@ -19,8 +19,11 @@
         </template>
         <template v-slot:append>
         <v-avatar class="mr-2" color="surface-variant" size="small">
-            <v-img src="http://hrd-adminweb/photos/46227.jpg" aspect-ratio="1/1" :width="10">
-            </v-img>
+            <v-img
+                :src="'/img/avatar.png'"
+            ></v-img>
+            <!-- <v-img src="http://hrd-adminweb/photos/46227.jpg" aspect-ratio="1/1" :width="10">
+            </v-img> -->
         </v-avatar>
         </template>
     </v-app-bar>
