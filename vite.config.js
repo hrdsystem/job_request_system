@@ -17,6 +17,7 @@ export default defineConfig({
         host: '0.0.0.0',
         cors : {
             origin: 'http://10.169.141.202:8000',
+            // origin: '*',
             credentials: true
         },
         hmr: {
