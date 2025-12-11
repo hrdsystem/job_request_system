@@ -961,6 +961,7 @@ class JobRequestController extends Controller
                 ->update([
                     'job_ecd' => $maxEcdDate->format('Y-m-d'),
                     'updated_by' => 261,
+                    // 'updated_by' => Auth::id(),
                     'updated_at' => now()
                 ]);
         }
@@ -976,8 +977,8 @@ class JobRequestController extends Controller
         ->where('project_registered.id', $register_id)
         ->firstOrFail();
 
-        $toIds = Arr::flatten($request->input('toRecipients'));
-        $ccIds = Arr::flatten($request->input('ccRecipients'));
+        $toIds = Arr::flatten($request->input('to_recipients'));
+        $ccIds = Arr::flatten($request->input('cc_recipients'));
 
         $to = $this->get_email_details($toIds);
         $cc = $this->get_email_details($ccIds);
@@ -995,9 +996,10 @@ class JobRequestController extends Controller
             'project_name' => $project->name,
             'subject' => $project->construction_code,
             'lot_number' => $lot_number,
-            'sender_username' => 'Test Usser',
-            'haveNewEcd' => $haveNewECD,
-            'document_uploaded' => $this->getRequiredDocWithUpload($request_id)
+            'sender_username' => 'Test User',
+            // 'sender_username' => Auth::id(),
+            'haveNewECD' => $haveNewECD,
+            'documents_uploaded' => $this->getRequiredDocWithUpload($request_id)
         ];
 
         $mailable = new IconnMail($data, $subject, 'email.job_request_hrd_updates_email');
@@ -1012,24 +1014,6 @@ class JobRequestController extends Controller
 
         $mailer->send($mailable);
     }
-
-    // private function get_emails($users)
-    // {
-    //     if (is_array($users)) {
-    //         $flatUsers = Arr::flatten($users); // Requires Illuminate\Support\Arr; or Laravel helper
-    //     } else {
-    //         //placeholder for future error trappings
-    //     }
-
-    //     $queryEmail = IconnUser::select('users.email', 'users.username as name')
-    //         ->whereIn('users.id', $flatUsers) // Correctly using $flatUsers
-    //         ->whereNotNull('users.email')
-    //         ->get();
-
-    //     $toArrayEmails = $queryEmail->toArray();
-
-    //     return $toArrayEmails; 
-    // }
 
     public function get_projects(){
         try{
