@@ -9,15 +9,16 @@ const Page404 = () => import('../components/includes/Page404.vue');
 // import Company from '../pages/Company.vue';
 
 const router = createRouter({
-    history: createWebHistory('/iconnsystem/'),
+    history: createWebHistory('/job_request/'),
+    base: '/job_request/',
     routes: [
+        // {
+        //     path: '/',
+        //     component: Page404,
+        //     name: '404',
+        // },
         {
             path: '/',
-            component: Page404,
-            name: '404',
-        },
-        {
-            path: '/job_request',
             component: JobRequestPage,
             name: 'job_request',
         },
