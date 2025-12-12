@@ -1,8 +1,13 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue'
+import dotenv from "dotenv";
 
 const root = "resources/js/components/";
+
+const { config } = dotenv;
+
+const env = config().parsed;
 
 export default defineConfig({
     plugins: [
@@ -14,17 +19,24 @@ export default defineConfig({
     ],
 
     server: {
-        host: '0.0.0.0',
-        cors : {
-            origin: 'http://10.169.141.202:8000',
-            // origin: '*',
-            credentials: true
-        },
-        hmr: {
-            host: '10.169.141.202',
-            clientPort: 5173
-        }
+            host: env.VITE_HOST || 'localhost', //to enable view in other device
+            cors: {
+                origin: '*',
+            },
     },
+
+    // server: {
+    //     host: '0.0.0.0',
+    //     cors : {
+    //         origin: 'http://10.169.141.202:8000',
+    //         // origin: '*',
+    //         credentials: true
+    //     },
+    //     hmr: {
+    //         host: '10.169.141.202',
+    //         clientPort: 5173
+    //     }
+    // },
 
     resolve: {
         alias: {
