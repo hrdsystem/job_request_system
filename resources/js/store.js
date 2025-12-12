@@ -51,8 +51,7 @@ export const useSampleStore = defineStore('sampleStore', {
             projectLists: [],
             // projectLot: [],
 
-            baseDir: `${window.location.protocol}//${window.location.host}/iconnsystem`,
-            // baseDir: 'http://127.0.0.1:8000/iconnsystem',
+            baseUrl: import.meta.env?.VITE_BASE_URL || "http://localhost/job_request",
 
             rules: {
                 required: [
@@ -195,7 +194,7 @@ export const useSampleStore = defineStore('sampleStore', {
 
         getmasterDrawerProjects() {
             this.overlay = true
-            axios.get(`/api/project_drawer`, {
+            axios.get($api+`/api/project_drawer`, {
                 keyword: this.masterProjectSearch,
               // path: this.route.name
             }).then((response) => {
@@ -215,7 +214,7 @@ export const useSampleStore = defineStore('sampleStore', {
 
         jobRequestPage(){
             this.overlay = true
-            axios.post(`/api/jobRequest/get_job_request`,{
+            axios.post($api+`/api/jobRequest/get_job_request`,{
                 search: this.JobRequestSearch,
                 sort: this.JobRequestSort
             })
@@ -230,7 +229,7 @@ export const useSampleStore = defineStore('sampleStore', {
 
         jobRequiredPage(){
             this.overlay = true
-            axios.post(`/api/jobMaster/get_job_requireds`,{
+            axios.post($api+`/api/jobMaster/get_job_requireds`,{
                 search: this.JobRequestRequiredSearch,
                 sort: this.JobRequestRequiredSort
             })
@@ -277,7 +276,7 @@ export const useSampleStore = defineStore('sampleStore', {
         },
 
         getMasterUsers() {
-            axios.post(`/api/jobRequest/master_users`, {
+            axios.post($api+`/api/jobRequest/master_users`, {
             }).then(response => {
                 this.masterUsers = response.data
             }).catch(error => {
@@ -286,7 +285,7 @@ export const useSampleStore = defineStore('sampleStore', {
         },
 
         getProjects() {
-            axios.post(`/api/jobRequest/get_projects`, {
+            axios.post($api+`/api/jobRequest/get_projects`, {
             }).then(response => {
                 this.projects = response.data
             }).catch(error => {
@@ -295,7 +294,7 @@ export const useSampleStore = defineStore('sampleStore', {
         },
 
         getProjectLists() {
-            axios.post(`/api/jobRequest/get_project_lists`, {
+            axios.post($api+`/api/jobRequest/get_project_lists`, {
             }).then(response => {
                 this.projectLists = response.data
             }).catch(error => {
@@ -304,7 +303,7 @@ export const useSampleStore = defineStore('sampleStore', {
         },
 
         // getProjectLots() {
-        //     axios.post(`/api/jobRequest/get_project_lot`, {
+        //     axios.post($api+`/api/jobRequest/get_project_lot`, {
         //     }).then(response => {
         //         this.projectLot = response.data
         //     }).catch(error => {
@@ -313,7 +312,7 @@ export const useSampleStore = defineStore('sampleStore', {
         // },
 
         emailRecipientPage(){
-            axios.post('/api/jobMaster/get_email_recipients', {
+            axios.post($api+`/api/jobMaster/get_email_recipients`, {
             }).then(res =>{
                 this.EmailRecipientsData = res.data
             }).catch(error =>{
