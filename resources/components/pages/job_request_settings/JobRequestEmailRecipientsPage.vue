@@ -124,7 +124,7 @@ export default {
                 },
                 back: {
                     show: true,
-                    url: '/iconnsystem/job_request'
+                    url: '/job_request'
                 },
                 view: false,
                 filter: true,
@@ -217,7 +217,7 @@ export default {
             
             axios({
                 method: 'post',
-                url: '/api/jobMaster/insert_recipients',
+                url: $api+`/api/jobMaster/insert_recipients`,
                 data: formdata
             })
             .then((res) =>{
@@ -240,7 +240,7 @@ export default {
         Delete(){
             axios({
                 method: 'post',
-                url: '/api/jobMaster/delete_recipients',
+                url: $api+`/api/jobMaster/delete_recipients`,
                 data:{
                     id: this.selectedRows.map(index => this.EmailRecipientsData[index].id)
                 }

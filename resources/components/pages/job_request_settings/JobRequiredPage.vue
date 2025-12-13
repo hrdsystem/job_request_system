@@ -393,7 +393,7 @@ export default {
                 },
                 back: {
                     show: true,
-                    url: '/iconnsystem/job_request'
+                    url: '/job_request'
                 },
                 view: false,
                 filter: true,
@@ -583,7 +583,7 @@ export default {
             try{
                 const res = await axios({
                     method: 'post',
-                    url: '/api/jobMaster/insert_job_required',
+                    url: $api+`/api/jobMaster/insert_job_required`,
                     data: formdata,
                 });
 
@@ -637,7 +637,7 @@ export default {
             try{
                 const res = await axios({
                     method: 'post',
-                    url: '/api/jobMaster/update_job_required',
+                    url: $api+`/api/jobMaster/update_job_required`,
                     data: formdata
                 });
 
@@ -676,7 +676,7 @@ export default {
             this.overlay = true
             axios({
                 method: 'post',
-                url: '/api/jobMaster/delete_job_required',
+                url: $api+`/api/jobMaster/delete_job_required`,
                 data: {
                     id: this.selectedRows.map(index => this.JobRequestRequiredData[index].id)
                 }
