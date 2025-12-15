@@ -148,7 +148,7 @@ export const useSampleStore = defineStore('sampleStore', {
             });
 
             if (obj.selector.value.length == 0){
-                this[obj.search].splice(obj.index, 1);
+                this[obj.search].splice(obj_index, 1);
             } else{
                 if(obj_index > -1){
                     this[obj.search][obj_index].val = obj.selector.value;
