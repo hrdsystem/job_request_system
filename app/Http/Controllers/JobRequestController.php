@@ -262,12 +262,6 @@ class JobRequestController extends Controller
 
     public function getJobRequests(Request $request){
 
-        // $cnt = JobRequest::when(request('search'), function ($q) {
-        //     for($i=0;$i<count(request('search'));$i++){
-        //         return $q->orWhere(request('search')[$i]['column'],'like','%'.request('search')[$i]['val'].'%');
-        //     }
-        // })->count();
-
         $users = IconnUser::select('id', 'username', 'photo');
         $project_registered = JobProjectList::select(
             'project_registered.id',
@@ -304,30 +298,15 @@ class JobRequestController extends Controller
             'project_registered.lot',
             'project_registered.construction_code',
             'projects.name as projects_name'
-        );
-        // $searchInputs = $request->input('search', []);
-        $jobRequestQuery->when(request('search'), function ($q) {
+        )
+        ->when(request('search'), function ($q) {
             for($i=0; $i<count(request('search')); $i++){
-                $q->where(request('search')[$i]['column'], 'like', '%'.request('search')[$i]['val'].'%');
+                $q->where(request('search')[$i]['column'], 'like', '%' . request('search')[$i]['val']. '%');
             }
             return $q;
-        });
+        })
 
-        // if (!empty($searchInputs) && is_array($searchInputs)) {
-        //     // Apply each filter sequentially (AND logic)
-        //     foreach ($searchInputs as $search) {
-        //         $searchColumn = $search['column'] ?? null;
-        //         $searchValue = $search['val'] ?? $search['value'] ?? null;
-                
-        //         // Only apply the WHERE clause if BOTH column and value are present
-        //         if ($searchColumn && $searchValue) {
-        //             // Apply directly to the main query builder
-        //             $jobRequestQuery->where($searchColumn, 'like', '%' . $searchValue . '%');
-        //         }
-        //     }
-        // }
-
-        $jobRequestQuery = $jobRequestQuery->when(request('sort') , function ($q) {
+        ->when(request('sort') , function ($q) {
             for($i=0;$i<count(request('sort'));$i++){
                 $q->orderBy(request('sort')[$i]['column'],request('sort')[$i]['val']);
             }
