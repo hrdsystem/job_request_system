@@ -81,6 +81,8 @@ class JobRequestSettingsController extends Controller
                 $data->header_name = $request->get('header_name');
                 $data->created_by = 261;
                 $data->updated_by = 261;
+                // $data->created_by = Auth::id();
+                // $data->updated_by = Auth::id();
                 $data->save();
                 DB::commit();
             } catch(\Exception $e){
@@ -117,6 +119,8 @@ class JobRequestSettingsController extends Controller
                 $data->header_name = $request->get('header_name');
                 $data->created_by = 261;
                 $data->updated_by = 261;
+                // $data->created_by = Auth::id();
+                // $data->updated_by = Auth::id();
                 $data->save();
 
                 $data_sub = json_decode($request->sub_docs);
@@ -154,11 +158,11 @@ class JobRequestSettingsController extends Controller
     public function jobRequiredDelete(Request $request){
         // return $request;
         $ids = $request->id;
-
         try{
             JobRequired::whereIn('id', $ids)
             ->update([
                 'deleted_by' => 261,
+                // 'deleted_by' => Auth::id(),
                 'deleted_at' => now()
             ]);
 
@@ -217,6 +221,7 @@ class JobRequestSettingsController extends Controller
             $email_recipients = new EmailRecipient;
             $email_recipients->user_id = $request->user_id;
             $email_recipients->created_by = 261;
+            // $email_recipients->created_by = Auth::id();
             $email_recipients->created_at = now();
             $email_recipients->updated_at = now();
             $email_recipients->save();
@@ -232,6 +237,7 @@ class JobRequestSettingsController extends Controller
             EmailRecipient::whereIn('id', $request->id)
             ->update([
                 'deleted_by' => 261,
+                // 'deleted_by' => Auth::id(),
                 'deleted_at' => now()
             ]);
         }catch(\Exeception $e){
