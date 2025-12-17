@@ -52,6 +52,7 @@ export const useSampleStore = defineStore('sampleStore', {
             // projectLot: [],
 
             baseUrl: import.meta.env?.VITE_BASE_URL || "http://localhost/job_request",
+            baseDir: `${window.location.protocol}//${window.location.host}/job_request`,
 
             rules: {
                 required: [
