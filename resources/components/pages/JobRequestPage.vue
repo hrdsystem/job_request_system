@@ -2469,6 +2469,18 @@ export default {
             }
         }
     },
+
+    mounted(){
+        this.jobRequiredPage()
+        this.jobRequestPage()
+        this.emailRecipientPage()
+        this.getProjects()
+        this.getProjectLists()
+        // this.fetchFilteredData()
+        // this.getProjectLots()
+        console.log('masterUsers:', this.masterUsers.map(user => ({ id: user.id, photo: user.photo })));
+        // :src="item.photo ? `/${item.photo}` : '/img/avatar.png'"
+        this.getMasterUsers()
     }
 }
 </script>
