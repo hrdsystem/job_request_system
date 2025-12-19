@@ -2474,6 +2474,148 @@ export default {
 </script>
 
 <style scoped>
+.icon-btn .disabled{
+    color: #E0E0E0;
+}
 
+.icon-btn .disabled2{
+    color: #000000;
+}
+
+tr.inactive{
+    background:#999999 !important;
+    color:#ffffff !important;
+}
+
+.required-label::before {
+    content: '* ';
+    color: red;
+}
+
+.overlay-center {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    
+}
+
+.text-ellipsis{
+    white-space: nowrap;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.v-table th,.v-table td{
+    white-space: nowrap !important;
+    font-size: 12px !important;
+    height: 40px !important;
+}
+
+.container-main{
+    max-width: 100% !important;
+    padding: 0px !important;
+    padding-left: 14px !important;
+    overflow: hidden;
+}
+
+.v-table :deep(.v-text-field input){
+    background-color: white;
+    min-height: 30px;
+    max-height: 30px;
+    color: black;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: -15px;
+}
+
+.text-ellipsis{
+    white-space: nowrap;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.v-table.mainTable th{
+    background: #34495e !important;
+    color:white !important;
+}
+
+.v-table .v-checkbox :deep(.v-selection-control){
+    min-height: 0px !important;
+}
+
+.v-table .v-checkbox :deep(.v-selection-control--density-default){
+    --v-selection-control-size: 24px; 
+}
+
+.v-file-input :deep(.v-field .v-field__input){
+    min-height: 40px;
+    max-height: 40px;
+}
+
+.v-dialog :deep(.v-text-field input){
+    min-height: 40px;
+    max-height: 40px;
+}
+
+.v-dialog :deep(.v-row [class*="col"]){
+    padding: 0px 8px !important;
+}
+
+.v-dialog :deep(.v-row:not([class*="mt-"])){
+    margin-top:16px !important;
+}
+
+.v-dialog .v-card-title {
+    cursor: grab !important;
+}
+
+.v-dialog .v-card-title:active {
+    cursor: grabbing !important;
+}
+
+.v-dialog > .v-overlay__content > .v-card > .v-card-text, .v-dialog > .v-overlay__content > form > .v-card > .v-card-text {
+    padding: 0px 16px 16px 
+}
+
+.v-selection-control--density-default {
+    --v-selection-control-size: 40px !important;
+}
+
+.v-dialog .v-textarea{
+    padding: 0 !important;
+}
+
+.float-right{
+    background-color: #53B257;
+}
+
+tbody tr:hover{
+    cursor: pointer;
+}
+
+tr.records{
+    vertical-align: top;
+}
+
+.text-field-small {
+    font-size: 12px;
+    padding: 4px;
+    margin: 2px;
+}
+
+.row-compact {
+    margin-bottom: 4px;
+}
+
+.v-dialog .v-card .v-card-title > .headline{
+    font-size: 16px !important;
+}
+
+.v-dialog .headline{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 </style>
