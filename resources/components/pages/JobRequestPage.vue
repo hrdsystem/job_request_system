@@ -2231,8 +2231,43 @@ export default {
                 this.snackbar.color = 'blue-grey'
                 this.jobRequestPage()
                 this.deleteDialog = false
+                this.jobRequestPage()
                 this.resetToggleSelectAll()
             })
+        },
+
+        removeItem(){
+            const item = this[this.tempRemoveFiles.model][this.tempRemoveFiles.index]
+
+            if(this.deletedAttachments.indexOf(item.id) == -1) {
+                this.deletedAttachments.push(item.id)
+            }
+            this[this.tempRemoveFiles.model].splice(this.tempRemoveFiles.index, 1)
+
+            this.tempRemoveFiles = {}
+            this.deleteItemDialog = false
+        },
+
+        Status(){
+            if(this.$refs.Status.validate()){
+                var myform = document.getElementById('Status')
+                var formdata = new FormData(myform)
+
+                axios({
+                    method: 'post',
+                    url: $api+`/api/jobRequest/job_status_change`,
+                    data: formdata
+                })
+                .then((res) =>{
+                    this.snackbar.show = true
+                    this.snackbar.text = 'Update Succesful'
+                    this.snackbar.color = 'blue-grey'
+                    this.jobRequestPage()
+                    this.statusDialog = false
+                }).catch((res) =>{
+                    console.log(res)
+                })
+            }
         },
 
         getIcon(filename) {
