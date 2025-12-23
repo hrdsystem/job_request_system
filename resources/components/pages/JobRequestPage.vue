@@ -2270,6 +2270,58 @@ export default {
             }
         },
 
+        ecdForm(){
+            if(this.$refs.ecdDate.validate()){
+                var myform = document.getElementById('ecdDate')
+                var formdata = new FormData(myform)
+
+                axios({
+                    method: 'post',
+                    url: $api+`/api/jobRequest/job_ecd_change`,
+                    data: formdata
+                })
+                .then((res) => {
+                    this.snackbar.show = true
+                    this.snackbar.text = 'ECD has been set'
+                    this.snackbar.color = 'blue-grey'
+                    this.jobRequestPage()
+                    this.ecdDialog = false
+                }).catch((res) => {
+                    console.log(res)
+                })
+            }
+        },
+
+        async getLotProjectList(projectId){
+            if (!projectId){
+                this.uniqueLots = []
+                this.tempLot2 = null
+                this.uniqueSubject = ''
+                return;
+            }
+
+            axios.post($api+`/api/jobRequest/get_lots_for_project/${projectId}`, {
+            }).then(res =>{
+                this.uniqueLots = res.data.map((item) => ({
+                    lot: item.lot,
+                    project_name: item.project_name,
+                    construction_code: item.construction_code,
+                    project_registered_id: item.project_registered_id, 
+                }));
+                // console.log('Complete Lot Logs: ', this.uniqueLots)
+                return res;
+            }).catch(error =>{
+                // console.log('Error fetching Lots: ',error)
+                this.uniqueLots = []
+                return error;
+            })
+        },
+
+        updateProjectRegisteredLotId(lotId){
+            const selectedLot = this.uniqueLots.find(lot => lot.lot === lotId);
+            this.project_registered_id = selectedLot ? selectedLot.project_registered_id : null;
+        },
+
         getIcon(filename) {
             if (filename) {
                 const ext = _.last(_.split(filename.toLowerCase(), '.'))
