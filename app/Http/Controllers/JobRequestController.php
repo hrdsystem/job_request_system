@@ -612,10 +612,6 @@ class JobRequestController extends Controller
         $lot_number = $request->input('lot_number');
         $updates = $request->input('updates');
 
-        // $data['greetings'] = 'Good day!';
-        // $data['header'] = 'New updates for the request' . $request->input('subject') . '.';
-        // $data['project_name'] = $project->project_name;
-
         try {
             DB::beginTransaction();
 
@@ -658,6 +654,7 @@ class JobRequestController extends Controller
                         'updating_reason' => $item['newUploadReasons'],
                         'send_date' => new \DateTime(),
                         'uploader' => 261,
+                        // 'uploader' => Auth::id(),
                         'latest' => true
                     ];
 
@@ -713,6 +710,7 @@ class JobRequestController extends Controller
                     ->update([
                         'job_ecd' => $maxEcdDate->format('Y-m-d'),
                         'updated_by' => 261,
+                        // 'updated_by' => Auth::id(),
                         'updated_at' => new \DateTime()
                     ]);
             }
@@ -726,27 +724,26 @@ class JobRequestController extends Controller
             $rawToRecipients = $request->input('to_recipients');
             $rawCcRecipients = $request->input('cc_recipients');
 
-            $to = $this->get_emails($rawToRecipients);
-            $cc = $this->get_emails($rawCcRecipients);
+            $toIds = Arr::flatten($rawToRecipients);
+            $ccIds = Arr::flatten($rawCcRecipients);
+
+            $to = $this->get_email_details($toIds);
+            $cc = $this->get_email_details($ccIds);
 
             Log::info('Raw TO recipients from frontend:', ['to' => $rawToRecipients]);
             Log::info('Raw CC recipients from frontend:', ['cc' => $rawCcRecipients]);
-            // dd($request->all(), $request->input('to_recipients'), $request->input('cc_recipients'));
 
-            // $to = $this->get_emails(json_decode($request->input('to_recipients')));
-            // $cc = $this->get_emails(json_decode($request->input('cc_recipients')));
             Log::info('Processed TO recipients:', $to);
             Log::info('Processed CC recipients:', $cc);
             if (empty($to)) {
-                Log::error('Mail Error: "To" recipient list is empty after get_emails.');
+                Log::error('Mail Error: "To" recipient list                                                                                                                                                                                                                                                     is empty after get_emails.');
                 // It's crucial to return an error or handle this gracefully.
                 // Otherwise, Laravel will throw the "An email must have a "To", "Cc", or "Bcc" header" error.
                 return response()->json(['message' => 'No valid "To" recipients found. Email not sent.'], 400);
             }
-            $subject = ' [JOB Request - New Job Updates] ' . $request->input('subject') . '.';
-            // $project = JobRequest::select(
-            //     'job_requests.project_name'
-            // )
+            $subject = ' [JOB Request - New Job Updates] ' . $request->input('subject');
+            // $template = 'email.job_request_hrd_updates_email';  
+            
             $projects = Project::select('id', 'name');
 
             $project = ProjectRegistered::joinSub($projects, 'projects', function($join) {
@@ -758,13 +755,15 @@ class JobRequestController extends Controller
             )
             ->where('project_registered.id', $register_id)
             ->firstOrFail();
+
             $data = [
                 'greetings' => 'Good day!',
-                'header' => 'New updates for the request ' . $request->input('subject') . '.',
+                'header' => 'New updates for the request ' . $request->input('subject'),
                 'project_name' => $project->name,
                 'subject' => $project->construction_code,
                 'lot_number' => $lot_number,
                 'sender_username' => 'Test User'
+                // 'sender_username' => Auth::id()
             ];
             
             $data['haveNewECD'] = $haveNewECD;
@@ -781,8 +780,6 @@ class JobRequestController extends Controller
             }
 
             Log::info('Email sent successfully for request_id: ' . $request_id);
-
-            
 
             return ['request_id' => $request_id];
             return response()->json(['debug', $debug_output]);
