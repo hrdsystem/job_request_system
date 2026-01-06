@@ -1,7 +1,7 @@
 <template>
     <v-app app>
         <AppBarComponent :drawer="drawer" @toggleDrawer="toggleDrawer($event)"></AppBarComponent>
-        <ProjectDrawer :drawer="drawer"></ProjectDrawer>
+        <!-- <ProjectDrawer :drawer="drawer"></ProjectDrawer> -->
         <v-main>
             <router-view></router-view>
         </v-main>
