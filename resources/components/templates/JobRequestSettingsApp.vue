@@ -17,7 +17,7 @@ import AppBarComponent from "@aspect/AppBarComponent.vue";
 </script>
 
 <script>
-import { mapState, mapActions  } from 'pinia'
+import { mapState, mapActions, mapWritableState  } from 'pinia'
 import { useSampleStore } from '../../js/store.js'
 export default {
     data (){
@@ -39,7 +39,8 @@ export default {
     },
 
     computed: {
-        ...mapState(useSampleStore, [
+        ...mapWritableState(useSampleStore, [
+            'selectedRows'
         ]),
     },
 
