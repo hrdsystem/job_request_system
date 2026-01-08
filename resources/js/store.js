@@ -313,9 +313,11 @@ export const useSampleStore = defineStore('sampleStore', {
         // },
 
         emailRecipientPage(){
+            this.overlay = true
             axios.post($api+`/api/jobMaster/get_email_recipients`, {
             }).then(res =>{
                 this.EmailRecipientsData = res.data
+                this.overlay = false
             }).catch(error =>{
                 console.log(error)
             })
