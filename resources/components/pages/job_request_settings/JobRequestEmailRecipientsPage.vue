@@ -5,7 +5,7 @@
             <thead>
                 <tr>
                     <th v-show="floatButtonData.editButtonActive" class="text-left" style="width:20px">
-                        <v-checkbox style="display: flex;" color="white" :input-value="allSelected" @change="toggleSelectAll()" ></v-checkbox>
+                        <v-checkbox style="display: flex;" color="white" v-model="allSelected"></v-checkbox>
                     </th>
                     <th>RECIPIENTS</th>
                 </tr>
@@ -21,15 +21,22 @@
                         <v-checkbox
                             style="display: flex;"
                             color="indigo"
-                            :model-value="allSelected"
-                            :input-value="allSelected"
-                            @change="setSelected(index)"
+                            v-model="selectedRows"
+                            :value="index"
                         ></v-checkbox>
                     </td>
                     <td>{{ item.username }}</td>
                 </tr>
             </tbody>
         </v-table>
+
+        <v-overlay v-model="overlay" overlay class="overlay-center">
+            <v-progress-circular 
+                indeterminate 
+                :size="64"
+                style="color: white;"
+            ></v-progress-circular>
+        </v-overlay>
 
         <v-dialog v-model="insertDialog" persistent width="300" @keydown.esc="insertDialog = false">
             <v-form id="Insert" ref="Insert" @submit.prevent="Insert">
@@ -72,22 +79,20 @@
                 </v-card-title>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-tooltip location="bottom">
-                        <template v-slot:activator="{ props }">
-                            <v-btn style="border: 1px solid grey; background-color: #e74c3c;" color="white" @click="Delete" v-bind="props">
-                                <v-icon>mdi-delete-alert</v-icon>Delete
-                            </v-btn>
-                        </template>
-                        <span>Delete</span>
-                    </v-tooltip>
-                    <v-tooltip location="bottom">
-                        <template v-slot:activator="{ props }">
-                            <v-btn style="border: 1px solid grey; background-color: #227093;" color="white" @click="deleteDialog = false" v-bind="props">
-                                <v-icon>mdi-close-thick</v-icon>Disagree
-                            </v-btn>
-                        </template>
-                        <span>Disagree</span>
-                    </v-tooltip>
+                    <v-btn
+                        color="blue-grey darken-3"
+                        text
+                        @click="Delete"
+                    >
+                        Agree
+                    </v-btn>
+                    <v-btn
+                        color="blue-grey darken-3"
+                        text
+                        @click="deleteDialog = false"
+                    >
+                        Disagree
+                    </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -97,7 +102,7 @@
         <float-button-component
             :floatButtonData="floatButtonData"
             @addButtonClicked="toggleAddDialog($event)"
-            @editButtonClicked="floatButtonData.editButtonActive = !floatButtonData.editButtonActive"
+            @editButtonClicked="onEditButtonClicked"
             @deleteButtonHandle="toggleDeleteDialog($event)"
         ></float-button-component>
     </v-container>
@@ -162,13 +167,32 @@ export default {
             'filterMode',
             'viewMode',
             'EmailRecipientsData',
-            'rules'
+            'rules',
+            'overlay'
         ]),
 
         ...mapWritableState(useSampleStore,[
             'allSelected',
             'selectedRows'
         ]),
+
+        allSelected: {
+            get() {
+                // This checks if the length of the selectedRows array
+                // is equal to the total number of items.
+                return this.selectedRows.length === this.EmailRecipientsData.length;
+            },
+            set(value) {
+                // This is the setter that runs when the select all checkbox is clicked.
+                if (value) {
+                    // Select all rows
+                    this.selectedRows = this.EmailRecipientsData.map((_, index) => index);
+                } else {
+                    // Deselect all rows
+                    this.selectedRows = [];
+                }
+            }
+        }
     },
 
     methods:{
@@ -181,6 +205,18 @@ export default {
             'setSelected',
             'resetToggleSelectAll'
         ]),
+
+        onEditButtonClicked(){
+            if(this.floatButtonData.editButtonActive){
+                this.clearSelectionItems()
+            }
+
+            this.floatButtonData.editButtonActive = !this.floatButtonData.editButtonActive
+        },
+
+        clearSelectionItems(){
+            this.selectedRows = []
+        },
 
         toggleAddDialog(){
             this.insertDialog = true
@@ -214,7 +250,7 @@ export default {
             const myform = document.getElementById('Insert')
             const formdata = new FormData(myform)
             formdata.append('user_id', this.tempName)
-            
+            this.overlay = true
             axios({
                 method: 'post',
                 url: $api+`/api/jobMaster/insert_recipients`,
@@ -233,11 +269,13 @@ export default {
                     this.snackbar.color = 'blue-grey'
                     this.emailRecipientPage()
                     this.insertDialog = false
+                    this.overlay = false
                 }
             })
         },
 
         Delete(){
+            this.overlay = true
             axios({
                 method: 'post',
                 url: $api+`/api/jobMaster/delete_recipients`,
@@ -251,6 +289,7 @@ export default {
                 this.snackbar.color = 'blue-grey'
                 this.deleteDialog = false
                 this.emailRecipientPage()
+                this.overlay = false
                 // this.resetToggleSelectAll()
             })
         }
