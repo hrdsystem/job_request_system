@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
 
 use App\Mail\IconnMail;
 use App\Models\JobRequestSubDocument;
@@ -23,6 +24,8 @@ use App\Models\JobRequestUpload;
 use App\Models\JobRequestUploadedFile;
 use App\Models\Project;
 use App\Models\ProjectRegistered;
+use App\Models\viewDocumentHistory;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Str;
 
 use function PHPSTORM_META\map;
@@ -243,22 +246,7 @@ class JobRequestController extends Controller
         ->get();
 
         return $history;
-    }
-
-    // public function getJobRequests(Request $request){
-    //     $jobRequest = JobRequest::with([
-    //         'user: id, username, photo',
-    //         'projectRegistration.project: id, name as projects_name',
-    //         'attachments',
-    //         'uploaaed_file',
-    //         'requiredDocument'
-    //     ])
-    //     ->select('job_requests.*')
-    //     // ->paginate()
-    //     ->get();
-
-    //     return $jobRequest;
-    // }
+    } 
 
     public function getJobRequests(Request $request){
 
@@ -342,6 +330,8 @@ class JobRequestController extends Controller
                 $data->note = $request->get('note');
                 $data->created_by = 261;
                 $data->updated_by = 261;
+                // $data->created_by = Auth::id();
+                // $data->updated_by = Auth::id();
                 $data->save();
     
                 $last_id = $data->id;
@@ -368,6 +358,7 @@ class JobRequestController extends Controller
                             'orig_filename' => $file_details['orig_filename'],
                             'file_hash' => $file_details['file_hash'],
                             'updated_by' => 211,
+                            // 'updated_by' => Auth::id(),
                             'updated_at' => new \DateTime
                         ];
         
@@ -414,6 +405,8 @@ class JobRequestController extends Controller
                 $data->note = $request->get('note');
                 $data->created_by = 261;
                 $data->updated_by = 261;
+                // $data->created_by = Auth::id();
+                // $data->updated_by = Auth::id();
                 $data->updated_at = now();
                 $data->save();
     
@@ -435,7 +428,6 @@ class JobRequestController extends Controller
                         ->whereIn('document_id', $removeJobRequirement)
                         ->delete();
                 }
-    
                 
                 $deleted_attachments = $request->input('deleted_attachments');
                 if (!empty($deleted_attachments)) {
@@ -443,14 +435,15 @@ class JobRequestController extends Controller
                         ->whereIn('id', $deleted_attachments)
                         ->update([
                             'deleted_by' => 211,
+                            // 'deleted_by' => Auth::id(),
                             'deleted_at' => new \DateTime()
                         ]);
                 }
-    
+
                 if (!empty($request->input('attachments'))) {
                     foreach ($request->input('attachments') as $item) {
                     $file = json_decode($item, true);
-    
+                    
                     if (isset($file['data'])){
                         $file_details = $this->file_details($item);
                         $attachments[] = [
@@ -458,6 +451,7 @@ class JobRequestController extends Controller
                             'orig_filename' => $file_details['orig_filename'],
                             'file_hash' => $file_details['file_hash'],
                             'updated_by' => 211,
+                            // 'updated_by' => Auth::id(),
                             'updated_at' => new \DateTime
                         ];
         
@@ -485,6 +479,7 @@ class JobRequestController extends Controller
             JobRequest::whereIn('id', $request->id)
             ->update([
                 'deleted_by' => 261,
+                // 'deleted_by' => Auth::id(),
                 'deleted_at' => now()
             ]);
         }catch(\Exception $e){
@@ -596,10 +591,9 @@ class JobRequestController extends Controller
                 ->where('job_request_uploads.latest', true);
             })
             ->when(!is_null($request->input('upload_id')), function ($q) use ($request) {
-                $q
-                ->where('job_request_uploads.id', $request->input('upload_id'));
+                $q->where('job_request_uploads.id', $request->input('upload_id'));
             })
-            ->get();
+        ->get();
     }
 
     public function getRequiredDocuments(Request $request){
@@ -892,6 +886,7 @@ class JobRequestController extends Controller
                     'updating_reason' => $item['newUploadReasons'],
                     'send_date' => now(),
                     'uploader' => 261,
+                    // 'uploader' => Auth::id(),
                     'latest' => true,
                 ]);
                 $upload_id = DB::getPdo()->lastInsertId(); 
