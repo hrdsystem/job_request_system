@@ -9,6 +9,7 @@
                 class="drawTitle"
                 link
                 density="compact"
+                @click="onNavitage"
                 style="margin-left: 2"
             >
                 <v-icon :icon="item.icon" class="ml-0 drawIcon"></v-icon>
@@ -20,6 +21,8 @@
 </template>
 
 <script>
+import { mapState, mapActions, mapWritableState  } from 'pinia'
+import { useSampleStore } from '../../js/store.js'
 export default {
     props: {
         drawer: {
@@ -44,10 +47,20 @@ export default {
         }
     },
 
+    computed: {
+        ...mapWritableState(useSampleStore, [
+            'selectedRows'
+        ]),
+    },
+
     methods: {
         toggleDrawer(val) {
             this.$emit("toggleDrawer", val)
         },
+
+        onNavitage(){
+            this.selectedRows = []
+        }
     }
 }
 </script>
