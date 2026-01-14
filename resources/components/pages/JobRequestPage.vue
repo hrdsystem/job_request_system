@@ -1683,11 +1683,24 @@ export default {
         ]),
 
         logUrl(attachment) {
+            const root = this.baseDir
             if(attachment.document_id){
-                console.log(`${this.baseDir}/job_request/document/${attachment.file_id}/${attachment.orig_filename}`)
+                console.log(`${root}/job_request/document/${attachment.file_id}/${attachment.orig_filename}`)
             }else{
-                console.log(`${this.baseDir}/job_request/attachments/${attachment.id}/${attachment.orig_filename}`);
+                console.log(`${root}/job_request/attachments/${attachment.id}/${attachment.orig_filename}`);
             }
+        },
+
+        onEditButtonClicked(){
+            if(this.floatButtonData.editButtonActive){
+                this.clearSelectionItems()
+            }
+
+            this.floatButtonData.editButtonActive = !this.floatButtonData.editButtonActive
+        },
+
+        clearSelectionItems(){
+            this.selectedRows = []
         },
 
         dateOnly(dateTime) {
