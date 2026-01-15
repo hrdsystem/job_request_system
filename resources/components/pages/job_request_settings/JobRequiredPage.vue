@@ -485,6 +485,18 @@ export default {
             'resetToggleSelectAll'
         ]),
 
+        onEditButtonClicked(){
+            if(this.floatButtonData.editButtonActive){
+                this.clearSelectionItems()
+            }
+
+            this.floatButtonData.editButtonActive = !this.floatButtonData.editButtonActive
+        },
+
+        clearSelectionItems(){
+            this.selectedRows = []
+        },
+
         toggleAddDialog(){
             this.insertDialog = true
         },
