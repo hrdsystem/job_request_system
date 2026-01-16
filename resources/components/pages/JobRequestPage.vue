@@ -18,7 +18,7 @@
                     <th rowspan="2" class="text-center Sortable" @click="sortCol($event.target, 'job_requests.requested_date')">REQUESTED DUE <br> DATE</th>
                     <th rowspan="2" class="text-center">ECD</th>
                     <th :colspan="JobRequestRequiredData.length" style="border-bottom: 1px solid #d9d9d9 !important;" class="text-center">JOB DOCUMENT</th>
-                    <th rowspan="2" class="text-center">Actions</th>
+                    <!-- <th rowspan="2" class="text-center">Actions</th> -->
                     <th rowspan="2">Upload</th>
                 </tr>
                 <tr>
@@ -56,7 +56,7 @@
                     </th>
                     <th v-for="header in JobRequestRequiredData" :key="'b'+header.id"></th>
                     <th></th>
-                    <th></th>
+                    <!-- <th></th> -->
                     <th></th>
                 </tr>
             </thead>
@@ -115,8 +115,8 @@
                                 <template v-slot:activator="{ props }">
                                     <v-avatar v-bind="props">
                                         <v-img
-                                            :src="'/img/avatar.png'"
-                                            :lazy-src="'/img/avatar.png'"
+                                            :src="baseDir + '/img/avatar.png'"
+                                            :lazy-src= "baseDir+ '/img/avatar.png'"
                                         >
                                         </v-img>
                                     </v-avatar>
@@ -138,7 +138,7 @@
                                 </td>
                             </template>
                         </template>
-                        <td class="text-center">
+                        <!-- <td class="text-center">
                             <v-tooltip location="bottom">
                                 <template v-slot:activator="{ props }">
                                     <v-icon size="30px" style="color: green" flat v-bind="props">mdi-file-excel</v-icon>
@@ -151,7 +151,7 @@
                                 </template>
                                 <span>Download PDF</span>
                             </v-tooltip>
-                        </td>
+                        </td> -->
                         <td class="text-center">
                             <v-tooltip location="bottom" v-if="item.requirements.length > 0 && (item.status === 'NEW' || item.status === 'ONGOING')">
                                 <template v-slot:activator="{ props }">
@@ -332,14 +332,14 @@
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions>
-                        <v-tooltip location="bottom">
+                        <!-- <v-tooltip location="bottom">
                             <template v-slot:activator="{ props }">
                                 <v-btn disabled style="border: 1px solid grey;" color="blue-grey darken-3" @click="toggleSendDialog()" v-bind="props">
                                     <v-icon>mdi-send</v-icon>Send
                                 </v-btn>
                             </template>
                             <span>Send to Email</span>
-                        </v-tooltip>
+                        </v-tooltip> -->
                         <v-tooltip location="bottom">
                             <template v-slot:activator="{ props }">
                                 <v-btn type="submit" style="border: 1px solid grey" color="blue-grey darken-3" v-bind="props">
@@ -469,7 +469,7 @@
                                     prepend-icon="mdi-file"
                                     persistent-placeholder
                                     variant="outlined"
-                                    multip
+                                    multiple
                                 ></v-file-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="6"></v-col>
@@ -538,7 +538,7 @@
             </v-form>
         </v-dialog>
 
-        <v-dialog v-model="uploadDialog" persistent :width="uploadTab == 1 ? 600 : 800 " @keydown.esc="showConfirmDialog()">
+        <v-dialog v-model="uploadDialog" persistent :width="uploadTab == 1 ? 600 : 800 " @keydown.esc="newUpdates ? showConfirmDialog() : uploadDialog = false">
             <v-form id="uploadForm" ref="uploadForm" @submit.prevent="processUploadForm">
                 <v-card class="rounded-lg">
                     <v-card-title>
@@ -546,7 +546,7 @@
                         <span class="headline" v-else-if="uploadTab == 1" >Upload {{ CurrentSubject }}</span>
                         <span class="headline" v-else-if="uploadTab == 2">{{ CurrentSubject }} Upload History</span>
                         <span class="headline" v-else>{{ CurrentSubject }} Viewed History</span>
-                        <v-icon style="float: right;" color="white" @click="showConfirmDialog()">mdi-close</v-icon>
+                        <v-icon style="float: right;" color="white" @click="newUpdates ? showConfirmDialog() : uploadDialog = false">mdi-close</v-icon>
                     </v-card-title>
                     <v-card-text class="pa-0">
                         <v-window v-model="uploadTab" touchless>
@@ -621,7 +621,7 @@
                                                     :href="documentLink(CurrentSubject, CurrentPlanNumber,doc.filling_mark, doc.job_request_id, doc.document_id, )"
                                                     target="_blank"
                                                     icon="mdi-file"
-                                                    @click="jobRequestPage()"
+                                                    @click="handleDocumentClick()"
                                                     v-if="doc.uploads.length === 1">
                                                     <v-icon size="30px" color="blue">mdi-file</v-icon>
                                                 </a>
@@ -802,7 +802,7 @@
                                             <tr v-for="(history, index) in uploadHistories" :key="'uh' + index">
                                                 <td class="text-center">
                                                     <a
-                                                        :href="`/job_requests/document/${history.files[0].id}/${encodeURIComponent(extractFileName(history.files[0].orig_filename))}`"
+                                                        :href="`/job_request/document/${history.files[0].id}/${encodeURIComponent(extractFileName(history.files[0].orig_filename))}`"
                                                         target="_blank"
                                                         icon="mdi-file"
                                                         @click="reloadJobRequest()"
@@ -943,8 +943,9 @@
                                     >
                                     <v-avatar left>
                                         <v-img
-                                            :src="'/img/avatar.png'"
-                                            :lazy-src="'/img/avatar.png'"                                            </v-img>
+                                            :src="baseDir + '/img/avatar.png'"
+                                            :lazy-src="baseDir + '/img/avatar.png'"                                           
+                                        </v-img>
                                     </v-avatar>
                                     {{ item.title }}
                                     </v-chip>
@@ -952,8 +953,8 @@
                                 <template v-slot:data="item">
                                     <v-avatar>
                                         <v-img
-                                            :src="item.data.photo ? '/' + item.data.photo : '/img/avatar.png'"
-                                            :lazy-src="'/img/avatar.png'"
+                                            :src="baseDir + '/img/avatar.png'"
+                                            :lazy-src="baseDir + '/img/avatar.png'"
                                         ></v-img>
                                     </v-avatar>
                                     <span>{{ item.data.title }}</span>
@@ -986,8 +987,8 @@
                                     >
                                         <v-avatar left>
                                             <v-img
-                                                :src="item.raw.photo ? `/${item.raw.photo}` : '/img/avatar.png'"
-                                                :lazy-src="'/img/avatar.png'">
+                                                :src="baseDir + '/img/avatar.png'"
+                                                :lazy-src="baseDir + '/img/avatar.png'"
                                             </v-img>
                                         </v-avatar>
                                     {{ item.title }}
@@ -996,8 +997,8 @@
                                 <template v-slot:data="item">
                                     <v-avatar>
                                         <v-img
-                                            :src="item.data.avatar ? '/' + item.data.avatar : '/img/avatar.png'"
-                                            :lazy-src="baseDir+'/img/avatar.png'"
+                                            :src="baseDir + '/img/avatar.png'"
+                                            :lazy-src="baseDir + '/img/avatar.png'"
                                         ></v-img>
                                     </v-avatar>
                                     <span>{{ item.data.title }}</span>
@@ -1240,7 +1241,7 @@
                             <tbody>
                                 <tr v-for="(attachment, i) in attachments" :key="'att' + i">
                                     <td class="text-center">
-                                        <a :href="`/job_requests/attachments/${attachment.id}/${attachment.orig_filename}`" target="_blank" class="text-decoration-none">
+                                        <a :href="getAttachmentLink(attachment)" target="_blank" class="text-decoration-none">
                                             <v-icon size="25px" color="primary">{{getIcon(attachment.orig_filename)}}</v-icon>
                                         </a>
                                     </td>
@@ -1323,7 +1324,7 @@
                     >
                         <template v-slot:activator="{ props }">
                             <v-text-field
-                                v-model="currentECD"
+                                v-model="formatChangeEcdDate"
                                 v-bind="props"
                                 @click:clear="currentECD = null"
                                 label="ESTIMATED COMPLETION DATE" 
@@ -1393,7 +1394,7 @@
         <float-button-component
             :floatButtonData="floatButtonData"
             @addButtonClicked="toggleAddDialog($event)"
-            @editButtonClicked="floatButtonData.editButtonActive = !floatButtonData.editButtonActive"
+            @editButtonClicked="onEditButtonClicked"
             @deleteButtonHandle="toggleDeleteDialog($event)"
         ></float-button-component>
         <footer-app :currentData="JobRequestData.length" :currentRecords="JobRequestRecords"></footer-app>
@@ -1461,6 +1462,7 @@ export default {
             ecdDialog: false,
             editEcdDialog: false,
             isEditing: false,
+            updateDispatch: false,
 
             //SECTION - ADD & EDIT DIALOG DATA
             tempAddIssuedDate: '',
@@ -1489,6 +1491,7 @@ export default {
             requiredFileName: [],
             requiredDocuments: [],
             uploadHistories: [],
+            viewerHistories: [],
             activeDocument: {},
             CurrentSubject: null,
             progress: false,
@@ -1502,7 +1505,7 @@ export default {
             updatingReason: null,
             jobRequiredAttachments: [],
             oldUploadData: [],
-            currentECD: moment().format('YYYY-MM-DD') ,
+            currentECD: moment().format('YYYY-MM-DD'),
 
             //SECTION - New uploadedFiles dialog
             newUploadedFiles: [],
@@ -1527,7 +1530,7 @@ export default {
             uniqueProjectLists: [],
             uniqueLots: [],
             tempProjectName: null,
-            tempLot2: '',
+            tempLot2: null,
             uniqueSubject: '',
             project_registered_id: null,
 
@@ -1553,15 +1556,17 @@ export default {
             'JobRequestRecords',
             'JobRequestSearch',
             'JobRequestSort',
-            'baseDir',
             'selected',
-            'EmailRecipientsData'
+            'EmailRecipientsData',
+            'projectLists',
+            'overlay',
         ]),
 
         ...mapWritableState(useSampleStore,[
-            'allSelected',
             'masterUsers',
-            'selectedRows'
+            'selectedRows',
+            'baseUrl',
+            'baseDir'
         ]),
 
         formattedDate() {
@@ -1624,31 +1629,6 @@ export default {
                 email: user.email
             }));
         },
-
-
-        // toEmails() {
-        //     let items = []
-        //     let alreadyListed = this.jobRecipients.concat(this.ccRecipients).concat(this.toRecipients);
-        //     console.log('toEmails: ',alreadyListed)
-
-        //     this.masterUsers.forEach(c => {
-        //         console.log('c.id: ', c.id, 'included: ', alreadyListed.includes(c.id))
-        //         items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
-        //     })
-        //     return items
-        // },
-
-        // ccEmails(){
-        //     let items = []
-        //     let alreadyListed = this.toRecipients.concat(this.ccRecipients).concat(this.jobRecipients);
-        //     console.log('ccEmails: ',alreadyListed)
-
-        //     this.masterUsers.forEach(c => {
-        //         console.log('c.id: ', c.id, 'included: ', alreadyListed.includes(c.id))
-        //         items.push({ id: c.id, username: c.username, avatar: c.photo, disabled: alreadyListed.includes(c.id)})
-        //     })
-        //     return items
-        // },
 
         newUpdates(){
             return _.some(this.requiredDocuments, {changedECD: true}) || this.hasNewUploads
@@ -1768,6 +1748,7 @@ export default {
             this.CurrentSubject = data.construction_code
             this.CurrentPlanNumber = data.lot_number
             this.uploadDialog = true
+            this.editECD = false
         },
 
         reloadJobRequest(){
@@ -1791,6 +1772,14 @@ export default {
 
         toggleAddDialog(){
             this.insertDialog = true
+        },
+
+        handleDocumentClick(){
+            setTimeout(() =>{
+                if (this.activeRequest){
+                    this.getRequiredDocuments(this.activeRequest)
+                }
+            }, 50)
         },
 
         saveForm(){
@@ -1844,7 +1833,7 @@ export default {
             console.log('function is working')
             axios({
                 method: 'post',
-                url: '/api/jobRequest/get_uploaded_requirements',
+                url: $api+`/api/jobRequest/get_uploaded_requirements`,
                 data:{
                     request_id: reqId,
                     document_id: docId,
@@ -1852,6 +1841,7 @@ export default {
                 },
             }).then((res) =>{
                 this.jobRequiredAttachments = res.data
+                // this.handleDocumentClick()
             }).catch(error =>{
                 console.log(error)
             })
@@ -1862,7 +1852,7 @@ export default {
         showUploadTab(doc){
             this.currentDocument = doc
             this.requiredFileName = `${this.CurrentSubject}-${doc.filling_mark}`
-            this.uploadTab = 1
+            this.uploadTab = 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
         },
 
         showHistoryTab(doc){
@@ -1871,7 +1861,7 @@ export default {
 
             axios({
                 method: 'post',
-                url: '/api/jobRequest/upload_history',
+                url: $api+`/api/jobRequest/upload_history`,
                 data:{
                     request_id: doc.job_request_id,
                     document_id: doc.document_id
@@ -1889,7 +1879,7 @@ export default {
 
             axios({
                 method: 'post',
-                url: '/api/jobRequest/get_viewer_history',
+                url: $api+`/api/jobRequest/get_viewer_history`,
                 data:{
                     upload_id: doc.document_id,
                     request_id: doc.job_request_id
@@ -1911,7 +1901,7 @@ export default {
             this.activeDocument = doc
             this.editEcdDialog = true
         },
-
+ 
         saveNewECD(){
             const index = this.requiredDocuments.findIndex(obj => obj.document_id === this.activeDocument.document_id)
             this.requiredDocuments[index].estimated_completion_date = this.formatChangeEcdDate
@@ -1948,20 +1938,21 @@ export default {
         },
 
         getAttachmentLink(attachment){
+            const root = this.baseDir
+
             if(attachment.document_id){
                 const rawFileName = ``
-                return `/job_requests/document/${attachment.file_id}/${encodeURIComponent(this.extractFileName(attachment.orig_filename))}`
+                return `${root}/job_request/document/${attachment.file_id}/${encodeURIComponent(this.extractFileName(attachment.orig_filename))}`
             }else{
-                return `/job_requests/attachments/${attachment.id}/${encodeURIComponent(this.extractFileName(attachment.orig_filename))}`
+                return `${root}/job_request/attachments/${attachment.id}/${encodeURIComponent(this.extractFileName(attachment.orig_filename))}`
             }
         },
 
         documentLink(constructionCode, planNo,fillingMark, requestId, documentId, latestUploadReferences = {}){
-            // const arr = planNo.split('-')
-            // const planNumber = arr.map(this.pad2).join('')
             let reference = `${requestId}-${documentId}`
+            const root = this.baseDir
 
-            return `/job_requests/document/${reference}/${constructionCode}-${planNo}-${fillingMark}`
+            return `${root}/job_request/document/${reference}/${constructionCode}-${planNo}-${fillingMark}`
         },
 
         extractFileName(origFilename) {
@@ -1983,10 +1974,6 @@ export default {
                 console.log('going to the process job updates function')
             }
             this.sendDialog = false
-        },
-
-        cancelRequest(){
-            console.log('test cancel working')
         },
 
         async Edit(data){
@@ -2023,36 +2010,21 @@ export default {
                     this.uniqueSubject = data.subject || data.lot_number || ''
                 }
             }
-
-            // if (data.lot_number) {
-            //     console.log('Reassigning tempLot2 with uniqueLots:', this.uniqueLots);
-            //     this.tempLot2 = data.lot_number;
-            //     // Fallback to data.subject if lot not found in uniqueLots
-            //     if (!this.uniqueLots.find(lot => lot.lot === data.lot_number)) {
-            //         console.log('Lot not found in uniqueLots, using data.subject');
-            //         this.uniqueSubject = data.subject || '';
-            //     }
-            // }
-
-            // if (data.lot_number) {
-            //     this.tempLot2 = data.lot_number; // Trigger tempLot2 setter again
-            // }
             
             this.oldJobRequirement = [...data.requirements]
             if (data.attachments.length > 0) {
+                const root = this.baseDir
                 _.forEach(data.attachments, (item) => {
                     this.editAttachments.push({
                         id: item.id,
                         filename: item.orig_filename,
-                        url: `${this.baseDir}/job_request/attachment/${item.id}/${encodeURIComponent(item.original_filename)}`
+                        url: `${root}/job_request/attachments/${item.id}/${encodeURIComponent(item.original_filename)}`
                     })
                 })
             } else {
                 this.editAttachments = []
                 this.uniqueLots = []
             }
-
-
             this.isInitializingEdit = false
             this.editDialog = true
         },
@@ -2071,7 +2043,7 @@ export default {
                 // --- END CONSOLE LOGS ---
             axios({
                 method: 'post',
-                url: '/api/jobRequest/process_job_updates',
+                url: $api+`/api/jobRequest/process_job_updates2`,
                 data: {
                     id: this.requestDetails.id,
                     register_id: this.requestDetails.register_id,
@@ -2089,7 +2061,9 @@ export default {
                     this.snackbar.text = 'Send Complete'
                     this.snackbar.color = 'success'
                     this.snackbar.show = true
+                    this.ccRecipients = []
                     this.jobRequestPage()
+                    this.uploadDialog = false
                 }
             })
             .catch((error) =>{
@@ -2120,7 +2094,7 @@ export default {
             try{
                 const res = await axios({
                     method: 'post',
-                    url: '/api/jobRequest/job_insert',
+                    url: $api+`/api/jobRequest/job_insert`,
                     data: formdata
                 });
 
@@ -2185,7 +2159,7 @@ export default {
             try{
                 const res = await axios({
                     method: 'post',
-                    url: '/api/jobRequest/job_update',
+                    url: $api+`/api/jobRequest/job_update`,
                     data: formdata
                 });
                 
@@ -2217,7 +2191,7 @@ export default {
         getRequiredDocuments(requestId){
             axios({
                 method: 'post',
-                url: '/api/jobRequest/get_required_documents',
+                url: $api+`/api/jobRequest/get_required_documents`,
                 data: {
                     request_id: requestId
                 },
@@ -2233,7 +2207,7 @@ export default {
             console.log('delete is working')
             axios({
                 method: 'post',
-                url: '/api/jobRequest/job_delete',
+                url: $api+`/api/jobRequest/job_delete`,
                 data:{
                     id: this.selectedRows.map(index => this.JobRequestData[index].id)
                 }
@@ -2242,7 +2216,6 @@ export default {
                 this.snackbar.show = true
                 this.snackbar.text = 'Delete Successful'
                 this.snackbar.color = 'blue-grey'
-                this.jobRequestPage()
                 this.deleteDialog = false
                 this.jobRequestPage()
                 this.resetToggleSelectAll()
@@ -2374,7 +2347,6 @@ export default {
 
         multiFileChecker(file, model, temp) {
             const self = this
-            // self.multiFileReader(file, model, file.name, file.type)
 
             if (model == 'addAttachments'){
                 this.multiFileReader(file, model, file.name, file.type)
@@ -2392,7 +2364,7 @@ export default {
                 } else {
                     this.multiFileReader(file, model, file.name, file.type)
                 }
-            }``
+            }
 
         },
         
@@ -2442,6 +2414,7 @@ export default {
     watch: {
         insertDialog(val){  
             if(!val){
+                this.addAttachments = []
                 this.saveForm()
             }
         },
@@ -2482,27 +2455,13 @@ export default {
             }
         },
 
-        // tempProjectName(newVal){
-        //     if(newVal){
-        //         console.log('PROJECT NAME condition is on if statement')
-        //         const selectedProjectName = this.projectLists.find(project => project.project_name === newVal)
-        //         this.tempLot2 = selectedProjectName ? selectedProjectName.lot : '';
-        //     } else if(!newVal){
-        //         // this.tempLot2 = this.editData.lot_number
-        //         this.tempLot2 = ''
-        //         console.log('PROJECT NAME condition is on else if statement')
-        //     }else{
-        //         console.log('not working')
-        //     }
-        // },
-
         tempProjectName(newVal){
-            console.log('tempProjectName: ', newVal)
+            // console.log('tempProjectName: ', newVal)
             if (newVal && !this.isEditing){
-                console.log('tempProject is on the IF STATEMENT')
+                // console.log('tempProject is on the IF STATEMENT')
                 this.tempLot2 = ''
             } else if(newVal && this.isEditing && !this.isInitializingEdit){
-                console.log('tempProject is on the ELSE IF STATEMENT')
+                // console.log('tempProject is on the ELSE IF STATEMENT')
                 this.tempLot2 = ''
                 this.uniqueSubject = ''
             }
@@ -2510,9 +2469,9 @@ export default {
         },
 
         tempLot2(newVal){
-            console.log('tempLot2 setter called:', newVal, 'uniqueLots:', this.uniqueLots);
+            // console.log('tempLot2 setter called:', newVal, 'uniqueLots:', this.uniqueLots);
             if (newVal){
-                console.log('LOTS condition is on if statement')
+                // console.log('LOTS condition is on if statement')
                 const selectedLot = this.uniqueLots.find(lot => lot.lot === newVal)
                 this.uniqueSubject = selectedLot ? selectedLot.construction_code : '';
             } else{

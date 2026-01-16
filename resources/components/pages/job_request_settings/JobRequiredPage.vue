@@ -366,7 +366,7 @@
         <float-button-component
             :floatButtonData="floatButtonData"
             @addButtonClicked="toggleAddDialog($event)"
-            @editButtonClicked="floatButtonData.editButtonActive = !floatButtonData.editButtonActive"
+            @editButtonClicked="onEditButtonClicked"
             @deleteButtonHandle="toggleDeleteDialog($event)"
         ></float-button-component>
     </v-container>
