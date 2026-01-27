@@ -92,6 +92,30 @@ class JobRequestController extends Controller
             ->deleteFileAfterSend();
     }
 
+    // protected function recordViewDocument(JobRequestUpload $uploaded_file, int $userId) : void {
+    //     $currentTime = now();
+        
+    //     DB::table('document_view_history')->insert([
+    //         'request_id'  => $uploaded_file->request_id,
+    //         'upload_id'   => $uploaded_file->document_id,
+    //         'user_id'     => $userId,
+    //         // 'user_id'     => Auth::id(),
+    //         'viewed_at'   => $currentTime,
+    //         'created_at'  => $currentTime, 
+    //         'updated_at'  => $currentTime,
+    //     ]);
+
+    //     if (!isset($uploaded_file->viewed_by) || $uploaded_file->viewed_by != $userId) {
+    //         DB::table('job_request_uploads')
+    //             ->where('id', $uploaded_file->id)
+    //             ->where('latest', true)
+    //             ->update([
+    //                 'viewed_by'   => $userId,
+    //                 'date_viewed' => $currentTime
+    //             ]);
+    //     }
+    // }
+
     protected function recordViewDocument(JobRequestUpload $uploaded_file, int $userId) : void {
         $currentTime = now();
         
