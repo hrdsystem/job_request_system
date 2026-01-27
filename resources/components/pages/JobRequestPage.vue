@@ -2479,34 +2479,6 @@ export default {
             }
         },
 
-        // tempLot2: {
-        //     handler(newVal) {
-        //         console.log('tempLot2 setter called:', newVal, 'uniqueLots:', this.uniqueLots);
-        //         if (newVal) {
-        //             const selectedLot = this.uniqueLots.find(lot => lot.lot === newVal);
-        //             console.log('Selected lot found:', selectedLot, 'Setting uniqueSubject to:', this.uniqueSubject);
-        //             this.uniqueSubject = selectedLot ? selectedLot.construction_code : '';
-        //         } else {
-        //             this.uniqueSubject = '';
-        //         }
-        //     },
-        //     immediate: true  // Add this to fire on init
-        // },
-        // // Your tempProjectName watcher can stay as-is, but wrap it similarly if needed
-        // tempProjectName(newVal) {
-        //     if(this.isEditing) return;
-        //     if (newVal) {
-        //         console.log('condition is on if statement');
-        //         const selectedProjectName = this.projectLists.find(project => project.project_name === newVal);
-        //         this.tempLot2 = selectedProjectName ? selectedProjectName.lot : '';
-        //     } else if (!newVal) {
-        //         this.tempLot2 = '';
-        //         console.log('condition is on else if statement');
-        //     } else {
-        //         console.log('not working');
-        //     }
-        // },
-
         requiredDocuments:{
             deep: true,
             handler(current) {
