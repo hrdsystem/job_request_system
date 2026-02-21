@@ -118,7 +118,7 @@ return [
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST_MYSQLICONN', '127.0.0.1'),
             'port' => env('DB_PORT_MYSQLICONN', '3306'),
-            'database' => env('DB_DATABASE_MYSQLICONN', 'forge'),
+            'database' => env('DB_ICONN_DATABASE', 'iconn_system_new2023'),
             'username' => env('DB_USERNAME_MYSQLICONN', 'forge'),
             'password' => env('DB_PASSWORD_MYSQLICONN', ''),
             'unix_socket' => env('DB_SOCKET', ''),
